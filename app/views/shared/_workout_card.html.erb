@@ -1,0 +1,26 @@
+# app/views/shared/_workout_card.html.erb
+<div class="col">
+  <div class="card h-100 shadow-sm">
+    <div class="card-body">
+      <!-- Workout title -->
+      <h5 class="card-title mb-1"><%= workout.name %></h5>
+
+      <!-- Muscle group label -->
+      <p class="card-text text-muted mb-2">
+        <strong>Target Muscle:</strong> <%= AppConstants::LABELS[workout.muscle_group.to_sym] %><br>
+        <% last_log = workout.workout_logs.order(created_at: :desc).first %>
+        <strong>Last performed:</strong>
+        <%= last_log ? last_log.created_at.strftime("%b %d, %Y") : "Never" %>
+      </p>
+
+      <!-- View button -->
+      <%= link_to "View",
+          split_plan_split_day_workout_path(
+            workout.split_day.split_plan,
+            workout.split_day,
+            workout
+          ),
+          class: "btn btn-outline-primary btn-sm" %>
+    </div>
+  </div>
+</div>

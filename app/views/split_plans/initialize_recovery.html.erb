@@ -1,0 +1,12 @@
+# app/views/split_plans/initialize_recovery.html.erb
+<%= form_with url: submit_recovery_split_plan_path(@split_plan), method: :post do %>
+  <% @muscles.each do |muscle| %>
+    <div class="mb-3">
+      <label><%= muscle.to_s.humanize %></label>
+      <%= date_field_tag "recovery_dates[#{muscle}]", nil, class: "form-control" %>
+    </div>
+  <% end %>
+
+  <%= submit_tag "Submit Recovery Data", class: "btn btn-primary" %>
+  <%= link_to "Skip", dashboard_path, class: "btn btn-outline-secondary ms-2" %>
+<% end %>

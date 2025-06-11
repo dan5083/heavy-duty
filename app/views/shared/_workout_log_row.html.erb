@@ -1,0 +1,9 @@
+<tr>
+  <td><%= log.created_at.strftime("%b %d, %Y") %></td>
+  <td><%= log.workout&.name || "—" %></td>
+  <td><%= AppConstants::LABELS[log.workout&.muscle_group] || "—" %></td>
+  <td>
+    <div><strong>Logged:</strong> <%= log.details.presence || content_tag(:em, "No details recorded") %></div>
+    <div class="text-muted small"><strong>Benchmark:</strong> <%= log.workout&.details.presence || "—" %></div>
+  </td>
+</tr>

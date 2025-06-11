@@ -1,0 +1,52 @@
+# app/views/split_plans/show.html.erb
+<h1><%= @split_plan.name %></h1>
+
+<% tracker = RecoveryTracker.new(@split_plan.user) %>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mt-4">
+  <% @split_plan.split_days.order(:day_number).each do |day| %>
+    <% workout = day.workouts.first %>
+    <% muscle = day.muscle_group.to_sym %>
+    <% ready_on = tracker.ready_date_for(muscle) %>
+    <% days_left = tracker.countdown_days_for(muscle) %>
+    <% presenter = WorkoutPresenter.new(workout) if workout %>
+
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><%= AppConstants::LABELS[muscle] %></h5>
+
+          <% if workout.present? %>
+            <p class="card-text mb-1"><strong>Workout:</strong> <%= presenter.name %></p>
+
+            <% if presenter.logged? %>
+              <p class="card-text text-muted mb-1">
+                Last Logged: <%= presenter.log_date %><br>
+                Volume: <%= presenter.volume %>
+                <% if presenter.note.present? %>
+                  <br><em>Note:</em> <%= presenter.note %>
+                <% end %>
+              </p>
+            <% else %>
+              <p class="text-muted mb-1"><em>No logs yet.</em></p>
+            <% end %>
+
+            <%= link_to "Log Workout", new_workout_workout_log_path(workout), class: "btn btn-sm btn-outline-success me-2 mt-2" %>
+          <% else %>
+            <p class="text-muted"><em>No workout assigned yet.</em></p>
+          <% end %>
+
+          <%= link_to "✏️ Edit Exercises", edit_split_plan_split_day_path(@split_plan, day), class: "btn btn-sm btn-outline-primary mt-2" %>
+
+          <hr class="my-3" />
+
+          <strong>🧠 Recovery:</strong>
+          <%= readiness_label(days_left) %>
+          <% if ready_on.present? %>
+            (on <%= ready_on.strftime("%b %d, %Y") %>)
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

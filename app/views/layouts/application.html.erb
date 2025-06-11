@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Heavy Duty" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <!-- ✅ Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+    <!-- Favicon and Touch Icons -->
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <!-- ✅ Rails app stylesheet -->
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+    <!-- ✅ JavaScript (Importmap + Turbo + Stimulus) -->
+    <%= javascript_importmap_tags %>
+
+    <!-- ✅ Bootstrap JS (for dropdowns, navbar toggler, etc.) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  </head>
+
+  <body>
+    <!-- ✅ Navbar -->
+    <%= render "shared/navbar" %>
+
+    <!-- ✅ Flash Messages -->
+    <div class="container mt-3">
+      <% if notice %>
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <%= notice %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% end %>
+
+      <% if alert %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= alert %>
+          <% unless user_signed_in? %>
+            <%= link_to "Sign In", new_user_session_path, class: "btn btn-sm btn-outline-light ms-3" %>
+          <% end %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- ✅ Main Content -->
+    <div class="container">
+      <%= yield %>
+    </div>
+
+    <!-- ✅ Chart.js for workout trends, recovery forecasts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  </body>
+</html>

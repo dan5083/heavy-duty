@@ -1,0 +1,14 @@
+# app/views/workouts/new.html.erb
+<h2>Add Workout for <%= AppConstants::LABELS[@split_day.muscle_group.to_sym] %></h2>
+
+<%= simple_form_for [@split_day, @workout] do |f| %>
+  <%= f.input :name,
+              label: "Select an exercise",
+              collection: @options,
+              prompt: false,
+              input_html: { class: "form-select" } %>
+
+  <%= f.input :muscle_group, as: :hidden, input_html: { value: @split_day.muscle_group } %>
+
+  <%= f.button :submit, "Add Workout", class: "btn btn-primary mt-2" %>
+<% end %>

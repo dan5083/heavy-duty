@@ -1,0 +1,41 @@
+<!-- app/views/split_plans/new.html.erb -->
+<h1>Choose Your Split Plan</h1>
+
+<%= form_with url: split_plans_path, method: :post, local: true do %>
+  <div data-controller="split-selector">
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      <% AppConstants::SPLITS.sort_by { |k, v| -v.size }.each_with_index do |(label, days), index| %>
+        <div class="col" data-split-selector-target="card">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title"><%= AppConstants::LABELS[label] %></h5>
+              <ul class="mb-3">
+                <% days.each_with_index do |muscle_group, i| %>
+                  <li>
+                    <strong>Workout <%= i + 1 %>:</strong>
+                    <%= AppConstants::LABELS[muscle_group] || muscle_group.to_s.humanize %>
+                  </li>
+                <% end %>
+              </ul>
+
+              <div class="form-check">
+                <%= radio_button_tag :split_plan_choice, label, index == 0,
+                      class: "form-check-input",
+                      id: "split_#{label}",
+                      data: {
+                        split_selector_target: "radio",
+                        action: "change->split-selector#highlightSelection"
+                      } %>
+                <%= label_tag "split_#{label}", "Choose this split", class: "form-check-label" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <%= submit_tag "Create Split Plan", class: "btn btn-success btn-lg" %>
+  </div>
+<% end %>

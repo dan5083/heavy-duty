@@ -1,0 +1,24 @@
+<h1 class="mb-4">📖 Training Log</h1>
+
+<h3 class="mt-4">🗓️ Logged Workouts:</h3>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Muscle Group</th>
+      <th>Workout</th>
+      <th>Date</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @logs.each do |log| %>
+      <tr>
+        <td><%= AppConstants::LABELS[log.workout.muscle_group] || log.workout.muscle_group.to_s.humanize %></td>
+        <td><%= log.workout.name %></td>
+        <td><%= log.created_at.strftime("%b %d, %Y") %></td>
+        <td><%= log.details.presence || content_tag(:em, "No details recorded") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,34 @@
+<h1 class="mb-4">💪 Training Dashboard</h1>
+
+<% if @next_ready %>
+  <div class="alert alert-info d-flex align-items-center mb-4 shadow-sm border-start border-4 border-primary" role="alert">
+    <i class="bi bi-flag me-3 fs-4 text-primary"></i>
+    <div>
+      <strong>Next-Up Muscle:</strong> <%= @next_ready[:label] %><br>
+      <small class="text-muted">
+        Ready for <%= pluralize(@next_ready[:days_ready], "day") %>
+        (since <%= @next_ready[:ready_on].strftime("%b %d") %>)
+      </small>
+    </div>
+  </div>
+<% end %>
+
+<% if current_split_muscles.none? { |m| @readiness_data[m].present? } %>
+  <div class="alert alert-warning">
+    <strong>No recovery data available yet.</strong><br>
+    Start logging workouts to unlock recovery tracking.
+  </div>
+<% end %>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+  <% current_split_muscles.each do |muscle| %>
+    <% data = @readiness_data[muscle] %>
+    <% next unless data %>
+    <% log_path = log_path_for_muscle(muscle, @workouts_by_muscle) %>
+    <% next unless log_path.present? %>
+
+    <div class="col">
+      <%= render partial: "muscle_countdown", locals: { muscle: muscle, data: data, log_path: log_path } %>
+    </div>
+  <% end %>
+</div>

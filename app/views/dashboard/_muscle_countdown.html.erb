@@ -1,0 +1,29 @@
+<% now = Time.current %>
+<% ready_on = data[:ready_on].to_time %>
+<% time_diff = ready_on - now %>
+
+<% if data[:days_left] <= 0 %>
+  <% label = "✅ Good to Go" %>
+  <% since = data[:ready_on].strftime("%b %d") %>
+  <% note = "Has been ready for #{pluralize(data[:days_ready], 'day')} (since #{since})" %>
+  <% color_class = "border-success text-success" %>
+<% else %>
+  <% days = (time_diff / 1.day).floor %>
+  <% hours = ((time_diff % 1.day) / 1.hour).floor %>
+  <% minutes = ((time_diff % 1.hour) / 1.minute).floor %>
+  <% note = "Will be ready in #{days}d #{hours}h #{minutes}m (on #{ready_on.strftime('%b %d')})" %>
+  <% label = "⏳ Recovering" %>
+  <% color_class = days <= 2 ? "border-warning text-warning" : "border-secondary text-muted" %>
+<% end %>
+
+<div class="card h-100 <%= color_class %>">
+  <div class="card-body">
+    <h5 class="card-title"><%= data[:label] %></h5>
+    <p class="card-text fw-bold"><%= label %></p>
+    <p class="small text-muted"><%= note %></p>
+
+    <% if log_path.present? %>
+      <%= link_to "Start Workout", log_path, class: "btn btn-sm btn-outline-success mt-2" %>
+    <% end %>
+  </div>
+</div>

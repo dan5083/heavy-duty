@@ -1,0 +1,2 @@
+module TrainingArchiveHelper
+end
