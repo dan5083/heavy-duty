@@ -1,4 +1,3 @@
-# app/views/split_days/edit.html.erb
 <h1>🛠️ Edit Exercises for <%= AppConstants::LABELS[@split_day.muscle_group.to_sym] %></h1>
 
 <%= simple_form_for [@split_day.split_plan, @split_day], url: split_plan_split_day_path(@split_day.split_plan, @split_day), method: :put do |f| %>

@@ -1,9 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  # ✅ Standalone user route
-  resources :users, only: [:show]
-
   # ✅ Nested workout logging structure with recovery seeding routes
   resources :split_plans, only: [:index, :new, :create, :show, :destroy] do
     member do
