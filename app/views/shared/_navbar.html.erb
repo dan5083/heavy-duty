@@ -25,7 +25,7 @@
             <span class="nav-link disabled">Signed in as <strong><%= current_user.email %></strong></span>
           </li>
           <li class="nav-item">
-            <%= link_to "Log Out", destroy_user_session_path, method: :delete, class: "nav-link" %>
+            <%= button_to "Log Out", destroy_user_session_path, method: :delete, class: "btn btn-link nav-link border-0 p-0", style: "background: none; color: rgba(255,255,255,.55);" %>
           </li>
         </ul>
       <% else %>

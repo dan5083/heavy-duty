@@ -76,18 +76,11 @@ app/
 ├── helpers/
 │   ├── application_helper.rb            # ✅ global view helpers
 │   ├── recovery_helper.rb               # ✅ readiness_label, current_split_muscles, log_path_for_muscle
-│   ├── workouts_helper.rb               # ✅ render_benchmark_details, parse_workout_details
-│   ├── split_days_helper.rb             # ✅ helpers for split day views or formatting
-│   ├── split_plans_helper.rb            # ✅ helpers for split plan display or utilities
-│   ├── training_archive_helper.rb       # ✅ helpers for archived training data display
-│   └── dashboard_helper.rb              # ✅ dashboard-specific helper methods
+│   └── workouts_helper.rb               # ✅ render_benchmark_details, parse_workout_details
 │
 ├── views/
 │   ├── layouts/
 │   │   └── application.html.erb         # ✅ Fixed layout with Importmap (no Vite)
-│   │
-│   ├── users/
-│   │   └── show.html.erb                # ✅ recovery dashboard (per-user)
 │   │
 │   ├── split_plans/
 │   │   ├── index.html.erb               # ✅ list of plans

@@ -1,2 +1,0 @@
-module SplitPlansHelper
-end

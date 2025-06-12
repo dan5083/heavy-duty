@@ -39,7 +39,14 @@ class SplitPlansController < ApplicationController
 
   def submit_recovery
     @split_plan = SplitPlan.find(params[:id])
-    recovery_dates = params[:recovery_dates] || {}
+
+    if params[:skip] == 'true'
+      # Set all muscles as ready for ~3 weeks (longer than any recovery cycle)
+      muscles = @split_plan.split_days.pluck(:muscle_group).uniq.map(&:to_sym)
+      recovery_dates = muscles.to_h { |muscle| [muscle.to_s, 3.weeks.ago.to_date] }
+    else
+      recovery_dates = params[:recovery_dates] || {}
+    end
 
     recovery_dates.each do |muscle_group, date|
       workout = Workout.find_or_create_by!(

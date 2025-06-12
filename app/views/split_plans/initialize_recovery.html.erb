@@ -7,5 +7,7 @@
   <% end %>
 
   <%= submit_tag "Submit Recovery Data", class: "btn btn-primary" %>
-  <%= link_to "Skip", dashboard_path, class: "btn btn-outline-secondary ms-2" %>
+  <%= button_to "Skip", submit_recovery_split_plan_path(@split_plan),
+      params: { skip: true },
+      class: "btn btn-outline-secondary ms-2" %>
 <% end %>
