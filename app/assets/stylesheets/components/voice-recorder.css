@@ -1,0 +1,62 @@
+.voice-btn {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0.375rem 0.375rem 0 !important;
+  padding: 0.375rem 0.75rem !important;
+}
+
+.voice-btn:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  color: white;
+}
+
+.voice-btn:focus {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  color: white;
+}
+
+/* Recording state */
+.voice-btn.btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  animation: pulse-record 1.5s infinite;
+}
+
+.voice-btn.btn-danger:hover {
+  background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+}
+
+@keyframes pulse-record {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
+
+/* Icon animations */
+.voice-btn .bi {
+  transition: transform 0.2s ease;
+}
+
+.voice-btn:hover .bi {
+  transform: scale(1.1);
+}
+
+.voice-btn.btn-danger .bi {
+  animation: record-pulse 0.8s infinite alternate;
+}
+
+@keyframes record-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}

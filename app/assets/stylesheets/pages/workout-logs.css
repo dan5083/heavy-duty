@@ -1,0 +1,7 @@
+.workout-logger {
+  padding-bottom: 120px; /* Space for fixed bottom */
+}
+
+body {
+  padding-bottom: 0 !important; /* Override any existing padding */
+}

@@ -111,7 +111,7 @@
     </div>
   </template>
 
-  <!-- Set Input Template -->
+<!-- Set Input Template -->
   <template data-log-builder-target="setTemplate">
     <div class="mb-4 set-row">
       <label class="form-label fw-bold text-primary">Set <span class="set-number"></span></label>
@@ -119,7 +119,7 @@
         <textarea class="form-control set-description"
                   rows="1"
                   placeholder="Describe your set - how heavy, how many reps, in amazing detail if you please! 💪"></textarea>
-        <button class="btn btn-outline-secondary voice-btn" type="button" title="Voice input">
+        <button class="btn voice-btn" type="button" title="Voice input">
           <i class="bi bi-mic"></i>
         </button>
       </div>
@@ -127,33 +127,3 @@
   </template>
 
 </div>
-
-<style>
-  .exercise-selector-card {
-    border: 2px solid #ddd;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .exercise-selector-card:hover {
-    background-color: #f8f9fa;
-    border-color: #0d6efd;
-  }
-
-  .exercise-workout-card {
-    border-left: 4px solid #0d6efd;
-  }
-
-  .workout-logger {
-    padding-bottom: 120px; /* Space for fixed bottom */
-  }
-
-  body {
-    padding-bottom: 0 !important; /* Override any existing padding */
-  }
-</style>

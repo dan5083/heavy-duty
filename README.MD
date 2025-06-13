@@ -1,3 +1,10 @@
+## ⚠️ Rails 8 + Propshaft CSS Architecture Note
+
+**IMPORTANT**: This app uses Rails 8 with Propshaft (not Sprockets). CSS components are compiled as separate files and must be explicitly included in the layout.
+
+When adding new CSS files in `app/assets/stylesheets/components/` or `app/assets/stylesheets/pages/`, you MUST update the stylesheet_link_tag in `app/views/layouts/application.html.erb`:
+
+
 ## 🧭 Part 1: Project Compass – polyrythmic-trainer
 
 ### 💡 Purpose
