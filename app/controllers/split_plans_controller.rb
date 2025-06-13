@@ -41,7 +41,6 @@ class SplitPlansController < ApplicationController
     @split_plan = SplitPlan.find(params[:id])
 
     if params[:skip] == 'true'
-      # Set all muscles as ready for ~3 weeks (longer than any recovery cycle)
       muscles = @split_plan.split_days.pluck(:muscle_group).uniq.map(&:to_sym)
       recovery_dates = muscles.to_h { |muscle| [muscle.to_s, 3.weeks.ago.to_date] }
     else
@@ -49,14 +48,22 @@ class SplitPlansController < ApplicationController
     end
 
     recovery_dates.each do |muscle_group, date|
-      workout = Workout.find_or_create_by!(
-        split_day: @split_plan.split_days.find_by(muscle_group: muscle_group),
-        muscle_group: muscle_group
+      split_day = @split_plan.split_days.find_by(muscle_group: muscle_group)
+
+      # Get benchmark data for this muscle group
+      benchmark_data = AppConstants::BENCHMARK_DATA[muscle_group.to_sym] || {}
+
+      # Create workout with proper name and details
+      workout = split_day.workouts.create!(
+        name: AppConstants::LABELS[muscle_group.to_sym],
+        muscle_group: muscle_group,
+        details: benchmark_data.to_json  # This should save the benchmark!
       )
 
       WorkoutLog.create!(
         user: current_user,
         workout: workout,
+        details: benchmark_data.to_json,
         created_at: date.to_date
       )
     end

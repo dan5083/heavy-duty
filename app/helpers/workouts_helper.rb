@@ -34,6 +34,8 @@ module WorkoutsHelper
   end
 
   def parse_workout_details(details)
+    return nil if details.blank?  # Add this line
+
     JSON.parse(details).yield_self do |parsed|
       if parsed.is_a?(Array) && parsed.first.is_a?(Hash)
         parsed.to_h { |entry| [entry["exercise"], entry["sets"]] }
