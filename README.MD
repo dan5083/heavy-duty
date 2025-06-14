@@ -5,11 +5,11 @@
 When adding new CSS files in `app/assets/stylesheets/components/` or `app/assets/stylesheets/pages/`, you MUST update the stylesheet_link_tag in `app/views/layouts/application.html.erb`:
 
 
-## 🧭 Part 1: Project Compass – polyrythmic-trainer
+## 🧭 Part 1: Project Compass – heavy-duty
 
 ### 💡 Purpose
 
-**Polyrythmic-Trainer** is a recovery-aware training organizer built for serious and self-directed lifters.
+**Heavy-Duty** is a recovery-aware training organizer built for serious and self-directed lifters.
 
 It helps users build and track their own custom workout schedules — based on chosen splits, exercises,
 and intensity. It intelligently managing recovery timelines for each muscle group.
@@ -17,7 +17,7 @@ and intensity. It intelligently managing recovery timelines for each muscle grou
 The system monitors how long each muscle has been resting, suggests what’s ready to train next, using boolians and time.
 *The app promotes well rehearsed sets, and adequate recovery time*
 
-*Polyrythmic-Trainer* enhances mental clarity by always showing you what’s coming up next in your split, keeping your next target muscle at the front of your focus before you even hit the gym.
+**Heavy-Duty** enhances mental clarity by always showing you what’s coming up next in your split, keeping your next target muscle at the front of your focus before you even hit the gym.
 
 **Behind the scenes, the app uses overlapping recovery cycles; as the number of cells in each muscle group varies greatly, so do their *periods* of recovery.**
 

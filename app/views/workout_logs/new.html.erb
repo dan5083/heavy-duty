@@ -1,58 +1,45 @@
 <!-- app/views/workout_logs/new.html.erb -->
 <div data-controller="log-builder" class="workout-logger">
 
-  <!-- Fixed Top Section: Collapsible Exercise Selector -->
+  <!-- Header -->
   <div class="sticky-top bg-white border-bottom shadow-sm p-3 mb-4">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="text-center">
       <h2 class="mb-0">Today's <%= AppConstants::LABELS[@workout.muscle_group.to_sym] %> Workout</h2>
-
-      <button class="btn btn-outline-primary"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#exercise-selector"
-              aria-expanded="false">
-        <i class="bi bi-plus-circle"></i> Add Exercise
-      </button>
+      <p class="text-muted mb-0">Edit your benchmark like a document</p>
     </div>
+  </div>
 
-    <!-- Collapsible Exercise Selector -->
-    <div class="collapse mt-3" id="exercise-selector">
-      <div class="card card-body">
-        <h6 class="mb-3">Select exercises to add to your workout:</h6>
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2" data-log-builder-target="exerciseGrid">
-          <% muscle_group = @workout.muscle_group.to_sym %>
-          <% exercises = AppConstants::WORKOUTS[muscle_group] || [] %>
-          <% exercises.each do |exercise| %>
-            <div class="col">
-              <div class="card exercise-selector-card text-center p-2"
-                   data-exercise="<%= exercise %>"
-                   data-action="click->log-builder#addExercise">
-                <small><strong><%= exercise %></strong></small>
-              </div>
+  <!-- Main Content: Single Unified Editor -->
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-body">
+            <textarea
+              data-log-builder-target="workoutEditor"
+              class="form-control workout-text-editor"
+              rows="20"
+              placeholder="# Exercise Name
+First set description...
+Second set description...
+
+# Another Exercise
+First set description...
+Second set description..."
+              style="font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace; font-size: 14px; line-height: 1.6;">
+            </textarea>
+
+            <div class="mt-3 text-muted small">
+              <strong>Format:</strong> Use <code># Exercise Name</code> for exercises, then describe each set on separate lines.
             </div>
-          <% end %>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Main Content: Today's Workout Cards -->
-  <div class="container-fluid">
-    <div id="workout-cards" data-log-builder-target="workoutCards" class="mb-5">
-      <!-- Exercise cards will be dynamically added here -->
-      <div class="text-center text-muted py-5" data-log-builder-target="emptyState">
-        <i class="bi bi-plus-circle display-1"></i>
-        <h4>Add exercises to start your workout</h4>
-        <p>Click "Add Exercise" above to get started</p>
-      </div>
-    </div>
-  </div>
-
   <!-- Fixed Bottom Section: Finish Workout -->
-  <div class="fixed-bottom bg-white border-top shadow p-3"
-       data-log-builder-target="finishSection"
-       style="display: none;">
-
+  <div class="fixed-bottom bg-white border-top shadow p-3">
     <%= form_with model: [@workout.split_day.split_plan, @workout.split_day, @workout, @log],
                   local: true,
                   id: "workout-form",
@@ -65,13 +52,13 @@
           <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="beat_benchmark" id="beat_yes" value="yes">
             <label class="form-check-label" for="beat_yes">
-              <strong class="text-success">✅ Beat my benchmark!</strong>
+              <strong class="text-success">✅ Update my benchmark</strong>
             </label>
           </div>
           <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="beat_benchmark" id="beat_no" value="no">
             <label class="form-check-label" for="beat_no">
-              <strong class="text-muted">📊 Standard workout</strong>
+              <strong class="text-muted">📊 Just save this workout</strong>
             </label>
           </div>
         </div>
@@ -79,51 +66,15 @@
         <div class="col-md-6 text-end">
           <%= f.submit "Finish Workout",
                        class: "btn btn-success btn-lg px-4",
-                       data: { log_builder_target: "submitButton" },
-                       disabled: true %>
+                       data: { log_builder_target: "submitButton" } %>
         </div>
       </div>
     <% end %>
   </div>
 
-  <!-- Benchmark Panel (if exists) -->
-  <% if @workout.details.present? %>
-    <div class="container-fluid mb-4">
-      <%= render "shared/benchmark_panel", workout: @workout %>
-    </div>
-  <% end %>
-
-  <!-- Exercise Card Template (hidden, used by Stimulus) -->
-  <template data-log-builder-target="exerciseCardTemplate">
-    <div class="card mb-3 exercise-workout-card" data-exercise="">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="mb-0 exercise-name"></h6>
-        <button type="button" class="btn btn-sm btn-outline-danger remove-exercise">
-          <i class="bi bi-trash"></i>
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="sets-container">
-          <!-- Sets will be added here -->
-        </div>
-        <!-- Remove the redundant Add Set button -->
-      </div>
-    </div>
-  </template>
-
-<!-- Set Input Template -->
-  <template data-log-builder-target="setTemplate">
-    <div class="mb-4 set-row">
-      <label class="form-label fw-bold text-primary">Set <span class="set-number"></span></label>
-      <div class="input-group">
-        <textarea class="form-control set-description"
-                  rows="1"
-                  placeholder="Describe your set - how heavy, how many reps, in amazing detail if you please! 💪"></textarea>
-        <button class="btn voice-btn" type="button" title="Voice input">
-          <i class="bi bi-mic"></i>
-        </button>
-      </div>
-    </div>
-  </template>
-
 </div>
+
+<!-- Pass benchmark data to JavaScript -->
+<script>
+  window.benchmarkData = <%= raw(@workout.details.present? ? @workout.details : '{}') %>;
+</script>

@@ -3,260 +3,96 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="log-builder"
 export default class extends Controller {
   static targets = [
-    "exerciseGrid",
-    "workoutCards",
-    "emptyState",
-    "finishSection",
+    "workoutEditor",
     "form",
     "hiddenDetails",
-    "submitButton",
-    "exerciseCardTemplate",
-    "setTemplate"
+    "submitButton"
   ]
 
   connect() {
-    console.log("Single-page log builder controller connected")
-    console.log("Available targets:", this.targets)
-    console.log("Template target available:", this.hasExerciseCardTemplateTarget)
-    console.log("Set template available:", this.hasSetTemplateTarget)
+    console.log("🚀 Unified workout editor connected!")
 
-    this.exerciseData = new Map() // Store data for each exercise
-    this.setCounters = new Map() // Track set numbers per exercise
-    this.updateUI()
-  }
+    this.benchmarkData = window.benchmarkData || {}
+    console.log("Benchmark data:", this.benchmarkData)
 
-  addExercise(event) {
-    const card = event.currentTarget
-    const exerciseName = card.dataset.exercise
+    // Pre-populate editor with formatted benchmark text
+    this.loadBenchmarkText()
 
-    // Don't add if already exists
-    if (this.exerciseData.has(exerciseName)) {
-      this.showMessage("Exercise already added!", "warning")
-      return
-    }
-
-    // Initialize exercise data
-    this.exerciseData.set(exerciseName, [])
-    this.setCounters.set(exerciseName, 0)
-
-    // Create exercise card
-    this.createExerciseCard(exerciseName)
-
-    // Update UI
-    this.updateUI()
-
-    // Collapse the selector
-    const collapse = new bootstrap.Collapse(document.getElementById('exercise-selector'), {
-      toggle: true
+    // Add event listener for text changes
+    this.workoutEditorTarget.addEventListener('input', () => {
+      this.updateHiddenField()
     })
 
-    this.showMessage(`Added ${exerciseName}`, "success")
-  }
-
-  createExerciseCard(exerciseName) {
-    // Clone the template
-    const template = this.exerciseCardTemplateTarget.content.cloneNode(true)
-    const card = template.querySelector('.exercise-workout-card')
-
-    // Set exercise name and data
-    card.dataset.exercise = exerciseName
-    card.querySelector('.exercise-name').textContent = exerciseName
-
-    // Add to DOM first
-    this.workoutCardsTarget.appendChild(card)
-
-    // Now add event listeners (elements are in DOM)
-    const actualCard = this.workoutCardsTarget.querySelector(`[data-exercise="${exerciseName}"]`)
-
-    const removeButton = actualCard.querySelector('.remove-exercise')
-    if (removeButton) {
-      removeButton.addEventListener('click', () => {
-        this.removeExercise(exerciseName)
-      })
-    }
-
-    // Add first set automatically
-    this.addSet(exerciseName)
-  }
-
-  addSet(exerciseName) {
-    const exerciseCard = this.workoutCardsTarget.querySelector(`[data-exercise="${exerciseName}"]`)
-    const setsContainer = exerciseCard.querySelector('.sets-container')
-
-    // Increment set counter
-    const currentCount = this.setCounters.get(exerciseName) + 1
-    this.setCounters.set(exerciseName, currentCount)
-
-    // Clone set template
-    const template = this.setTemplateTarget.content.cloneNode(true)
-    const setRow = template.querySelector('.set-row')
-
-    // Set the set number
-    setRow.querySelector('.set-number').textContent = currentCount
-
-    // Add to DOM first
-    setsContainer.appendChild(setRow)
-
-    // Now add event listeners (elements are in DOM)
-    const textarea = setsContainer.lastElementChild.querySelector('.set-description')
-    const voiceBtn = setsContainer.lastElementChild.querySelector('.voice-btn')
-
-    if (textarea) {
-      textarea.addEventListener('input', () => {
-        this.updateExerciseData(exerciseName)
-      })
-    }
-
-    if (voiceBtn) {
-      voiceBtn.addEventListener('click', () => {
-        this.startVoiceRecognition(textarea, voiceBtn)
-      })
-    }
-
-    // Update data
-    this.updateExerciseData(exerciseName)
-  }
-
-  startVoiceRecognition(textarea, button) {
-    // Check if browser supports speech recognition
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      this.showMessage("Voice recognition not supported in this browser", "warning")
-      return
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    const recognition = new SpeechRecognition()
-
-    recognition.continuous = true
-    recognition.interimResults = true
-    recognition.lang = 'en-US'
-
-    // Visual feedback
-    button.classList.add('btn-danger')
-    button.innerHTML = '<i class="bi bi-record-circle"></i>'
-    button.disabled = true
-
-    recognition.onstart = () => {
-      console.log('Voice recognition started')
-    }
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript
-      textarea.value = transcript
-      textarea.dispatchEvent(new Event('input')) // Trigger the input event
-      this.showMessage(`Voice captured: "${transcript}"`, "success")
-    }
-
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error)
-      this.showMessage(`Voice recognition error: ${event.error}`, "danger")
-    }
-
-    recognition.onend = () => {
-      // Reset button
-      button.classList.remove('btn-danger')
-      button.innerHTML = '<i class="bi bi-mic"></i>'
-      button.disabled = false
-    }
-
-    recognition.start()
-  }
-
-  removeSet(exerciseName, setRow) {
-    setRow.remove()
-    this.updateExerciseData(exerciseName)
-    this.updateUI()
-  }
-
-  removeExercise(exerciseName) {
-    // Remove from data
-    this.exerciseData.delete(exerciseName)
-    this.setCounters.delete(exerciseName)
-
-    // Remove from DOM
-    const card = this.workoutCardsTarget.querySelector(`[data-exercise="${exerciseName}"]`)
-    if (card) card.remove()
-
-    this.updateUI()
-    this.showMessage(`Removed ${exerciseName}`, "info")
-  }
-
-  updateExerciseData(exerciseName) {
-    const exerciseCard = this.workoutCardsTarget.querySelector(`[data-exercise="${exerciseName}"]`)
-    const setRows = exerciseCard.querySelectorAll('.set-row')
-
-    const sets = []
-    let shouldAddNewSet = false
-
-    setRows.forEach((row, index) => {
-      const description = row.querySelector('.set-description').value.trim()
-
-      if (description) {
-        sets.push(description)
-        // If this is the last row and it has content, we should add a new set
-        if (index === setRows.length - 1) {
-          shouldAddNewSet = true
-        }
-      }
-    })
-
-    this.exerciseData.set(exerciseName, sets)
-
-    // Add new set if the last one was filled
-    if (shouldAddNewSet) {
-      this.addSet(exerciseName)
-    }
-
-    this.updateUI()
-  }
-
-  updateUI() {
-    const hasExercises = this.exerciseData.size > 0
-    const hasSets = Array.from(this.exerciseData.values()).some(sets => sets.length > 0)
-
-    // Show/hide empty state
-    this.emptyStateTarget.style.display = hasExercises ? 'none' : 'block'
-
-    // Show/hide finish section
-    this.finishSectionTarget.style.display = hasSets ? 'block' : 'none'
-
-    // Enable/disable submit button
-    this.submitButtonTarget.disabled = !hasSets
-
-    // Update hidden field with JSON data
     this.updateHiddenField()
   }
 
-  updateHiddenField() {
-    const workoutData = {}
+  loadBenchmarkText() {
+    const formattedText = this.formatWorkoutData(this.benchmarkData)
+    this.workoutEditorTarget.value = formattedText
+  }
 
-    this.exerciseData.forEach((sets, exercise) => {
-      if (sets.length > 0) {
-        workoutData[exercise] = sets // Just store the array of description strings
+  formatWorkoutData(data) {
+    // Convert JSON benchmark data to markdown-style text
+    if (!data || Object.keys(data).length === 0) {
+      return "# Exercise Name\nDescribe your first set...\nDescribe your second set...\n\n# Another Exercise\nDescribe your first set...\nDescribe your second set..."
+    }
+
+    let text = ""
+    Object.entries(data).forEach(([exerciseName, sets], index) => {
+      if (index > 0) text += "\n\n"
+      text += `# ${exerciseName}\n`
+      sets.forEach(set => {
+        text += `${set}\n`
+      })
+    })
+
+    // Add template for new exercise at the end
+    text += "\n\n# \n"
+
+    return text
+  }
+
+  parseWorkoutText(text) {
+    // Convert markdown-style text back to JSON
+    const workoutData = {}
+    const lines = text.split('\n')
+    let currentExercise = null
+
+    lines.forEach(line => {
+      line = line.trim()
+
+      if (line.startsWith('# ')) {
+        // This is an exercise header
+        currentExercise = line.substring(2).trim()
+        if (currentExercise) {
+          workoutData[currentExercise] = []
+        }
+      } else if (line && currentExercise) {
+        // This is a set description
+        workoutData[currentExercise].push(line)
       }
     })
 
-    this.hiddenDetailsTarget.value = JSON.stringify(workoutData)
-    console.log("Workout data prepared:", workoutData) // Debug logging
+    // Remove any exercises with no sets
+    Object.keys(workoutData).forEach(exercise => {
+      if (workoutData[exercise].length === 0) {
+        delete workoutData[exercise]
+      }
+    })
+
+    return workoutData
   }
 
-  showMessage(text, type = "info") {
-    // Create a temporary toast/alert
-    const alertDiv = document.createElement('div')
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`
-    alertDiv.style.cssText = 'top: 100px; right: 20px; z-index: 1050; max-width: 300px;'
-    alertDiv.innerHTML = `
-      ${text}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `
+  updateHiddenField() {
+    const text = this.workoutEditorTarget.value
+    const workoutData = this.parseWorkoutText(text)
 
-    document.body.appendChild(alertDiv)
+    this.hiddenDetailsTarget.value = JSON.stringify(workoutData)
 
-    // Auto-remove after 3 seconds
-    setTimeout(() => {
-      if (alertDiv.parentNode) {
-        alertDiv.remove()
-      }
-    }, 3000)
+    // Enable/disable submit button based on content
+    const hasContent = Object.keys(workoutData).length > 0
+    this.submitButtonTarget.disabled = !hasContent
+
+    console.log("Parsed workout data:", workoutData)
   }
 }
