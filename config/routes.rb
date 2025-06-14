@@ -1,10 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  # ✅ PWA routes
-  get '/manifest.json', to: 'pwa#manifest'
-  get '/service-worker.js', to: 'pwa#service_worker'
-
   # ✅ Nested workout logging structure with recovery seeding routes
   resources :split_plans, only: [:index, :new, :create, :show, :destroy] do
     member do
