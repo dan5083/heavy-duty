@@ -45,9 +45,13 @@ git push origin --delete feature-name        # Delete remote branch
 # git checkout -b next-feature-name
 
 # 📝 QUICK REFERENCE
-# Check current branch:     git branch
-# See all branches:         git branch -a
-# Switch branches:          git checkout branch-name
-# Check status:             git status
+# Check current branch:
+git branch
+# See all branches:
+git branch -a
+# Switch branches:
+git checkout branch-name
+# Check status:
+git status
 # test a feature on Heroku before merging to main:
-#                           git push heroku feature-name:main
+git push heroku feature-name:main
