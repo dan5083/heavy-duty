@@ -196,21 +196,6 @@ export default class extends Controller {
     }
   }
 
-  // Delete this badge
-  delete(event) {
-    event.stopPropagation()
-
-    this.dispatch('badgeDeleted', {
-      detail: {
-        type: this.typeValue,
-        content: this.contentValue,
-        exerciseId: this.exerciseIdValue
-      }
-    })
-
-    this.element.remove()
-  }
-
   // Add new badge after this one
   addAfter(event) {
     event.stopPropagation()

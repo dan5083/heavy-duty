@@ -22,7 +22,6 @@ export default class extends Controller {
 
     // Listen for badge change events
     this.element.addEventListener('badge-editor:badge-changed', this.handleBadgeChange.bind(this))
-    this.element.addEventListener('badge-editor:badge-deleted', this.handleBadgeDelete.bind(this))
     this.element.addEventListener('badge-editor:add-badge', this.handleAddBadge.bind(this))
 
     this.updateHiddenField()
@@ -122,13 +121,6 @@ export default class extends Controller {
             data-badge-editor-exercise-id-value="${exerciseIndex}"
             data-action="click->badge-editor#edit">
         <span class="badge-text">${badge.content}</span>
-        <span class="badge-actions">
-          <button class="btn btn-sm badge-delete-btn"
-                  data-action="click->badge-editor#delete"
-                  onclick="event.stopPropagation()">
-            <i class="bi bi-x"></i>
-          </button>
-        </span>
       </span>
     `
   }
@@ -349,12 +341,6 @@ export default class extends Controller {
   // Handle badge changes from badge-editor
   handleBadgeChange(event) {
     console.log('Badge changed:', event.detail)
-    this.updateWorkoutData()
-  }
-
-  // Handle badge deletions
-  handleBadgeDelete(event) {
-    console.log('Badge deleted:', event.detail)
     this.updateWorkoutData()
   }
 

@@ -114,46 +114,6 @@
   border-color: #a6a8c4;
 }
 
-/* Badge Actions */
-.badge-actions {
-  margin-left: 0.25rem;
-  opacity: 0;
-  transition: opacity 0.15s ease-in-out;
-}
-
-.workout-badge:hover .badge-actions {
-  opacity: 1;
-}
-
-.badge-delete-btn {
-  background: none;
-  border: none;
-  color: currentColor;
-  font-size: 0.75rem;
-  padding: 0.125rem 0.25rem;
-  cursor: pointer;
-  border-radius: 0.25rem;
-  opacity: 0.7;
-  transition: all 0.2s ease;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.2rem;
-  height: 1.2rem;
-}
-
-.badge-delete-btn:hover {
-  opacity: 1;
-  background-color: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
-  transform: translateY(-1px);
-}
-
-.badge-delete-btn:active {
-  transform: translateY(0);
-}
-
 /* Badge Dropdown - Mobile Optimized */
 .badge-dropdown {
   background: white;
