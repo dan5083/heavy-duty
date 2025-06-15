@@ -1,0 +1,301 @@
+/* app/assets/stylesheets/components/badge-editor.css */
+
+/* Badge Container */
+.badge-container {
+  min-height: 300px;
+  padding: 1.5rem;
+  border: 2px dashed #dee2e6;
+  border-radius: 0.5rem;
+  background-color: #fafafa;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  line-height: 2;
+}
+
+.badge-container:focus-within {
+  border-color: #0d6efd;
+  background-color: #fff;
+}
+
+/* Exercise Headers */
+.exercise-header {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 1.5rem 0 0.5rem 0;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.exercise-header:first-child {
+  margin-top: 0;
+}
+
+/* Set Lines */
+.set-line {
+  margin: 0.75rem 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.set-number {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+/* Badge Base Styles */
+.workout-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  position: relative;
+  user-select: none;
+  margin: 0.125rem;
+  border: 1px solid transparent;
+}
+
+.workout-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.workout-badge:active {
+  transform: translateY(0);
+}
+
+/* Badge Type Colors */
+.badge-status {
+  background-color: #cfe2ff;
+  color: #084298;
+  border-color: #b6d4fe;
+}
+
+.badge-status:hover {
+  background-color: #9ec5fe;
+  border-color: #86b7fe;
+}
+
+.badge-reps {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border-color: #badbcc;
+}
+
+.badge-reps:hover {
+  background-color: #a3cfbb;
+  border-color: #75b798;
+}
+
+.badge-weight {
+  background-color: #fff3cd;
+  color: #664d03;
+  border-color: #ffecb5;
+}
+
+.badge-weight:hover {
+  background-color: #ffe69c;
+  border-color: #ffda6a;
+}
+
+.badge-reflection {
+  background-color: #e2e3f1;
+  color: #3d3d71;
+  border-color: #d0d1e2;
+}
+
+.badge-reflection:hover {
+  background-color: #c5c6d8;
+  border-color: #a6a8c4;
+}
+
+/* Badge Actions */
+.badge-actions {
+  margin-left: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.workout-badge:hover .badge-actions {
+  opacity: 1;
+}
+
+.badge-delete-btn {
+  background: none;
+  border: none;
+  color: currentColor;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.25rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
+}
+
+.badge-delete-btn:hover {
+  opacity: 1;
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  transform: translateY(-1px);
+}
+
+.badge-delete-btn:active {
+  transform: translateY(0);
+}
+
+/* Badge Dropdown - Mobile Optimized */
+.badge-dropdown {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  max-height: 250px; /* Taller for mobile */
+  overflow-y: auto;
+  z-index: 1000;
+  min-width: 180px;
+  animation: fadeInUp 0.15s ease-out;
+  /* Mobile scroll optimization */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.badge-option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f8f9fa;
+  transition: background-color 0.15s ease-in-out;
+  font-size: 0.875rem;
+  /* Better touch targets for mobile */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.badge-option:last-child {
+  border-bottom: none;
+}
+
+.badge-option:hover,
+.badge-option:active {
+  background-color: #f8f9fa !important;
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+  .badge-dropdown {
+    max-height: 200px; /* Shorter on small screens */
+    min-width: 160px;
+    /* Better positioning on mobile */
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 80vw;
+    max-width: 300px;
+  }
+
+  .badge-option {
+    padding: 1rem;
+    font-size: 1rem;
+    min-height: 48px; /* Larger touch targets */
+  }
+}
+
+/* Add Badge Button */
+.add-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+  background-color: transparent;
+  border: 1px dashed #6c757d;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  margin: 0.125rem;
+}
+
+.add-badge-btn:hover {
+  color: #0d6efd;
+  border-color: #0d6efd;
+  background-color: #f8f9fa;
+}
+
+/* Empty State */
+.empty-exercise {
+  padding: 2rem;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .badge-container {
+    padding: 1rem;
+  }
+
+  .workout-badge {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .set-line {
+    gap: 0.25rem;
+  }
+
+  .badge-dropdown {
+    min-width: 180px;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus States for Accessibility */
+.workout-badge:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+.badge-option:focus {
+  background-color: #e9ecef;
+  outline: none;
+}
+
+/* Badge Creation Animation */
+.badge-creating {
+  animation: badgeSlideIn 0.3s ease-out;
+}
+
+@keyframes badgeSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

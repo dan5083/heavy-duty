@@ -5,32 +5,45 @@
   <div class="sticky-top bg-white border-bottom shadow-sm p-3 mb-4">
     <div class="text-center">
       <h2 class="mb-0">Today's <%= AppConstants::LABELS[@workout.muscle_group.to_sym] %> Workout</h2>
-      <p class="text-muted mb-0">Edit your benchmark like a document</p>
+      <p class="text-muted mb-0">Click badges to edit • Add exercises with <code>+</code></p>
     </div>
   </div>
 
-  <!-- Main Content: Single Unified Editor -->
+  <!-- Main Content: Badge Editor -->
   <div class="container-fluid">
     <div class="row justify-content-center">
-      <div class="col-lg-8">
+      <div class="col-lg-10">
         <div class="card">
-          <div class="card-body">
-            <textarea
-              data-log-builder-target="workoutEditor"
-              class="form-control workout-text-editor"
-              rows="20"
-              placeholder="# Exercise Name
-First set description...
-Second set description...
+          <div class="card-body p-0">
+            <!-- Badge Container -->
+            <div class="badge-container"
+                 data-log-builder-target="badgeContainer"
+                 data-action="click->log-builder#addExercise">
 
-# Another Exercise
-First set description...
-Second set description..."
-              style="font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace; font-size: 14px; line-height: 1.6;">
-            </textarea>
+              <!-- Exercises will be rendered here -->
+              <div data-log-builder-target="exerciseList">
+                <!-- Initial content loaded from benchmark -->
+              </div>
 
-            <div class="mt-3 text-muted small">
-              <strong>Format:</strong> Use <code># Exercise Name</code> for exercises, then describe each set on separate lines.
+              <!-- Empty State -->
+              <div class="empty-exercise" data-log-builder-target="emptyState">
+                <i class="bi bi-plus-circle display-4 text-muted"></i>
+                <h5 class="text-muted mt-3">Click anywhere to add your first exercise</h5>
+                <p class="text-muted">Or type <code>#</code> to search exercises</p>
+              </div>
+
+            </div>
+
+            <!-- Help Text -->
+            <div class="p-3 border-top bg-light">
+              <div class="text-muted small">
+                <strong>Quick Tips:</strong>
+                <span class="badge badge-status ms-2">Status</span>
+                <span class="badge badge-reps ms-1">Reps</span>
+                <span class="badge badge-weight ms-1">Weight</span>
+                <span class="badge badge-reflection ms-1">Notes</span>
+                • Click any badge to change it • Hover for actions
+              </div>
             </div>
           </div>
         </div>
@@ -74,7 +87,16 @@ Second set description..."
 
 </div>
 
-<!-- Pass benchmark data to JavaScript -->
+<!-- Pass exercise and benchmark data to JavaScript -->
 <script>
   window.benchmarkData = <%= raw(@workout.details.present? ? @workout.details : '{}') %>;
+  window.availableExercises = <%= raw(AppConstants::WORKOUTS[@workout.muscle_group.to_sym].to_json) %>;
 </script>
+
+<!-- Debug: Force badge colors -->
+<style>
+  .badge-status { background-color: #cfe2ff !important; color: #084298 !important; }
+  .badge-reps { background-color: #d1e7dd !important; color: #0f5132 !important; }
+  .badge-weight { background-color: #fff3cd !important; color: #664d03 !important; }
+  .badge-reflection { background-color: #e2e3f1 !important; color: #3d3d71 !important; }
+</style>

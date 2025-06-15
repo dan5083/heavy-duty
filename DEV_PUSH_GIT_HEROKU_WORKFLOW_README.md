@@ -8,6 +8,8 @@ tree -I "node_modules|.git|.DS_Store|*.log|coverage|build|dist|tmp"
 # Show all controllers with filenames as headers:
 for file in app/controllers/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 
+for file in app/views/**/*.html.erb; do echo "=== $file ==="; cat "$file"; echo; done
+
 # 1️⃣ CREATE & SWITCH TO NEW BRANCH
 git checkout -b feature-name
 

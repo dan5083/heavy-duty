@@ -29,7 +29,7 @@ class SplitPlansController < ApplicationController
 
     # 🆕 Redirect to post-creation recovery seeding
     redirect_to initialize_recovery_split_plan_path(@split_plan),
-                notice: "Split plan created! Now let’s set up your recent training."
+                notice: "Split plan created! Now let's set up your recent training."
   end
 
   def initialize_recovery
@@ -50,14 +50,14 @@ class SplitPlansController < ApplicationController
     recovery_dates.each do |muscle_group, date|
       split_day = @split_plan.split_days.find_by(muscle_group: muscle_group)
 
-      # Get benchmark data for this muscle group
-      benchmark_data = AppConstants::BENCHMARK_DATA[muscle_group.to_sym] || {}
+      # 🆕 Generate benchmark data using CLAUSE_LIBRARY instead of hardcoded BENCHMARK_DATA
+      benchmark_data = generate_initial_benchmark(muscle_group.to_sym)
 
       # Create workout with proper name and details
       workout = split_day.workouts.create!(
         name: AppConstants::LABELS[muscle_group.to_sym],
         muscle_group: muscle_group,
-        details: benchmark_data.to_json  # This should save the benchmark!
+        details: benchmark_data.to_json
       )
 
       WorkoutLog.create!(
@@ -85,5 +85,50 @@ class SplitPlansController < ApplicationController
 
   def split_plan_params
     params.require(:split_plan).permit(:name, :split_length)
+  end
+
+  # 🆕 Generate initial benchmark using CLAUSE_LIBRARY patterns
+  def generate_initial_benchmark(muscle_group)
+    exercises = AppConstants::WORKOUTS[muscle_group] || []
+    return {} if exercises.empty?
+
+    # Pick 2-4 random exercises for the initial benchmark
+    sample_exercises = exercises.sample(rand(2..4))
+
+    benchmark = {}
+    sample_exercises.each do |exercise|
+      # Generate 2-3 sets using clause patterns
+      sets_count = rand(2..3)
+      sets = []
+
+      sets_count.times do |i|
+        set_description = generate_set_description(i + 1, exercise)
+        sets << set_description
+      end
+
+      benchmark[exercise] = sets
+    end
+
+    benchmark
+  end
+
+  def generate_set_description(set_number, exercise)
+    # Use CLAUSE_LIBRARY to build realistic set descriptions
+    status_options = ["First set", "Second set", "Third set"]
+    weight_options = ["at #{rand(20..100)} kilos", "with bodyweight", "at #{rand(60..90)}% intensity"]
+    reps_options = ["#{rand(6..15)} reps", "to failure", "#{rand(8..12)} reps"]
+    reflection_options = ["kept it smooth", "felt heavy", "perfect form", "solid effort", "could go heavier next time"]
+
+    status = set_number == 1 ? "First set" : status_options[set_number - 1] || "Working set"
+    weight = weight_options.sample
+    reps = reps_options.sample
+    reflection = reflection_options.sample
+
+    # Handle bodyweight exercises
+    if exercise.include?("Push-Up") || exercise.include?("Pull-Up") || exercise.include?("Dip")
+      weight = "with bodyweight"
+    end
+
+    "#{status} was #{reps} #{weight}, #{reflection}."
   end
 end
