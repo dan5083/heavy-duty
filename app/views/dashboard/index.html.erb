@@ -13,7 +13,7 @@
   </div>
 <% end %>
 
-<% if current_split_muscles.none? { |m| @readiness_data[m].present? } %>
+<% if @readiness_data.none? { |m, data| data.present? } %>
   <div class="alert alert-warning">
     <strong>No recovery data available yet.</strong><br>
     Start logging workouts to unlock recovery tracking.
@@ -21,9 +21,7 @@
 <% end %>
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-  <% current_split_muscles.each do |muscle| %>
-    <% data = @readiness_data[muscle] %>
-    <% next unless data %>
+  <% @readiness_data.each do |muscle, data| %>
     <% log_path = log_path_for_muscle(muscle, @workouts_by_muscle) %>
     <% next unless log_path.present? %>
 

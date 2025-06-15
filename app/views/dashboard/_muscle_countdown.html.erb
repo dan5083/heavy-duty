@@ -11,7 +11,14 @@
   <% days = (time_diff / 1.day).floor %>
   <% hours = ((time_diff % 1.day) / 1.hour).floor %>
   <% minutes = ((time_diff % 1.hour) / 1.minute).floor %>
-  <% note = "Will be ready in #{days}d #{hours}h #{minutes}m (on #{ready_on.strftime('%b %d')})" %>
+
+  <% countdown_html = raw("
+    <span class='countdown-number'>#{days}</span><span class='countdown-unit'>D</span>
+    <span class='countdown-number'>#{hours}</span><span class='countdown-unit'>H</span>
+    <span class='countdown-number'>#{minutes}</span><span class='countdown-unit'>M</span>
+  ") %>
+
+  <% note = raw("Will be ready in #{countdown_html} (on #{ready_on.strftime('%b %d')})") %>
   <% label = "⏳ Recovering" %>
   <% color_class = days <= 2 ? "border-warning text-warning" : "border-secondary text-muted" %>
 <% end %>

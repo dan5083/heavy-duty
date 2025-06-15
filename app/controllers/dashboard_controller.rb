@@ -19,12 +19,14 @@ class DashboardController < ApplicationController
     muscles = latest_plan.split_days.pluck(:muscle_group).map(&:to_sym).uniq
     filtered_data = all_data.slice(*muscles)
 
-    # Sort: ready muscles by longest waiting first, then recovering by soonest
-    @readiness_data = filtered_data.sort_by do |_, data|
+    # Sort: ready muscles first (by days_ready ascending), then recovering muscles last
+    @readiness_data = filtered_data.sort_by do |muscle, data|
       if data[:days_left] <= 0
-        [-data[:days_ready], 0] # Prioritize long-ready muscles
+        # Ready muscles: category 0 (first), sort by days_ready ascending
+        [0, data[:days_ready], muscle.to_s]
       else
-        [Float::INFINITY, data[:days_left]] # Then sort recovering by time left
+        # Recovering muscles: category 1 (last), sort by days_left ascending
+        [1, data[:days_left], muscle.to_s]
       end
     end.to_h
 

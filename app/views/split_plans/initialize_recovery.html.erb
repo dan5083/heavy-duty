@@ -1,13 +1,13 @@
-<%= form_with url: submit_recovery_split_plan_path(@split_plan), method: :post do %>
+<%= form_with url: submit_recovery_split_plan_path(@split_plan), method: :post, local: true do %>
   <% @muscles.each do |muscle| %>
     <div class="mb-3">
       <label><%= muscle.to_s.humanize %></label>
-      <%= date_field_tag "recovery_dates[#{muscle}]", nil, class: "form-control" %>
+      <%= date_field_tag "recovery_dates[#{muscle}]", Date.current, class: "form-control" %>
     </div>
   <% end %>
 
-  <%= submit_tag "Submit Recovery Data", class: "btn btn-primary" %>
-  <%= button_to "Skip", submit_recovery_split_plan_path(@split_plan),
-      params: { skip: true },
-      class: "btn btn-outline-secondary ms-2" %>
+  <div class="mt-4">
+    <%= submit_tag "Submit Recovery Data", class: "btn btn-primary" %>
+    <%= submit_tag "Skip (Use 3 weeks ago)", name: "skip", value: "true", class: "btn btn-outline-secondary ms-2" %>
+  </div>
 <% end %>
