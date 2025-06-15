@@ -30,8 +30,7 @@
               <p class="text-muted mb-1"><em>No logs yet.</em></p>
             <% end %>
 
-            <%= link_to "Log Workout", new_workout_workout_log_path(workout), class: "btn btn-sm btn-outline-success me-2 mt-2" %>
-          <% else %>
+            <%= link_to "Log Workout", new_split_plan_split_day_workout_workout_log_path(@split_plan, day, workout), class: "btn btn-sm btn-outline-success me-2 mt-2" %>          <% else %>
             <p class="text-muted"><em>No workout assigned yet.</em></p>
           <% end %>
 

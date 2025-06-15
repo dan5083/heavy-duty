@@ -24,6 +24,11 @@ export default class extends Controller {
     this.element.addEventListener('badge-editor:badge-changed', this.handleBadgeChange.bind(this))
     this.element.addEventListener('badge-editor:add-badge', this.handleAddBadge.bind(this))
 
+    // Listen for form submission to capture current badge state
+    if (this.hasFormTarget) {
+      this.formTarget.addEventListener('submit', this.handleFormSubmit.bind(this))
+    }
+
     this.updateHiddenField()
   }
 
@@ -307,6 +312,9 @@ export default class extends Controller {
     const exerciseId = event.target.dataset.exerciseId
     console.log(`Adding set to exercise ${exerciseId}`)
 
+    // First update our data from current badge state
+    this.updateWorkoutData()
+
     // Find exercise in benchmark data and add a sample set
     const exercises = Object.keys(this.benchmarkData)
     const exerciseName = exercises[exerciseId]
@@ -323,6 +331,9 @@ export default class extends Controller {
     const exerciseId = event.target.dataset.exerciseId
     console.log(`Deleting exercise ${exerciseId}`)
 
+    // First update our data from current badge state
+    this.updateWorkoutData()
+
     const exercises = Object.keys(this.benchmarkData)
     const exerciseName = exercises[exerciseId]
 
@@ -338,9 +349,16 @@ export default class extends Controller {
     }
   }
 
-  // Handle badge changes from badge-editor
+  // Handle form submission - ensure we capture current badge state
+  handleFormSubmit(event) {
+    console.log("Form submitting - capturing current badge state...")
+    this.updateWorkoutData()
+  }
+
+  // Handle badge changes from badge-editor (FIXED - no re-rendering!)
   handleBadgeChange(event) {
     console.log('Badge changed:', event.detail)
+    // Update data but DON'T re-render to preserve other badge states
     this.updateWorkoutData()
   }
 
@@ -350,12 +368,50 @@ export default class extends Controller {
     // For now, just log - could show badge type selector
   }
 
-  // Update internal workout data from current badge state
+  // Update internal workout data from current badge state (FIXED!)
   updateWorkoutData() {
-    // Read current badge state and update benchmarkData
-    // This is a simplified version - in full implementation,
-    // would parse all badges back to text format
+    // Rebuild benchmarkData by reading current badge states from DOM
+    const newBenchmarkData = {}
+
+    // Get all exercise blocks
+    const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
+
+    exerciseBlocks.forEach((block, exerciseIndex) => {
+      // Get exercise name from header
+      const exerciseHeader = block.querySelector('.exercise-header span')
+      if (!exerciseHeader) return
+
+      const exerciseName = exerciseHeader.textContent.replace('🏋️ ', '').trim()
+      newBenchmarkData[exerciseName] = []
+
+      // Get all set lines for this exercise (exclude add set button line)
+      const setLines = block.querySelectorAll('.set-line[data-set-index]')
+
+      setLines.forEach((setLine) => {
+        // Get all badges in this set
+        const badges = setLine.querySelectorAll('[data-controller="badge-editor"]')
+        const badgeTexts = []
+
+        badges.forEach(badge => {
+          const content = badge.getAttribute('data-badge-editor-content-value')
+          if (content) {
+            badgeTexts.push(content)
+          }
+        })
+
+        // Reconstruct set description from badges
+        if (badgeTexts.length > 0) {
+          const setDescription = badgeTexts.join(', ')
+          newBenchmarkData[exerciseName].push(setDescription)
+        }
+      })
+    })
+
+    // Update our internal state
+    this.benchmarkData = newBenchmarkData
     this.updateHiddenField()
+
+    console.log("Rebuilt workout data from current badge state:", this.benchmarkData)
   }
 
   // Update hidden field for form submission

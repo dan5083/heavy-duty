@@ -1,14 +1,19 @@
 
-# 🚀 FEATURE BRANCH WORKFLOW
-# Replace 'feature-name' with your actual feature (e.g., 'add-rest-timer', 'fix-mobile-ui')
 
 
 # FYI to see decluttered tree use:
 tree -I "node_modules|.git|.DS_Store|*.log|coverage|build|dist|tmp"
-# Show all controllers with filenames as headers:
+# Show all controllers.rb with filenames as headers:
 for file in app/controllers/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
-
+# Show all views with filenames as headers:
 for file in app/views/**/*.html.erb; do echo "=== $file ==="; cat "$file"; echo; done
+# Show all js controllers with filenames as headers:
+for file in app/javascript/controllers/**/*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
+
+
+# 🚀 FEATURE BRANCH WORKFLOW
+# Replace 'feature-name' with your actual feature (e.g., 'add-rest-timer', 'fix-mobile-ui')
+
 
 # 1️⃣ CREATE & SWITCH TO NEW BRANCH
 git checkout -b feature-name
