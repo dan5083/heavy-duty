@@ -2,7 +2,7 @@
 
 /* Badge Dropdown - Enhanced with Texture */
 .badge-dropdown {
-  background-image: url('dropdown-texture.jpg');
+  background-image: url('/textures/dropdown-texture.jpg');
   background-size: cover;
   background-position: center;
   border: 1px solid rgba(0,0,0,0.15);
@@ -64,7 +64,7 @@
 
 /* Bootstrap Dropdown Enhancement */
 .dropdown-menu {
-  background-image: url('dropdown-texture.jpg');
+  background-image: url('/textures/dropdown-texture.jpg');
   background-size: cover;
   background-position: center;
   border: 1px solid rgba(0,0,0,0.15);
@@ -121,7 +121,7 @@
 
 /* Exercise Selector Dropdown (Special for Workout App) */
 .exercise-selector-dropdown {
-  background-image: url('dropdown-texture.jpg');
+  background-image: url('/textures/dropdown-texture.jpg');
   background-size: cover;
   background-position: center;
   border: 1px solid rgba(0,0,0,0.15);
@@ -177,17 +177,17 @@
   border-bottom: none;
 }
 
-/* Mobile Specific Improvements */
+/* Mobile Specific Improvements - FIXED POSITIONING */
 @media (max-width: 768px) {
   .badge-dropdown {
-    max-height: 200px;
-    min-width: 160px;
     position: fixed !important;
-    left: 50% !important;
     top: 50% !important;
+    left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 80vw;
-    max-width: 300px;
+    width: 80vw !important;
+    max-width: 300px !important;
+    max-height: 60vh !important;
+    z-index: 9999 !important;
   }
 
   .badge-option {
@@ -198,12 +198,13 @@
 
   .exercise-selector-dropdown {
     position: fixed !important;
-    left: 50% !important;
     top: 50% !important;
+    left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 90vw;
-    max-width: 350px;
-    max-height: 70vh;
+    width: 90vw !important;
+    max-width: 350px !important;
+    max-height: 70vh !important;
+    z-index: 9999 !important;
   }
 
   .exercise-option {
@@ -280,27 +281,4 @@
   outline: 2px solid #0d6efd;
   outline-offset: -2px;
   background: rgba(13, 110, 253, 0.1);
-}
-
-/* Dark Mode Adjustments (if implemented) */
-@media (prefers-color-scheme: dark) {
-  .badge-dropdown,
-  .exercise-selector-dropdown,
-  .dropdown-menu {
-    background-image:
-      linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
-      url('dropdown-texture.jpg');
-  }
-
-  .badge-option,
-  .exercise-option,
-  .dropdown-item {
-    color: #e9ecef;
-  }
-
-  .badge-option:hover::before,
-  .exercise-option:hover::before,
-  .dropdown-item:hover::before {
-    background: rgba(255,255,255,0.1);
-  }
 }

@@ -264,7 +264,7 @@
 
 /* Enhanced Badge Dropdown with Texture - ADD TO EXISTING .badge-dropdown */
 .badge-dropdown {
-  background-image: url('dropdown-texture.jpg');
+  background-image: url('/textures/dropdown-texture.jpg');
   background-size: cover;
   background-position: center;
   /* ... keep all your existing styles ... */
