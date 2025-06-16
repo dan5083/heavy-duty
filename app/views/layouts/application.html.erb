@@ -25,9 +25,14 @@
     <link rel="manifest" href="/manifest.json">
 
     <!-- ✅ Rails app stylesheet -->
-    <%= stylesheet_link_tag "application", "components/buttons", "pages/workout-logs", "data-turbo-track": "reload" %>
-
-    <!-- ✅ JavaScript (Importmap + Turbo + Stimulus) -->
+    <%= stylesheet_link_tag "application",
+        "components/buttons",
+        "components/badge-editor",
+        "components/forms",        # ← NEW
+        "components/dropdowns",    # ← NEW
+        "pages/workout-logs",
+        "data-turbo-track": "reload" %>
+        <!-- ✅ JavaScript (Importmap + Turbo + Stimulus) -->
     <%= javascript_importmap_tags %>
 
     <!-- ✅ Bootstrap JS (for dropdowns, navbar toggler, etc.) -->

@@ -1,0 +1,306 @@
+/* app/assets/stylesheets/components/dropdowns.css */
+
+/* Badge Dropdown - Enhanced with Texture */
+.badge-dropdown {
+  background-image: url('dropdown-texture.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 0.5rem 1rem rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 1000;
+  min-width: 180px;
+  animation: fadeInUp 0.15s ease-out;
+  backdrop-filter: blur(2px);
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Badge Dropdown Options */
+.badge-option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  transition: all 0.15s ease-in-out;
+  font-size: 0.875rem;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: rgba(255,255,255,0.1);
+}
+
+.badge-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0);
+  transition: background 0.15s ease-in-out;
+  pointer-events: none;
+}
+
+.badge-option:hover::before,
+.badge-option:active::before {
+  background: rgba(255,255,255,0.2);
+}
+
+.badge-option:last-child {
+  border-bottom: none;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+.badge-option:first-child {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+/* Bootstrap Dropdown Enhancement */
+.dropdown-menu {
+  background-image: url('dropdown-texture.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow:
+    0 0.5rem 1rem rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  backdrop-filter: blur(2px);
+}
+
+.dropdown-item {
+  background: rgba(255,255,255,0.05);
+  transition: all 0.15s ease-in-out;
+  position: relative;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0);
+  transition: background 0.15s ease-in-out;
+  pointer-events: none;
+}
+
+.dropdown-item:hover::before,
+.dropdown-item:focus::before {
+  background: rgba(255,255,255,0.15);
+}
+
+.dropdown-item:active {
+  background: rgba(0,0,0,0.05);
+}
+
+/* Dropdown Headers */
+.dropdown-header {
+  background: rgba(0,0,0,0.05);
+  color: #6c757d;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Dropdown Dividers */
+.dropdown-divider {
+  border-top: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* Exercise Selector Dropdown (Special for Workout App) */
+.exercise-selector-dropdown {
+  background-image: url('dropdown-texture.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 0.5rem 1rem rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  min-width: 300px;
+  backdrop-filter: blur(2px);
+  -webkit-overflow-scrolling: touch;
+}
+
+.exercise-selector-dropdown .p-3 {
+  background: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.exercise-option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  transition: all 0.15s ease-in-out;
+  background: rgba(255,255,255,0.05);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.exercise-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0);
+  transition: background 0.15s ease-in-out;
+  pointer-events: none;
+}
+
+.exercise-option:hover::before {
+  background: rgba(255,255,255,0.15);
+}
+
+.exercise-option:last-child {
+  border-bottom: none;
+}
+
+/* Mobile Specific Improvements */
+@media (max-width: 768px) {
+  .badge-dropdown {
+    max-height: 200px;
+    min-width: 160px;
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 80vw;
+    max-width: 300px;
+  }
+
+  .badge-option {
+    padding: 1rem;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+
+  .exercise-selector-dropdown {
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90vw;
+    max-width: 350px;
+    max-height: 70vh;
+  }
+
+  .exercise-option {
+    padding: 1rem;
+    min-height: 48px;
+    font-size: 1rem;
+  }
+
+  .dropdown-menu {
+    min-width: 200px;
+  }
+
+  .dropdown-item {
+    padding: 0.75rem 1rem;
+    min-height: 44px;
+    font-size: 1rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar Styling for Dropdowns */
+.badge-dropdown::-webkit-scrollbar,
+.exercise-selector-dropdown::-webkit-scrollbar,
+.dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.badge-dropdown::-webkit-scrollbar-track,
+.exercise-selector-dropdown::-webkit-scrollbar-track,
+.dropdown-menu::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+.badge-dropdown::-webkit-scrollbar-thumb,
+.exercise-selector-dropdown::-webkit-scrollbar-thumb,
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.3);
+  border-radius: 3px;
+}
+
+.badge-dropdown::-webkit-scrollbar-thumb:hover,
+.exercise-selector-dropdown::-webkit-scrollbar-thumb:hover,
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.5);
+}
+
+/* Focus States for Accessibility */
+.badge-option:focus,
+.exercise-option:focus,
+.dropdown-item:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: -2px;
+  background: rgba(13, 110, 253, 0.1);
+}
+
+/* Dark Mode Adjustments (if implemented) */
+@media (prefers-color-scheme: dark) {
+  .badge-dropdown,
+  .exercise-selector-dropdown,
+  .dropdown-menu {
+    background-image:
+      linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+      url('dropdown-texture.jpg');
+  }
+
+  .badge-option,
+  .exercise-option,
+  .dropdown-item {
+    color: #e9ecef;
+  }
+
+  .badge-option:hover::before,
+  .exercise-option:hover::before,
+  .dropdown-item:hover::before {
+    background: rgba(255,255,255,0.1);
+  }
+}
