@@ -9,6 +9,8 @@ for file in app/controllers/*.rb; do echo "=== $file ==="; cat "$file"; echo; do
 for file in app/views/**/*.html.erb; do echo "=== $file ==="; cat "$file"; echo; done
 # Show all js controllers with filenames as headers:
 for file in app/javascript/controllers/**/*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
+# For all CSS files in stylesheets directory
+for file in app/assets/stylesheets/**/*.css; do echo "=== $file ==="; cat "$file"; echo; done
 
 
 # 🚀 FEATURE BRANCH WORKFLOW

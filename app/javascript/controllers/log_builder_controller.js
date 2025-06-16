@@ -184,7 +184,7 @@ export default class extends Controller {
       badges.push({ type: 'weight', content: `at ${percentMatch[1]}% 1RM` })
     }
 
-    // Extract reflection badges
+    // Extract reflection badges - IMPROVED DETECTION
     if (text.includes('felt heavy') || text.includes('heavy')) {
       badges.push({ type: 'reflection', content: 'felt heavy' })
     } else if (text.includes('felt light') || text.includes('light')) {
@@ -203,6 +203,9 @@ export default class extends Controller {
       badges.push({ type: 'reflection', content: 'solid effort' })
     } else if (text.includes('great pump') || text.includes('pump')) {
       badges.push({ type: 'reflection', content: 'great pump' })
+    } else if (text.includes('felt good') || text.includes('felt great') || text.includes('good')) {
+      // FIX 2: Add this common reflection pattern that was missing
+      badges.push({ type: 'reflection', content: 'felt good' })
     }
 
     // If no badges found, try to intelligently categorize the whole text
@@ -219,6 +222,11 @@ export default class extends Controller {
     // Ensure we have at least a status if none was detected
     if (!badges.find(b => b.type === 'status')) {
       badges.unshift({ type: 'status', content: 'Working set' })
+    }
+
+    // FIX 2: Ensure we always have a reflection badge if none was found
+    if (!badges.find(b => b.type === 'reflection')) {
+      badges.push({ type: 'reflection', content: 'felt good' })
     }
 
     return badges
@@ -289,15 +297,16 @@ export default class extends Controller {
     }, 100)
   }
 
-  // Add selected exercise with sample sets
+  // Add selected exercise with sample sets - FIX 1: Only one set
   selectExercise(exerciseName) {
     console.log(`Adding exercise: ${exerciseName}`)
 
     // Add to benchmark data
     if (!this.benchmarkData[exerciseName]) {
+      // FIX 1: Only add ONE set instead of two
+      // FIX 2: Ensure the reflection badge is included by using "felt good"
       this.benchmarkData[exerciseName] = [
-        "Working set 10 reps at 70 kilos, felt good",
-        "Working set 8 reps at 75 kilos, perfect form"
+        "Working set was 10 reps at 70 kilos, felt good"
       ]
     }
 
@@ -320,7 +329,7 @@ export default class extends Controller {
     const exerciseName = exercises[exerciseId]
 
     if (exerciseName) {
-      this.benchmarkData[exerciseName].push("Working set 10 reps at 70 kilos, solid effort")
+      this.benchmarkData[exerciseName].push("Working set was 10 reps at 70 kilos, solid effort")
       this.renderWorkoutBadges()
       this.updateHiddenField()
     }
