@@ -1,0 +1,18 @@
+/* app/assets/stylesheets/components/alerts.css */
+.alert-success {
+  background-image:
+    linear-gradient(rgba(25, 135, 84, 0.1), rgba(25, 135, 84, 0.1)),
+    url('/textures/alert-success-texture.jpg');
+}
+
+.alert-danger {
+  background-image:
+    linear-gradient(rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.1)),
+    url('/textures/alert-danger-texture.jpg');
+}
+
+.alert-info {
+  background-image:
+    linear-gradient(rgba(13, 110, 253, 0.1), rgba(13, 110, 253, 0.1)),
+    url('/textures/alert-info-texture.jpg');
+}
