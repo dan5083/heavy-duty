@@ -23,14 +23,14 @@
   <% color_class = days <= 2 ? "border-warning text-warning" : "border-secondary text-muted" %>
 <% end %>
 
-<div class="card h-100 <%= color_class %>">
+<div class="card nav-style h-100 <%= color_class %>">
   <div class="card-body">
     <h5 class="card-title"><%= data[:label] %></h5>
     <p class="card-text fw-bold"><%= label %></p>
     <p class="small text-muted"><%= note %></p>
 
     <% if log_path.present? %>
-      <%= link_to "Start Workout", log_path, class: "btn btn-sm btn-outline-success mt-2" %>
+      <%= link_to "Start Workout", log_path, class: "btn btn-sm btn-primary mt-2" %>
     <% end %>
   </div>
 </div>

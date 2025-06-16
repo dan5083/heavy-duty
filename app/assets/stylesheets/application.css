@@ -8,7 +8,7 @@
  */
 
 /* Import authentic handwritten fonts */
-@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Indie+Flower&family=Shadows+Into+Light&family=Permanent+Marker&family=Handlee&family=Amatic+SC:wght@400;700&family=Fredoka+One&family=Covered+By+Your+Grace&family=Kalam:wght@300;400;700&family=Schoolbell&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Indie+Flower&family=Shadows+Into+Light&family=Permanent+Marker&family=Handlee&family=Amatic+SC:wght@400;700&family=Fredoka+One&family=Covered+By+Your+Grace&family=Kalam:wght@300;400;700&family=Schoolbell&family=Caveat:wght@400;700&display=swap');
 
 /* Base body - default paper */
 body {
@@ -18,7 +18,7 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   min-height: 100vh;
-  font-family: 'Indie Flower', cursive;
+  font-family: 'Caveat', cursive;
   color: #2d3748;
   line-height: 1.6;
 }
@@ -108,7 +108,7 @@ nav.navbar,
 }
 
 .navbar-brand {
-  font-family: 'Permanent Marker', cursive !important;
+  font-family: 'Caveat', cursive !important;
   font-weight: 400 !important;
   font-size: 1.8rem !important;
   color: #f5f5f5 !important;
@@ -123,7 +123,7 @@ nav.navbar,
 }
 
 .nav-link {
-  font-family: 'Architects Daughter', cursive !important;
+  font-family: 'Caveat', cursive !important;
   color: rgba(245, 245, 245, 0.8) !important;
   font-weight: 400;
   font-size: 1.1rem !important;
@@ -138,7 +138,7 @@ nav.navbar,
 
 /* Handwritten typography */
 h1 {
-  font-family: 'Permanent Marker', cursive;
+  font-family: 'Caveat', cursive;
   font-size: 2.5rem;
   color: #1a365d;
   text-shadow: 1px 1px 0px rgba(26, 54, 93, 0.3);
@@ -148,7 +148,7 @@ h1 {
 }
 
 h2 {
-  font-family: 'Architects Daughter', cursive;
+  font-family: 'Caveat', cursive;
   font-size: 1.8rem;
   color: #276749;
   text-shadow: 0.5px 0.5px 0px rgba(39, 103, 73, 0.3);
@@ -157,7 +157,7 @@ h2 {
 }
 
 h3 {
-  font-family: 'Handlee', cursive;
+  font-family: 'Caveat', cursive;
   font-size: 1.4rem;
   color: #553c9a;
   text-shadow: 0.5px 0.5px 0px rgba(85, 60, 154, 0.3);
@@ -175,7 +175,7 @@ h3 {
   border: 1px solid rgba(180, 170, 150, 0.3);
   border-radius: 8px;
   padding: 16px 20px;
-  font-family: 'Kalam', cursive;
+  font-family: 'Caveat', cursive;
   font-size: 1rem;
   font-weight: 400;
   color: #2d3748;
@@ -203,7 +203,7 @@ h3 {
 
 /* Labels */
 label, .form-label {
-  font-family: 'Covered By Your Grace', cursive;
+  font-family: 'Caveat', cursive;
   color: #744210;
   font-weight: 400;
   font-size: 1.2rem;
@@ -213,26 +213,6 @@ label, .form-label {
   transform: rotate(-0.3deg);
 }
 
-/* Buttons */
-.btn-primary, .btn[type="submit"] {
-  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
-  border: 1px solid #1a365d;
-  color: #ffffff;
-  font-family: 'Amatic SC', cursive;
-  font-weight: 700;
-  font-size: 1.2rem;
-  padding: 14px 32px;
-  border-radius: 8px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
 
 .btn-primary:hover {
   background: linear-gradient(135deg, #2d3748 0%, #1a365d 100%);
@@ -247,7 +227,7 @@ label, .form-label {
 /* Links */
 a {
   color: #1a365d;
-  font-family: 'Handlee', cursive;
+  font-family: 'Caveat', cursive;
   font-weight: 400;
   font-size: 1rem;
   text-decoration: none;
@@ -277,14 +257,14 @@ a:hover::after {
 
 /* Card titles and text */
 .card-title {
-  font-family: 'Architects Daughter', cursive;
+  font-family: 'Caveat', cursive;
   font-weight: 400;
   color: #1a365d;
   font-size: 1.4rem;
 }
 
 .card-text {
-  font-family: 'Indie Flower', cursive;
+  font-family: 'Caveat', cursive;
   color: #2d3748;
   line-height: 1.6;
 }
