@@ -26,6 +26,7 @@
 
     <!-- ✅ Rails app stylesheet -->
     <%= stylesheet_link_tag "application",
+        "animations/typography",
         "components/buttons",
         "components/badge-editor",
         "components/forms",
@@ -34,7 +35,7 @@
         "components/dropdowns",
         "pages/workout-logs",
         "data-turbo-track": "reload" %>
-        <!-- ✅ JavaScript (Importmap + Turbo + Stimulus) -->
+    <!-- ✅ JavaScript (Importmap + Turbo + Stimulus) -->
     <%= javascript_importmap_tags %>
 
     <!-- ✅ Bootstrap JS (for dropdowns, navbar toggler, etc.) -->
