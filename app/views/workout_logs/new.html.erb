@@ -5,7 +5,7 @@
   <div class="sticky-top bg-white border-bottom shadow-sm p-3 mb-4">
     <div class="text-center">
       <h2 class="mb-0">Today's <%= AppConstants::LABELS[@workout.muscle_group.to_sym] %> Workout</h2>
-      <p class="text-muted mb-0">Click badges to edit • Add exercises with <code>+</code></p>
+      <p class="text-muted mb-0">Tap badges to edit • Add exercises with <code>+</code></p>
     </div>
   </div>
 
@@ -28,8 +28,8 @@
               <!-- Empty State -->
               <div class="empty-exercise" data-log-builder-target="emptyState">
                 <i class="bi bi-plus-circle display-4 text-muted"></i>
-                <h5 class="text-muted mt-3">Click anywhere to add your first exercise</h5>
-                <p class="text-muted">Or type <code>#</code> to search exercises</p>
+                <h5 class="text-muted mt-3">Tap anywhere to add your first exercise</h5>
+                <p class="text-muted">Start building your workout</p>
               </div>
 
             </div>
@@ -42,7 +42,7 @@
                 <span class="badge badge-reps ms-1">Reps</span>
                 <span class="badge badge-weight ms-1">Weight</span>
                 <span class="badge badge-reflection ms-1">Notes</span>
-                • Click any badge to change it • Hover for actions
+                • Tap any badge to change it
               </div>
             </div>
           </div>
@@ -86,6 +86,9 @@
   </div>
 
 </div>
+
+<!-- Badge Modal - Will be created by JavaScript -->
+<!-- The modal HTML is dynamically created by badge_editor_controller.js -->
 
 <!-- Pass exercise and benchmark data to JavaScript -->
 <script>
