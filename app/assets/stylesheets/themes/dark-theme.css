@@ -1,0 +1,556 @@
+/* app/assets/stylesheets/themes/dark-theme.css */
+
+/* ===============================================
+   DARK THEME - CSS CUSTOM PROPERTIES
+   Heavy Duty Workout App
+   =============================================== */
+
+:root {
+  /* === CORE DARK COLORS === */
+  --bg-primary: #0d1117;          /* Deep dark background */
+  --bg-secondary: #161b22;        /* Card/panel background */
+  --bg-tertiary: #21262d;         /* Elevated surfaces */
+  --bg-overlay: #30363d;          /* Modals, dropdowns */
+
+  /* === SURFACE COLORS === */
+  --surface-glass: rgba(255, 255, 255, 0.05);  /* Glassmorphism base */
+  --surface-hover: rgba(255, 255, 255, 0.1);   /* Hover states */
+  --surface-active: rgba(255, 255, 255, 0.15); /* Active states */
+
+  /* === TEXT COLORS === */
+  --text-primary: #f0f6fc;        /* Main text */
+  --text-secondary: #8b949e;      /* Secondary text */
+  --text-muted: #6e7681;          /* Muted text */
+  --text-inverse: #0d1117;        /* Dark text on light bg */
+
+  /* === ACCENT COLORS === */
+  --accent-primary: #58a6ff;      /* Primary blue */
+  --accent-success: #3fb950;      /* Success green */
+  --accent-warning: #f85149;      /* Warning/danger red */
+  --accent-info: #79c0ff;         /* Info cyan */
+  --accent-recovery: #a5a5a5;     /* Recovery gray */
+
+  /* === BORDER COLORS === */
+  --border-default: #30363d;      /* Default borders */
+  --border-muted: #21262d;        /* Subtle borders */
+  --border-emphasis: #f0f6fc;     /* Emphasized borders */
+
+  /* === GLASSMORPHISM BLUR === */
+  --glass-blur: blur(16px);       /* Standard blur */
+  --glass-blur-light: blur(8px);  /* Light blur */
+  --glass-blur-heavy: blur(24px); /* Heavy blur */
+
+  /* === SHADOWS === */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 16px 48px rgba(0, 0, 0, 0.4);
+  --shadow-floating: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+/* ===============================================
+   GLOBAL DARK THEME APPLICATION
+   =============================================== */
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===============================================
+   BOOTSTRAP COMPONENT OVERRIDES
+   =============================================== */
+
+/* === CONTAINERS === */
+.container,
+.container-fluid {
+  background: transparent;
+}
+
+/* === CARDS === */
+.card {
+  background: var(--surface-glass);
+  border: 1px solid var(--border-muted);
+  border-radius: 16px;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-glass);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-default);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.card-body {
+  color: var(--text-primary);
+}
+
+.card-title {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.card-text {
+  color: var(--text-secondary);
+}
+
+/* === NAVIGATION === */
+.navbar {
+  background: var(--surface-glass) !important;
+  border: 1px solid var(--border-muted);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-glass);
+}
+
+.navbar-brand {
+  color: var(--text-primary) !important;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+  color: var(--text-secondary) !important;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--accent-primary) !important;
+}
+
+.navbar-toggler {
+  border-color: var(--border-default);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28240, 246, 252, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* === BUTTONS === */
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary), #4c9aff);
+  border: 1px solid var(--accent-primary);
+  color: var(--text-inverse);
+  box-shadow: 0 4px 16px rgba(88, 166, 255, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4c9aff, var(--accent-primary));
+  border-color: #4c9aff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(88, 166, 255, 0.4);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--accent-success), #2ea043);
+  border: 1px solid var(--accent-success);
+  color: var(--text-inverse);
+  box-shadow: 0 4px 16px rgba(63, 185, 80, 0.3);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #2ea043, var(--accent-success));
+  border-color: #2ea043;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(63, 185, 80, 0.4);
+}
+
+.btn-outline-primary {
+  background: var(--surface-glass);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.btn-outline-primary:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: var(--text-inverse);
+  transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+  background: var(--surface-glass);
+  border: 1px solid var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.btn-outline-secondary:hover {
+  background: var(--surface-hover);
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+/* === ALERTS === */
+.alert {
+  border-radius: 12px;
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid transparent;
+}
+
+.alert-info {
+  background: rgba(121, 192, 255, 0.1);
+  border-color: var(--accent-info);
+  color: var(--accent-info);
+}
+
+.alert-warning {
+  background: rgba(248, 81, 73, 0.1);
+  border-color: var(--accent-warning);
+  color: var(--accent-warning);
+}
+
+.alert-success {
+  background: rgba(63, 185, 80, 0.1);
+  border-color: var(--accent-success);
+  color: var(--accent-success);
+}
+
+.alert-danger {
+  background: rgba(248, 81, 73, 0.1);
+  border-color: var(--accent-warning);
+  color: var(--accent-warning);
+}
+
+.alert-secondary {
+  background: var(--surface-glass);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+/* === FORMS === */
+.form-control,
+.form-select {
+  background: var(--surface-glass);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  color: var(--text-primary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background: var(--surface-hover);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 0.25rem rgba(88, 166, 255, 0.25);
+  color: var(--text-primary);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-label {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.form-check-input {
+  background-color: var(--surface-glass);
+  border: 1px solid var(--border-default);
+}
+
+.form-check-input:checked {
+  background-color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.form-check-label {
+  color: var(--text-primary);
+}
+
+/* === LIST GROUPS === */
+.list-group {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.list-group-item {
+  background: var(--surface-glass);
+  border: 1px solid var(--border-muted);
+  color: var(--text-primary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+}
+
+.list-group-item:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-default);
+}
+
+/* === TABLES === */
+.table {
+  color: var(--text-primary);
+}
+
+.table-dark {
+  --bs-table-bg: var(--bg-secondary);
+  --bs-table-border-color: var(--border-default);
+}
+
+.table thead th {
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+
+.table td {
+  border-top: 1px solid var(--border-muted);
+}
+
+/* === BADGES === */
+.badge {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+}
+
+.bg-primary {
+  background: linear-gradient(135deg, var(--accent-primary), #4c9aff) !important;
+}
+
+.bg-success {
+  background: linear-gradient(135deg, var(--accent-success), #2ea043) !important;
+}
+
+/* ===============================================
+   MUSCLE COUNTDOWN SPECIFIC STYLES
+   =============================================== */
+
+.nav-style {
+  background: var(--surface-glass) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+}
+
+/* Recovery Status Colors */
+.border-success {
+  border-color: var(--accent-success) !important;
+}
+
+.text-success {
+  color: var(--accent-success) !important;
+}
+
+.border-warning {
+  border-color: #f59e0b !important;
+}
+
+.text-warning {
+  color: #f59e0b !important;
+}
+
+.border-secondary {
+  border-color: var(--accent-recovery) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Countdown Numbers */
+.countdown-number {
+  color: var(--accent-primary);
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+.countdown-unit {
+  color: var(--text-muted);
+  font-size: 0.85em;
+  margin-right: 0.5rem;
+}
+
+/* ===============================================
+   WORKOUT BADGE SPECIFIC STYLES
+   =============================================== */
+
+.workout-badge {
+  backdrop-filter: var(--glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--glass-blur-light) !important;
+  border-radius: 12px !important;
+  padding: 0.5rem 1rem !important;
+  margin: 0.25rem !important;
+  border: 1px solid transparent !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.badge-status {
+  background: rgba(88, 166, 255, 0.2) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+}
+
+.badge-reps {
+  background: rgba(63, 185, 80, 0.2) !important;
+  border-color: var(--accent-success) !important;
+  color: var(--accent-success) !important;
+}
+
+.badge-weight {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border-color: #f59e0b !important;
+  color: #f59e0b !important;
+}
+
+.badge-reflection {
+  background: rgba(165, 165, 165, 0.2) !important;
+  border-color: var(--accent-recovery) !important;
+  color: var(--accent-recovery) !important;
+}
+
+.workout-badge:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ===============================================
+   EXERCISE BLOCKS
+   =============================================== */
+
+.exercise-block {
+  background: var(--surface-glass);
+  border: 1px solid var(--border-muted);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-glass);
+}
+
+.exercise-header {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.set-line {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.set-number {
+  font-weight: 700;
+  color: var(--accent-primary);
+  min-width: 3rem;
+}
+
+.add-badge-btn {
+  background: var(--surface-hover);
+  border: 1px dashed var(--border-default);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.add-badge-btn:hover {
+  background: var(--surface-active);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+/* ===============================================
+   STICKY ELEMENTS
+   =============================================== */
+
+.sticky-top {
+  background: var(--surface-glass) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border-bottom: 1px solid var(--border-default) !important;
+}
+
+.fixed-bottom {
+  background: var(--surface-glass) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border-top: 1px solid var(--border-default) !important;
+}
+
+/* ===============================================
+   UTILITIES
+   =============================================== */
+
+.bg-light {
+  background: var(--bg-secondary) !important;
+}
+
+.bg-white {
+  background: var(--surface-glass) !important;
+}
+
+.border-top {
+  border-top: 1px solid var(--border-default) !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--border-default) !important;
+}
+
+/* ===============================================
+   RESPONSIVE ENHANCEMENTS
+   =============================================== */
+
+@media (max-width: 768px) {
+  .card {
+    border-radius: 12px;
+  }
+
+  .btn {
+    border-radius: 10px;
+  }
+
+  .form-control,
+  .form-select {
+    border-radius: 10px;
+  }
+
+  .workout-badge {
+    border-radius: 8px !important;
+    padding: 0.4rem 0.8rem !important;
+  }
+}
+
+/* ===============================================
+   ANIMATION SUPPORT
+   =============================================== */
+
+* {
+  transition-property: background-color, border-color, color, box-shadow, transform;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

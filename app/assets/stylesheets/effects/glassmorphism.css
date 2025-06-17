@@ -1,0 +1,437 @@
+/* app/assets/stylesheets/effects/glassmorphism.css */
+
+/* ===============================================
+   GLASSMORPHISM EFFECTS SYSTEM
+   Heavy Duty Workout App
+   =============================================== */
+
+/* ===============================================
+   GLASSMORPHISM BASE CLASSES
+   =============================================== */
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-heavy {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-intense {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* ===============================================
+   COLORED GLASS VARIANTS
+   =============================================== */
+
+.glass-primary {
+  background: rgba(88, 166, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(88, 166, 255, 0.2);
+  box-shadow:
+    0 8px 32px rgba(88, 166, 255, 0.3),
+    inset 0 1px 0 rgba(88, 166, 255, 0.1);
+}
+
+.glass-success {
+  background: rgba(63, 185, 80, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(63, 185, 80, 0.2);
+  box-shadow:
+    0 8px 32px rgba(63, 185, 80, 0.3),
+    inset 0 1px 0 rgba(63, 185, 80, 0.1);
+}
+
+.glass-warning {
+  background: rgba(245, 158, 11, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  box-shadow:
+    0 8px 32px rgba(245, 158, 11, 0.3),
+    inset 0 1px 0 rgba(245, 158, 11, 0.1);
+}
+
+.glass-danger {
+  background: rgba(248, 81, 73, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(248, 81, 73, 0.2);
+  box-shadow:
+    0 8px 32px rgba(248, 81, 73, 0.3),
+    inset 0 1px 0 rgba(248, 81, 73, 0.1);
+}
+
+.glass-recovery {
+  background: rgba(165, 165, 165, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(165, 165, 165, 0.2);
+  box-shadow:
+    0 8px 32px rgba(165, 165, 165, 0.3),
+    inset 0 1px 0 rgba(165, 165, 165, 0.1);
+}
+
+/* ===============================================
+   INTERACTIVE GLASS STATES
+   =============================================== */
+
+.glass-interactive {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.glass-interactive:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-interactive:active {
+  transform: translateY(0);
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ===============================================
+   SPECIALIZED WORKOUT APP GLASS COMPONENTS
+   =============================================== */
+
+/* Muscle Recovery Cards */
+.glass-muscle-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-muscle-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent);
+}
+
+.glass-muscle-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Ready State Glass */
+.glass-muscle-card.ready {
+  background: rgba(63, 185, 80, 0.08);
+  border-color: rgba(63, 185, 80, 0.3);
+  box-shadow:
+    0 8px 32px rgba(63, 185, 80, 0.2),
+    inset 0 1px 0 rgba(63, 185, 80, 0.1);
+}
+
+.glass-muscle-card.ready:hover {
+  background: rgba(63, 185, 80, 0.12);
+  border-color: rgba(63, 185, 80, 0.4);
+  box-shadow:
+    0 16px 48px rgba(63, 185, 80, 0.3),
+    inset 0 1px 0 rgba(63, 185, 80, 0.15);
+}
+
+/* Warning State Glass */
+.glass-muscle-card.warning {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow:
+    0 8px 32px rgba(245, 158, 11, 0.2),
+    inset 0 1px 0 rgba(245, 158, 11, 0.1);
+}
+
+.glass-muscle-card.warning:hover {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow:
+    0 16px 48px rgba(245, 158, 11, 0.3),
+    inset 0 1px 0 rgba(245, 158, 11, 0.15);
+}
+
+/* ===============================================
+   NAVBAR GLASS EFFECTS
+   =============================================== */
+
+.glass-navbar {
+  background: rgba(13, 17, 23, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ===============================================
+   EXERCISE BLOCK GLASS
+   =============================================== */
+
+.glass-exercise-block {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.glass-exercise-block::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    rgba(255, 255, 255, 0.01) 50%,
+    rgba(255, 255, 255, 0.02) 100%);
+  pointer-events: none;
+}
+
+/* ===============================================
+   BADGE GLASS EFFECTS
+   =============================================== */
+
+.glass-badge {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-badge:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Status Badge Glass */
+.glass-badge.status {
+  background: rgba(88, 166, 255, 0.15);
+  border-color: rgba(88, 166, 255, 0.3);
+  box-shadow:
+    0 4px 16px rgba(88, 166, 255, 0.2),
+    inset 0 1px 0 rgba(88, 166, 255, 0.1);
+}
+
+/* Reps Badge Glass */
+.glass-badge.reps {
+  background: rgba(63, 185, 80, 0.15);
+  border-color: rgba(63, 185, 80, 0.3);
+  box-shadow:
+    0 4px 16px rgba(63, 185, 80, 0.2),
+    inset 0 1px 0 rgba(63, 185, 80, 0.1);
+}
+
+/* Weight Badge Glass */
+.glass-badge.weight {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow:
+    0 4px 16px rgba(245, 158, 11, 0.2),
+    inset 0 1px 0 rgba(245, 158, 11, 0.1);
+}
+
+/* Reflection Badge Glass */
+.glass-badge.reflection {
+  background: rgba(165, 165, 165, 0.15);
+  border-color: rgba(165, 165, 165, 0.3);
+  box-shadow:
+    0 4px 16px rgba(165, 165, 165, 0.2),
+    inset 0 1px 0 rgba(165, 165, 165, 0.1);
+}
+
+/* ===============================================
+   STICKY GLASS OVERLAYS
+   =============================================== */
+
+.glass-sticky {
+  background: rgba(13, 17, 23, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ===============================================
+   FORM GLASS ELEMENTS
+   =============================================== */
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(88, 166, 255, 0.5);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 0 0.25rem rgba(88, 166, 255, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ===============================================
+   ALERT GLASS VARIANTS
+   =============================================== */
+
+.glass-alert {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-alert.info {
+  background: rgba(121, 192, 255, 0.1);
+  border-color: rgba(121, 192, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(121, 192, 255, 0.2),
+    inset 0 1px 0 rgba(121, 192, 255, 0.1);
+}
+
+.glass-alert.warning {
+  background: rgba(248, 81, 73, 0.1);
+  border-color: rgba(248, 81, 73, 0.3);
+  box-shadow:
+    0 6px 24px rgba(248, 81, 73, 0.2),
+    inset 0 1px 0 rgba(248, 81, 73, 0.1);
+}
+
+/* ===============================================
+   PERFORMANCE OPTIMIZATIONS
+   =============================================== */
+
+/* GPU acceleration for smooth animations */
+.glass,
+.glass-light,
+.glass-heavy,
+.glass-intense,
+.glass-interactive,
+.glass-muscle-card,
+.glass-badge {
+  will-change: transform, box-shadow, background;
+  transform: translateZ(0);
+}
+
+/* ===============================================
+   FALLBACKS FOR OLDER BROWSERS
+   =============================================== */
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur()) {
+  .glass,
+  .glass-light,
+  .glass-heavy,
+  .glass-intense {
+    background: rgba(22, 27, 34, 0.9);
+  }
+
+  .glass-muscle-card {
+    background: rgba(22, 27, 34, 0.95);
+  }
+
+  .glass-navbar {
+    background: rgba(13, 17, 23, 0.95);
+  }
+}
+
+/* ===============================================
+   REDUCED MOTION SUPPORT
+   =============================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-interactive,
+  .glass-muscle-card,
+  .glass-badge {
+    transition: none;
+  }
+
+  .glass-interactive:hover,
+  .glass-muscle-card:hover,
+  .glass-badge:hover {
+    transform: none;
+  }
+}
