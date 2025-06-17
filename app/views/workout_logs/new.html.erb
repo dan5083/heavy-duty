@@ -92,11 +92,3 @@
   window.benchmarkData = <%= raw(@workout.details.present? ? @workout.details : '{}') %>;
   window.availableExercises = <%= raw(AppConstants::WORKOUTS[@workout.muscle_group.to_sym].to_json) %>;
 </script>
-
-<!-- Debug: Force badge colors -->
-<style>
-  .badge-status { background-color: #cfe2ff !important; color: #084298 !important; }
-  .badge-reps { background-color: #d1e7dd !important; color: #0f5132 !important; }
-  .badge-weight { background-color: #fff3cd !important; color: #664d03 !important; }
-  .badge-reflection { background-color: #e2e3f1 !important; color: #3d3d71 !important; }
-</style>

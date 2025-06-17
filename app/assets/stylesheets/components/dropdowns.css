@@ -1,10 +1,10 @@
 /* app/assets/stylesheets/components/dropdowns.css */
 
-/* Badge Dropdown - Enhanced with Texture */
+/* Badge Dropdown - Enhanced without texture */
 .badge-dropdown {
-  background-image: url('/textures/dropdown-texture.jpg');
-  background-size: cover;
-  background-position: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(0,0,0,0.15);
   border-radius: 0.5rem;
   box-shadow:
@@ -15,7 +15,6 @@
   z-index: 1000;
   min-width: 180px;
   animation: fadeInUp 0.15s ease-out;
-  backdrop-filter: blur(2px);
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
 }
@@ -62,16 +61,19 @@
   border-top-right-radius: 0.5rem;
 }
 
-/* Bootstrap Dropdown Enhancement */
+/* Bootstrap Dropdown Enhancement - Modern Glassmorphism */
 .dropdown-menu {
-  background-image: url('/textures/dropdown-texture.jpg');
-  background-size: cover;
-  background-position: center;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%),
+    linear-gradient(45deg, rgba(13, 110, 253, 0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(13, 110, 253, 0.05) 25%, transparent 25%);
+  background-size: 100% 100%, 20px 20px, 20px 20px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border: 1px solid rgba(0,0,0,0.15);
   box-shadow:
     0 0.5rem 1rem rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255,255,255,0.1);
-  backdrop-filter: blur(2px);
 }
 
 .dropdown-item {
@@ -119,11 +121,14 @@
   box-shadow: 0 1px 0 rgba(255,255,255,0.1);
 }
 
-/* Exercise Selector Dropdown (Special for Workout App) */
+/* Exercise Selector Dropdown - Modern Pattern */
 .exercise-selector-dropdown {
-  background-image: url('/textures/dropdown-texture.jpg');
-  background-size: cover;
-  background-position: center;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.9) 100%),
+    radial-gradient(circle at 25% 25%, rgba(13, 110, 253, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(111, 66, 193, 0.1) 0%, transparent 50%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(0,0,0,0.15);
   border-radius: 0.5rem;
   box-shadow:
@@ -133,7 +138,6 @@
   overflow-y: auto;
   z-index: 1000;
   min-width: 300px;
-  backdrop-filter: blur(2px);
   -webkit-overflow-scrolling: touch;
 }
 

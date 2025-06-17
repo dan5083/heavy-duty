@@ -29,9 +29,6 @@
                 data-badge-editor-exercise-id-value="<%= exercise_index %>"
                 data-action="click->badge-editor#edit badge-editor:badge-changed->log-builder#updateWorkout">
             <%= badge[:content] %>
-            <span class="badge-actions">
-              <button class="badge-action" data-action="click->badge-editor#delete">×</button>
-            </span>
           </span>
         <% end %>
 
