@@ -113,9 +113,9 @@ export default class extends Controller {
     `
   }
 
-  // Render a single badge
+  // Render a single badge with animation support
   renderBadge(badge, exerciseIndex, setIndex, badgeIndex) {
-    console.log(`Rendering badge: ${badge.type} - ${badge.content}`) // Debug log
+    console.log(`Rendering badge: ${badge.type} - ${badge.content}`)
 
     return `
       <span class="workout-badge badge-${badge.type}"
@@ -124,6 +124,7 @@ export default class extends Controller {
             data-badge-editor-type-value="${badge.type}"
             data-badge-editor-content-value="${badge.content}"
             data-badge-editor-exercise-id-value="${exerciseIndex}"
+            data-new-badge="true"
             data-action="click->badge-editor#edit">
         <span class="badge-text">${badge.content}</span>
       </span>
@@ -297,7 +298,7 @@ export default class extends Controller {
     }, 100)
   }
 
-  // Add selected exercise with sample sets - FIX 1: Only one set
+  // Add selected exercise with sample sets and animations
   selectExercise(exerciseName) {
     console.log(`Adding exercise: ${exerciseName}`)
 
@@ -314,9 +315,18 @@ export default class extends Controller {
     this.hideEmptyState()
     this.renderWorkoutBadges()
     this.updateHiddenField()
+
+    // Add success animation to the new exercise
+    setTimeout(() => {
+      const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
+      const newExercise = exerciseBlocks[exerciseBlocks.length - 2] // -2 because last is add button
+      if (newExercise) {
+        newExercise.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+      }
+    }, 50)
   }
 
-  // Add a new set to an exercise
+  // Add a new set to an exercise with animations
   addSet(event) {
     const exerciseId = event.target.dataset.exerciseId
     console.log(`Adding set to exercise ${exerciseId}`)
@@ -332,6 +342,25 @@ export default class extends Controller {
       this.benchmarkData[exerciseName].push("Working set was 10 reps at 70 kilos, solid effort")
       this.renderWorkoutBadges()
       this.updateHiddenField()
+
+      // Add animation to new set
+      setTimeout(() => {
+        const exerciseBlock = this.exerciseListTarget.querySelector(`[data-exercise-id="${exerciseId}"]`)
+        if (exerciseBlock) {
+          const setLines = exerciseBlock.querySelectorAll('.set-line[data-set-index]')
+          const newSetLine = setLines[setLines.length - 1]
+          if (newSetLine) {
+            newSetLine.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+
+            // Animate each badge in the new set
+            const badges = newSetLine.querySelectorAll('.workout-badge')
+            badges.forEach((badge, index) => {
+              badge.style.animationDelay = `${index * 0.1}s`
+              badge.classList.add('badge-creating')
+            })
+          }
+        }
+      }, 50)
     }
   }
 
@@ -358,23 +387,64 @@ export default class extends Controller {
     }
   }
 
-  // Handle form submission - ensure we capture current badge state
+  // Handle form submission with animations
   handleFormSubmit(event) {
     console.log("Form submitting - capturing current badge state...")
     this.updateWorkoutData()
+
+    // Add loading state to all badges
+    const allBadges = this.exerciseListTarget.querySelectorAll('.workout-badge')
+    allBadges.forEach(badge => {
+      badge.classList.add('badge-loading')
+    })
+
+    // Show submission feedback
+    this.showSuccessFeedback('Saving workout...')
   }
 
-  // Handle badge changes from badge-editor (FIXED - no re-rendering!)
+  // Handle badge changes with success feedback
   handleBadgeChange(event) {
     console.log('Badge changed:', event.detail)
     // Update data but DON'T re-render to preserve other badge states
     this.updateWorkoutData()
+
+    // Show brief success feedback
+    this.showSuccessFeedback('Badge updated!')
   }
 
   // Add new badge
   handleAddBadge(event) {
     console.log('Add badge:', event.detail)
     // For now, just log - could show badge type selector
+  }
+
+  // Add success feedback method
+  showSuccessFeedback(message) {
+    // Create temporary success message
+    const feedback = document.createElement('div')
+    feedback.className = 'badge-success-feedback'
+    feedback.textContent = message
+    feedback.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      color: #155724;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 9999;
+      animation: slideInRight 0.3s ease-out;
+      backdrop-filter: blur(10px);
+    `
+
+    document.body.appendChild(feedback)
+
+    // Remove after animation
+    setTimeout(() => {
+      feedback.style.animation = 'slideOutRight 0.3s ease-in forwards'
+      setTimeout(() => feedback.remove(), 300)
+    }, 2000)
   }
 
   // Update internal workout data from current badge state (FIXED!)
