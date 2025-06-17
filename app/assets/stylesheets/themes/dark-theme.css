@@ -2,7 +2,7 @@
 
 /* ===============================================
    DARK THEME - CSS CUSTOM PROPERTIES
-   Heavy Duty Workout App
+   Heavy Duty Workout App - Updated for Modern Typography
    =============================================== */
 
 :root {
@@ -54,6 +54,113 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
+  /* Keep the modern typography from application.css */
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+
+/* ===============================================
+   TYPOGRAPHY DARK THEME OVERRIDES
+   =============================================== */
+
+/* === HEADINGS - Dark Theme Colors === */
+h1, .h1 {
+  color: var(--text-primary);
+  /* Keep typography styles from application.css */
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+}
+
+h2, .h2 {
+  color: var(--accent-success);
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+}
+
+h3, .h3 {
+  color: var(--accent-info);
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+}
+
+h4, .h4 {
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-semibold);
+}
+
+h5, .h5 {
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+}
+
+h6, .h6 {
+  color: var(--text-secondary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+}
+
+/* === BODY TEXT === */
+p {
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+}
+
+/* === SPECIALIZED TYPOGRAPHY DARK OVERRIDES === */
+
+/* Brand/Logo */
+.navbar-brand {
+  color: var(--text-primary) !important;
+  font-family: var(--font-display) !important;
+  font-weight: var(--weight-bold) !important;
+  font-size: var(--text-2xl) !important;
+}
+
+/* Navigation */
+.nav-link {
+  color: var(--text-secondary) !important;
+  font-family: var(--font-primary) !important;
+  font-weight: var(--weight-medium) !important;
+}
+
+.nav-link:hover {
+  color: var(--accent-primary) !important;
+}
+
+/* Data/Numbers */
+.data-text, .countdown-number, .metric-value {
+  color: var(--accent-primary);
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+}
+
+.countdown-unit {
+  color: var(--text-muted);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
+}
+
+/* Exercise names and workout titles */
+.exercise-name, .workout-title {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+}
+
+/* Set numbers */
+.set-number {
+  color: var(--accent-primary);
+  font-family: var(--font-mono);
+  font-weight: var(--weight-bold);
 }
 
 /* ===============================================
@@ -90,11 +197,15 @@ body {
 
 .card-title {
   color: var(--text-primary);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-xl);
 }
 
 .card-text {
   color: var(--text-secondary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
 }
 
 /* === NAVIGATION === */
@@ -104,22 +215,6 @@ body {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   box-shadow: var(--shadow-glass);
-}
-
-.navbar-brand {
-  color: var(--text-primary) !important;
-  font-weight: 700;
-  font-size: 1.5rem;
-}
-
-.navbar-nav .nav-link {
-  color: var(--text-secondary) !important;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.navbar-nav .nav-link:hover {
-  color: var(--accent-primary) !important;
 }
 
 .navbar-toggler {
@@ -133,7 +228,10 @@ body {
 /* === BUTTONS === */
 .btn {
   border-radius: 12px;
-  font-weight: 600;
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-base);
+  letter-spacing: 0.025em;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: var(--glass-blur-light);
   -webkit-backdrop-filter: var(--glass-blur-light);
@@ -151,6 +249,7 @@ body {
   border-color: #4c9aff;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(88, 166, 255, 0.4);
+  color: var(--text-inverse);
 }
 
 .btn-success {
@@ -165,6 +264,7 @@ body {
   border-color: #2ea043;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(63, 185, 80, 0.4);
+  color: var(--text-inverse);
 }
 
 .btn-outline-primary {
@@ -198,6 +298,9 @@ body {
   backdrop-filter: var(--glass-blur-light);
   -webkit-backdrop-filter: var(--glass-blur-light);
   border: 1px solid transparent;
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
 }
 
 .alert-info {
@@ -240,6 +343,9 @@ body {
   backdrop-filter: var(--glass-blur-light);
   -webkit-backdrop-filter: var(--glass-blur-light);
   transition: all 0.3s ease;
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-normal);
 }
 
 .form-control:focus,
@@ -256,7 +362,11 @@ body {
 
 .form-label {
   color: var(--text-primary);
-  font-weight: 600;
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .form-check-input {
@@ -271,6 +381,7 @@ body {
 
 .form-check-label {
   color: var(--text-primary);
+  font-family: var(--font-primary);
 }
 
 /* === LIST GROUPS === */
@@ -305,17 +416,24 @@ body {
 .table thead th {
   border-bottom: 1px solid var(--border-default);
   color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-semibold);
 }
 
 .table td {
   border-top: 1px solid var(--border-muted);
+  font-family: var(--font-primary);
 }
 
 /* === BADGES === */
 .badge {
   border-radius: 8px;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
+  font-family: var(--font-accent);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.375rem 0.75rem;
   backdrop-filter: var(--glass-blur-light);
   -webkit-backdrop-filter: var(--glass-blur-light);
 }
@@ -331,12 +449,6 @@ body {
 /* ===============================================
    MUSCLE COUNTDOWN SPECIFIC STYLES
    =============================================== */
-
-.nav-style {
-  background: var(--surface-glass) !important;
-  backdrop-filter: var(--glass-blur) !important;
-  -webkit-backdrop-filter: var(--glass-blur) !important;
-}
 
 /* Recovery Status Colors */
 .border-success {
@@ -363,19 +475,6 @@ body {
   color: var(--text-muted) !important;
 }
 
-/* Countdown Numbers */
-.countdown-number {
-  color: var(--accent-primary);
-  font-weight: 700;
-  font-size: 1.1em;
-}
-
-.countdown-unit {
-  color: var(--text-muted);
-  font-size: 0.85em;
-  margin-right: 0.5rem;
-}
-
 /* ===============================================
    WORKOUT BADGE SPECIFIC STYLES
    =============================================== */
@@ -384,10 +483,15 @@ body {
   backdrop-filter: var(--glass-blur-light) !important;
   -webkit-backdrop-filter: var(--glass-blur-light) !important;
   border-radius: 12px !important;
-  padding: 0.5rem 1rem !important;
   margin: 0.25rem !important;
   border: 1px solid transparent !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-family: var(--font-accent) !important;
+  font-weight: var(--weight-medium) !important;
+  font-size: var(--text-sm) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.375rem 0.75rem !important;
 }
 
 .badge-status {
@@ -436,8 +540,9 @@ body {
 
 .exercise-header {
   color: var(--text-primary);
-  font-weight: 700;
-  font-size: 1.2rem;
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -452,19 +557,15 @@ body {
   gap: 0.5rem;
 }
 
-.set-number {
-  font-weight: 700;
-  color: var(--accent-primary);
-  min-width: 3rem;
-}
-
 .add-badge-btn {
   background: var(--surface-hover);
   border: 1px dashed var(--border-default);
   border-radius: 12px;
   color: var(--text-secondary);
   padding: 0.5rem 1rem;
-  font-size: 0.9rem;
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-normal);
   transition: all 0.3s ease;
 }
 
@@ -491,6 +592,23 @@ body {
   backdrop-filter: var(--glass-blur-heavy) !important;
   -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
   border-top: 1px solid var(--border-default) !important;
+}
+
+/* ===============================================
+   LINKS
+   =============================================== */
+
+a {
+  color: var(--accent-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  color: var(--accent-info);
+  text-decoration: underline;
 }
 
 /* ===============================================
