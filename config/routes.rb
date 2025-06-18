@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   # ✅ Nested workout logging structure with recovery seeding routes
-  resources :split_plans, only: [:index, :new, :create, :show, :destroy] do
+  resources :split_plans, only: [:index, :new, :create, :destroy] do
     member do
       get :initialize_recovery
       post :submit_recovery

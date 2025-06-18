@@ -35,17 +35,20 @@ class WorkoutLogsController < ApplicationController
 
           Rails.logger.info "Benchmark updated with user's workout data"
 
-          redirect_to split_plan_path(@workout.split_day.split_plan),
+          # FIXED: Redirect to training archive instead of split plan
+          redirect_to training_archive_path,
                       notice: "Workout saved and benchmark updated! 🎉"
         rescue JSON::ParserError => e
           Rails.logger.error "Failed to parse workout details for benchmark update: #{e.message}"
 
-          redirect_to split_plan_path(@workout.split_day.split_plan),
+          # FIXED: Redirect to training archive instead of split plan
+          redirect_to training_archive_path,
                       notice: "Workout saved, but benchmark update failed."
         end
       else
         # User chose just to save workout without updating benchmark
-        redirect_to split_plan_path(@workout.split_day.split_plan),
+        # FIXED: Redirect to training archive instead of split plan
+        redirect_to training_archive_path,
                     notice: "Workout saved."
       end
     else

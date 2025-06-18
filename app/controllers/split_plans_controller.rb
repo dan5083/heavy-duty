@@ -71,9 +71,7 @@ class SplitPlansController < ApplicationController
     redirect_to dashboard_path, notice: "Recovery initialized successfully."
   end
 
-  def show
-    @split_plan = SplitPlan.find(params[:id])
-  end
+  # REMOVED: show action - no longer needed since we redirect to archive
 
   def destroy
     @split_plan = SplitPlan.find(params[:id])
