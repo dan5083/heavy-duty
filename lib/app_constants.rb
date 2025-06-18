@@ -308,7 +308,7 @@ WORKOUTS = {
   neck_and_mobility_stretching: 4
   }.freeze
 
-# 🆕 Enhanced CLAUSE_LIBRARY with badge metadata
+# 🆕 Simplified CLAUSE_LIBRARY with discrete ranges
 CLAUSE_LIBRARY = {
   status: {
     options: ["Working set", "Warmup set", "Drop set", "Super set", "Heavy set", "Light set"],
@@ -316,12 +316,12 @@ CLAUSE_LIBRARY = {
     css_class: "badge-status"
   },
   reps: {
-    options: ["{number} reps", "to failure", "{range} reps", "AMRAP", "controlled reps", "explosive reps"],
+    options: (1..35).to_a,
     color: "green",
     css_class: "badge-reps"
   },
   weight: {
-    options: ["at {weight} kilos", "with bodyweight", "at {percent}% 1RM", "light weight", "moderate weight", "heavy weight"],
+    options: (1..300).to_a,
     color: "yellow",
     css_class: "badge-weight"
   },
