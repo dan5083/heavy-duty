@@ -143,94 +143,27 @@ export default class extends Controller {
     `
   }
 
-  // Parse set description into badge objects (simplified JS version)
+  // FIX 1: Parse set description into badge objects - ALWAYS 4 BADGES
   parseSetIntoBadges(setDescription) {
-    const badges = []
-    const text = setDescription.toLowerCase()
+    // Split by comma and trim whitespace
+    const parts = setDescription.split(',').map(part => part.trim())
 
-    // Extract status badges (Working set, Drop set, etc.)
-    if (text.includes('working set') || text.includes('working')) {
-      badges.push({ type: 'status', content: 'Working set' })
-    } else if (text.includes('warmup') || text.includes('warm up')) {
-      badges.push({ type: 'status', content: 'Warmup set' })
-    } else if (text.includes('drop set') || text.includes('drop')) {
-      badges.push({ type: 'status', content: 'Drop set' })
-    } else if (text.includes('super set') || text.includes('super')) {
-      badges.push({ type: 'status', content: 'Super set' })
-    } else if (text.includes('heavy set') || text.includes('heavy set')) {
-      badges.push({ type: 'status', content: 'Heavy set' })
-    } else if (text.includes('light set') || text.includes('light set')) {
-      badges.push({ type: 'status', content: 'Light set' })
+    // Ensure exactly 4 parts (pad with defaults if needed)
+    while (parts.length < 4) {
+      if (parts.length === 1) parts.push('10')        // Default reps
+      else if (parts.length === 2) parts.push('70')   // Default weight
+      else if (parts.length === 3) parts.push('felt good') // Default reflection
     }
 
-    // Extract reps badges
-    const repsMatch = text.match(/(\d+)\s*reps?/)
-    if (repsMatch) {
-      badges.push({ type: 'reps', content: `${repsMatch[1]} reps` })
-    } else if (text.includes('to failure') || text.includes('failure')) {
-      badges.push({ type: 'reps', content: 'to failure' })
-    } else if (text.includes('amrap')) {
-      badges.push({ type: 'reps', content: 'AMRAP' })
-    }
+    // Truncate if more than 4 parts
+    const [status, reps, weight, reflection] = parts.slice(0, 4)
 
-    // Extract weight badges
-    const weightMatch = text.match(/(?:at|with)\s*(\d+(?:\.\d+)?)\s*(kilos?|kgs?|lbs?|pounds?)/)
-    if (weightMatch) {
-      const unit = weightMatch[2].includes('lb') || weightMatch[2].includes('pound') ? 'lbs' : 'kilos'
-      badges.push({ type: 'weight', content: `at ${weightMatch[1]} ${unit}` })
-    } else if (text.includes('bodyweight') || text.includes('body weight')) {
-      badges.push({ type: 'weight', content: 'with bodyweight' })
-    } else if (text.match(/(\d+)%\s*1rm/)) {
-      const percentMatch = text.match(/(\d+)%\s*1rm/)
-      badges.push({ type: 'weight', content: `at ${percentMatch[1]}% 1RM` })
-    }
-
-    // Extract reflection badges - IMPROVED DETECTION
-    if (text.includes('felt heavy') || text.includes('heavy')) {
-      badges.push({ type: 'reflection', content: 'felt heavy' })
-    } else if (text.includes('felt light') || text.includes('light')) {
-      badges.push({ type: 'reflection', content: 'felt light' })
-    } else if (text.includes('kept it smooth') || text.includes('smooth')) {
-      badges.push({ type: 'reflection', content: 'kept it smooth' })
-    } else if (text.includes('perfect form') || text.includes('perfect')) {
-      badges.push({ type: 'reflection', content: 'perfect form' })
-    } else if (text.includes('good form') || text.includes('clean form')) {
-      badges.push({ type: 'reflection', content: 'good form' })
-    } else if (text.includes('form broke down') || text.includes('sloppy')) {
-      badges.push({ type: 'reflection', content: 'form broke down' })
-    } else if (text.includes('could go heavier') || text.includes('too easy')) {
-      badges.push({ type: 'reflection', content: 'could go heavier' })
-    } else if (text.includes('solid effort') || text.includes('solid')) {
-      badges.push({ type: 'reflection', content: 'solid effort' })
-    } else if (text.includes('great pump') || text.includes('pump')) {
-      badges.push({ type: 'reflection', content: 'great pump' })
-    } else if (text.includes('felt good') || text.includes('felt great') || text.includes('good')) {
-      // FIX 2: Add this common reflection pattern that was missing
-      badges.push({ type: 'reflection', content: 'felt good' })
-    }
-
-    // If no badges found, try to intelligently categorize the whole text
-    if (badges.length === 0) {
-      // Check if it's mostly numbers (likely reps/weight)
-      if (text.match(/\d+/)) {
-        badges.push({ type: 'reps', content: setDescription.trim() })
-      } else {
-        // Default to reflection
-        badges.push({ type: 'reflection', content: setDescription.trim() })
-      }
-    }
-
-    // Ensure we have at least a status if none was detected
-    if (!badges.find(b => b.type === 'status')) {
-      badges.unshift({ type: 'status', content: 'Working set' })
-    }
-
-    // FIX 2: Ensure we always have a reflection badge if none was found
-    if (!badges.find(b => b.type === 'reflection')) {
-      badges.push({ type: 'reflection', content: 'felt good' })
-    }
-
-    return badges
+    return [
+      { type: 'status', content: status || 'Working set' },
+      { type: 'reps', content: reps || '10' },
+      { type: 'weight', content: weight || '70' },
+      { type: 'reflection', content: reflection || 'felt good' }
+    ]
   }
 
   // Handle clicking in empty area to add exercise
@@ -298,16 +231,14 @@ export default class extends Controller {
     }, 100)
   }
 
-  // Add selected exercise with sample sets and animations
+  // FIX 2: Add selected exercise with EXACTLY 1 SET
   selectExercise(exerciseName) {
     console.log(`Adding exercise: ${exerciseName}`)
 
-    // Add to benchmark data
+    // Add to benchmark data with EXACTLY ONE SET (4 comma-separated values)
     if (!this.benchmarkData[exerciseName]) {
-      // FIX 1: Only add ONE set instead of two
-      // FIX 2: Ensure the reflection badge is included by using "felt good"
       this.benchmarkData[exerciseName] = [
-        "Working set was 10 reps at 70 kilos, felt good"
+        "Working set, 10, 70, felt good"  // Single set with 4 badges
       ]
     }
 
@@ -326,7 +257,7 @@ export default class extends Controller {
     }, 50)
   }
 
-  // Add a new set to an exercise with animations
+  // FIX 3: Add a new set to an exercise - EXACTLY 1 SET with 4 badges
   addSet(event) {
     const exerciseId = event.target.dataset.exerciseId
     console.log(`Adding set to exercise ${exerciseId}`)
@@ -334,12 +265,13 @@ export default class extends Controller {
     // First update our data from current badge state
     this.updateWorkoutData()
 
-    // Find exercise in benchmark data and add a sample set
+    // Find exercise in benchmark data and add ONE set with 4 comma-separated badges
     const exercises = Object.keys(this.benchmarkData)
     const exerciseName = exercises[exerciseId]
 
     if (exerciseName) {
-      this.benchmarkData[exerciseName].push("Working set was 10 reps at 70 kilos, solid effort")
+      // Add exactly 1 set with 4 comma-separated badges (status, reps, weight, reflection)
+      this.benchmarkData[exerciseName].push("Working set, 10, 70, solid effort")
       this.renderWorkoutBadges()
       this.updateHiddenField()
 

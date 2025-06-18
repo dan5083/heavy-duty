@@ -97,38 +97,29 @@ class SplitPlansController < ApplicationController
 
     benchmark = {}
     sample_exercises.each do |exercise|
-      # Generate 2-3 sets using clause patterns
-      sets_count = rand(2..3)
-      sets = []
-
-      sets_count.times do |i|
-        set_description = generate_set_description(i + 1, exercise)
-        sets << set_description
-      end
-
-      benchmark[exercise] = sets
+      # Generate EXACTLY 1 SET using comma-separated format
+      benchmark[exercise] = [generate_set_description(1, exercise)]
     end
 
     benchmark
   end
 
+  # FIX 2: Generate set description - ALWAYS 1 SET with 4 comma-separated badges
   def generate_set_description(set_number, exercise)
-    # Use CLAUSE_LIBRARY to build realistic set descriptions
-    status_options = ["First set", "Second set", "Third set"]
-    weight_options = ["at #{rand(20..100)} kilos", "with bodyweight", "at #{rand(60..90)}% intensity"]
-    reps_options = ["#{rand(6..15)} reps", "to failure", "#{rand(8..12)} reps"]
-    reflection_options = ["kept it smooth", "felt heavy", "perfect form", "solid effort", "could go heavier next time"]
+    # Generate 4 comma-separated values: status, reps, weight, reflection
+    status = "Working set"
+    reps = rand(8..12)  # Integer: 8-12
 
-    status = set_number == 1 ? "First set" : status_options[set_number - 1] || "Working set"
-    weight = weight_options.sample
-    reps = reps_options.sample
-    reflection = reflection_options.sample
-
-    # Handle bodyweight exercises
+    # Handle bodyweight vs weighted exercises
     if exercise.include?("Push-Up") || exercise.include?("Pull-Up") || exercise.include?("Dip")
-      weight = "with bodyweight"
+      weight = "bodyweight"
+    else
+      weight = rand(60..90)  # Integer: 60-90
     end
 
-    "#{status} was #{reps} #{weight}, #{reflection}."
+    reflection = ["felt good", "solid effort", "kept it smooth"].sample
+
+    # Return comma-separated format for 4 badges
+    "#{status}, #{reps}, #{weight}, #{reflection}"
   end
 end

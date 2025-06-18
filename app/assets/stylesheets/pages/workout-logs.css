@@ -1,7 +1,145 @@
+/* FIX 6: Bottom Scroll Padding - Prevent fixed bottom banner hiding content */
 .workout-logger {
-  padding-bottom: 120px; /* Space for fixed bottom */
+  padding-bottom: 140px; /* Increased from 120px for safety */
 }
 
 body {
   padding-bottom: 0 !important; /* Override any existing padding */
+}
+
+/* FIX 5: Mobile Layout - Single Row Badges with flex layout */
+.set-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.workout-badge {
+  flex-shrink: 0; /* Prevent badge compression */
+  white-space: nowrap;
+}
+
+.set-number {
+  flex-shrink: 0; /* Keep set number from shrinking */
+  margin-right: 0.5rem;
+}
+
+/* Single row layout for all screen sizes */
+@media (max-width: 768px) {
+  .set-line {
+    overflow-x: auto; /* Allow horizontal scroll if needed */
+    flex-wrap: nowrap; /* Force single row on mobile */
+    padding-bottom: 0.25rem; /* Space for scroll indicator */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  .workout-badge {
+    min-width: fit-content; /* Ensure badges don't get squished */
+  }
+}
+
+/* Ensure fixed bottom elements don't interfere */
+.fixed-bottom {
+  z-index: 1030;
+}
+
+/* Add scroll margin for better UX */
+.exercise-block:last-child {
+  margin-bottom: 2rem;
+}
+
+/* Exercise block styling */
+.exercise-block {
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+.exercise-header {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Badge animations for better UX */
+.workout-badge {
+  transition: transform 0.2s ease-in-out;
+}
+
+.workout-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Loading states */
+.badge-loading {
+  opacity: 0.7;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Success animations */
+@keyframes badge-spawn {
+  0% {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(0deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.badge-creating {
+  animation: badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Responsive improvements */
+@media (max-width: 576px) {
+  .exercise-block {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .set-line {
+    gap: 0.25rem;
+  }
+
+  .workout-logger {
+    padding-bottom: 160px; /* Extra padding on small screens */
+  }
 }
