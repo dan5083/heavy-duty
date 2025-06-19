@@ -8,28 +8,36 @@
    TYPEWRITER ANIMATION
    =============================================== */
 
+/* Typewriter Animation - Character by character with cursor */
 .typewriter-text {
-  overflow: hidden;
-  border-right: 0.15em solid var(--accent-primary);
-  white-space: nowrap;
-  margin: 0 auto;
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
   color: var(--text-primary);
   letter-spacing: var(--tracking-wide);
+  display: inline-block;
+  overflow: hidden;
+  border-right: 2px solid var(--accent-primary);
+  white-space: nowrap;
+  margin: 0 auto;
+  width: 0;
   animation:
-    typewriter 3.5s steps(40, end),
-    blink-caret 0.75s step-end infinite;
+    typing 3.5s steps(30, end) forwards,
+    blink 0.75s step-end infinite,
+    hide-cursor 0s linear 5s forwards;
 }
 
-@keyframes typewriter {
+@keyframes typing {
   from { width: 0; }
   to { width: 100%; }
 }
 
-@keyframes blink-caret {
+@keyframes blink {
   from, to { border-color: transparent; }
   50% { border-color: var(--accent-primary); }
+}
+
+@keyframes hide-cursor {
+  to { border-right: none; }
 }
 
 /* Remove cursor after animation completes */

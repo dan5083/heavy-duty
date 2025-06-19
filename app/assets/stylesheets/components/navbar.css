@@ -1,10 +1,9 @@
-/* Add this to the end of app/assets/stylesheets/components/navbar.css */
-
 /* Logo styling */
 .navbar-logo {
   transition: all 0.2s ease;
   border-radius: 4px;
-  max-height: 40px;
+  height: 56px !important; /* Fixed height that barely fits standard navbar */
+  max-height: 56px;
   width: auto;
 }
 
@@ -15,15 +14,15 @@
 /* Mobile responsive logo */
 @media (max-width: 768px) {
   .navbar-logo {
-    height: 32px !important;
-    max-height: 32px;
+    height: 48px !important;
+    max-height: 48px;
   }
 }
 
 /* Very small screens */
 @media (max-width: 480px) {
   .navbar-logo {
-    height: 28px !important;
-    max-height: 28px;
+    height: 40px !important;
+    max-height: 40px;
   }
 }

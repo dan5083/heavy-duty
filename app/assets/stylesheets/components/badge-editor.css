@@ -245,20 +245,20 @@
 @media (max-width: 768px) {
   .workout-badge {
     padding: 0.25rem 0.4rem;
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     min-height: 32px;
     margin: 0.05rem;
   }
 
   .set-number {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     min-width: 1rem;
     margin-right: 0.15rem;
   }
 
   .add-badge-btn {
     padding: 0.25rem 0.4rem;
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     min-height: 32px;
     margin: 0.05rem;
   }

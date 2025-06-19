@@ -116,7 +116,7 @@ export default class extends Controller {
 
   renderAddExerciseButton() {
     return `
-      <div class="text-center mt-4">
+      <div class="text-center mt-4 mb-4">
         <button class="btn btn-outline-success"
                 data-action="click->log-builder#addExercise">
           <i class="bi bi-plus-lg"></i> Add Exercise
@@ -224,38 +224,40 @@ export default class extends Controller {
     }, 50)
   }
 
-  addSet(event) {
-    const exerciseId = event.target.dataset.exerciseId
-    console.log(`Adding set to exercise ${exerciseId}`)
+addSet(event) {
+  event.preventDefault()
+  event.stopPropagation()
+  const exerciseId = event.target.dataset.exerciseId
+  console.log(`Adding set to exercise ${exerciseId}`)
 
-    this.updateWorkoutData()
+  this.updateWorkoutData()
 
-    const exercises = Object.keys(this.benchmarkData)
-    const exerciseName = exercises[exerciseId]
+  const exercises = Object.keys(this.benchmarkData)
+  const exerciseName = exercises[exerciseId]
 
-    if (exerciseName) {
-      this.benchmarkData[exerciseName].push("Work, 10, 70, good")
-      this.renderWorkoutBadges()
-      this.updateHiddenField()
+  if (exerciseName) {
+    this.benchmarkData[exerciseName].push("Work, 10, 70, good")
+    this.renderWorkoutBadges()
+    this.updateHiddenField()
 
-      setTimeout(() => {
-        const exerciseBlock = this.exerciseListTarget.querySelector(`[data-exercise-id="${exerciseId}"]`)
-        if (exerciseBlock) {
-          const setLines = exerciseBlock.querySelectorAll('.set-line[data-set-index]')
-          const newSetLine = setLines[setLines.length - 1]
-          if (newSetLine) {
-            newSetLine.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+    setTimeout(() => {
+      const exerciseBlock = this.exerciseListTarget.querySelector(`[data-exercise-id="${exerciseId}"]`)
+      if (exerciseBlock) {
+        const setLines = exerciseBlock.querySelectorAll('.set-line[data-set-index]')
+        const newSetLine = setLines[setLines.length - 1]
+        if (newSetLine) {
+          newSetLine.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
 
-            const badges = newSetLine.querySelectorAll('.workout-badge')
-            badges.forEach((badge, index) => {
-              badge.style.animationDelay = `${index * 0.1}s`
-              badge.classList.add('badge-creating')
-            })
-          }
+          const badges = newSetLine.querySelectorAll('.workout-badge')
+          badges.forEach((badge, index) => {
+            badge.style.animationDelay = `${index * 0.1}s`
+            badge.classList.add('badge-creating')
+          })
         }
-      }, 50)
-    }
+      }
+    }, 50)
   }
+}
 
   deleteExercise(event) {
     const exerciseId = event.target.dataset.exerciseId
