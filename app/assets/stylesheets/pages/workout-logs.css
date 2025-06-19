@@ -7,36 +7,45 @@ body {
   padding-bottom: 0 !important; /* Override any existing padding */
 }
 
-/* FIX 5: Mobile Layout - Single Row Badges with flex layout */
+/* FIX 5: Mobile Layout - Remove scroll, use flex wrap, minimize padding */
 .set-line {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-wrap: wrap !important; /* Always allow wrapping */
+  gap: 0.25rem; /* Reduced from 0.5rem */
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem; /* Reduced from 0.75rem */
+  overflow-x: visible !important; /* Remove scroll */
+  padding: 0 !important; /* Remove padding */
 }
 
 .workout-badge {
   flex-shrink: 0; /* Prevent badge compression */
   white-space: nowrap;
+  margin: 0.125rem !important; /* Minimal margin */
 }
 
 .set-number {
   flex-shrink: 0; /* Keep set number from shrinking */
-  margin-right: 0.5rem;
+  margin-right: 0.05rem !important; /* Almost no space */
+  padding: 0 !important;
 }
 
-/* Single row layout for all screen sizes */
+/* Remove the mobile scroll behavior entirely */
 @media (max-width: 768px) {
   .set-line {
-    overflow-x: auto; /* Allow horizontal scroll if needed */
-    flex-wrap: nowrap; /* Force single row on mobile */
-    padding-bottom: 0.25rem; /* Space for scroll indicator */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    flex-wrap: wrap !important; /* Force wrapping on mobile */
+    overflow-x: visible !important; /* No scroll */
+    padding: 0 !important;
+    gap: 0.2rem; /* Even smaller gap on mobile */
   }
 
   .workout-badge {
     min-width: fit-content; /* Ensure badges don't get squished */
+    margin: 0.1rem !important; /* Tighter spacing on mobile */
+  }
+
+  .set-number {
+    margin-right: 0.05rem !important; /* Super tight spacing */
   }
 }
 
@@ -50,20 +59,21 @@ body {
   margin-bottom: 2rem;
 }
 
-/* Exercise block styling */
+/* Exercise block styling - FIX 2: Use dark theme colors, reduced padding */
 .exercise-block {
-  background: #f8f9fa;
+  background: var(--surface-primary) !important;
   border-radius: 0.5rem;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border: 1px solid #dee2e6;
+  padding: 0.75rem !important; /* Reduced from 1rem */
+  margin-bottom: 0.75rem !important; /* Reduced from 1rem */
+  border: 1px solid var(--border-muted) !important;
 }
 
 .exercise-header {
   font-weight: 600;
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--border-muted) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Badge animations for better UX */

@@ -1,52 +1,52 @@
 <!-- app/views/workout_logs/new.html.erb -->
-<div data-controller="log-builder" class="workout-logger">
+<div data-controller="log-builder typography-animator"
+     class="workout-logger"
+     data-typography-animator-delay-value="200"
+     data-typography-animator-stagger-value="150">
 
   <!-- Header -->
   <div class="sticky-top bg-white border-bottom shadow-sm p-3 mb-4">
     <div class="text-center">
-      <h2 class="mb-0">Today's <%= AppConstants::LABELS[@workout.muscle_group.to_sym] %> Workout</h2>
-      <p class="text-muted mb-0">Tap badges to edit • Add exercises with <code>+</code></p>
+      <h2 class="mb-0" data-typography-animator-target="typewriter">
+        Today's <%= AppConstants::LABELS[@workout.muscle_group.to_sym] %> Workout
+      </h2>
+      <p class="text-muted mb-0" data-typography-animator-target="fadeIn">
+        Tap badges to edit • Add exercises with <code>+</code>
+      </p>
     </div>
   </div>
 
-  <!-- Main Content: Badge Editor -->
-  <div class="container-fluid">
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <div class="card">
-          <div class="card-body p-0">
-            <!-- Badge Container -->
-            <div class="badge-container"
-                 data-log-builder-target="badgeContainer"
-                 data-action="click->log-builder#addExercise">
+  <!-- Main Content: Badge Editor - FIX 3: Remove card wrapper entirely -->
+  <div class="px-3">
+    <!-- Badge Container - No more card wrapper! -->
+    <div class="badge-container"
+         data-log-builder-target="badgeContainer"
+         data-action="click->log-builder#addExercise"
+         data-typography-animator-target="slideUp">
 
-              <!-- Exercises will be rendered here -->
-              <div data-log-builder-target="exerciseList">
-                <!-- Initial content loaded from benchmark -->
-              </div>
+      <!-- Exercises will be rendered here -->
+      <div data-log-builder-target="exerciseList">
+        <!-- Initial content loaded from benchmark -->
+      </div>
 
-              <!-- Empty State -->
-              <div class="empty-exercise" data-log-builder-target="emptyState">
-                <i class="bi bi-plus-circle display-4 text-muted"></i>
-                <h5 class="text-muted mt-3">Tap anywhere to add your first exercise</h5>
-                <p class="text-muted">Start building your workout</p>
-              </div>
+      <!-- Empty State -->
+      <div class="empty-exercise" data-log-builder-target="emptyState">
+        <i class="bi bi-plus-circle display-4 text-muted"></i>
+        <h5 class="text-muted mt-3">Tap anywhere to add your first exercise</h5>
+        <p class="text-muted">Start building your workout</p>
+      </div>
 
-            </div>
+    </div>
 
-            <!-- Help Text -->
-            <div class="p-3 border-top bg-light">
-              <div class="text-muted small">
-                <strong>Quick Tips:</strong>
-                <span class="badge badge-status ms-2">Status</span>
-                <span class="badge badge-reps ms-1">Reps</span>
-                <span class="badge badge-weight ms-1">Weight</span>
-                <span class="badge badge-reflection ms-1">Notes</span>
-                • Tap any badge to change it
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- Help Text -->
+    <div class="p-3 border-top bg-light" data-typography-animator-target="fadeIn">
+      <div class="text-muted small">
+        <strong>Quick Tips:</strong>
+        <span class="badge badge-status ms-2">Status</span>
+        <span class="badge badge-reps ms-1">Reps</span>
+        <span class="badge badge-weight ms-1">Weight</span>
+        <span class="badge badge-reflection ms-1">Notes</span>
+        • Tap any badge to change it
       </div>
     </div>
   </div>
@@ -86,9 +86,6 @@
   </div>
 
 </div>
-
-<!-- Badge Modal - Will be created by JavaScript -->
-<!-- The modal HTML is dynamically created by badge_editor_controller.js -->
 
 <!-- Pass exercise and benchmark data to JavaScript -->
 <script>

@@ -13,9 +13,9 @@
 /* === TYPOGRAPHY VARIABLES === */
 :root {
   /* Font Families */
-  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-display: 'Poppins', 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  --font-primary: 'Oswald', 'Inter', system-ui, sans-serif;
+  --font-display: 'Oswald', 'Poppins', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Oswald', 'Monaco', 'Inconsolata', monospace;
   --font-accent: 'Oswald', 'Inter', sans-serif;
 
   /* Font Weights */
@@ -58,7 +58,7 @@ body {
   font-weight: var(--weight-normal);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
-  color: #2d3748;
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -69,7 +69,7 @@ h1, .h1 {
   font-weight: var(--weight-bold);
   font-size: var(--text-4xl);
   line-height: var(--leading-tight);
-  color: #1a365d;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   letter-spacing: -0.025em;
 }
@@ -79,7 +79,7 @@ h2, .h2 {
   font-weight: var(--weight-semibold);
   font-size: var(--text-3xl);
   line-height: var(--leading-tight);
-  color: #276749;
+  color: var(--accent-success);
   margin-bottom: 1.25rem;
   letter-spacing: -0.025em;
 }
@@ -89,7 +89,7 @@ h3, .h3 {
   font-weight: var(--weight-semibold);
   font-size: var(--text-2xl);
   line-height: var(--leading-tight);
-  color: #553c9a;
+  color: var(--accent-info);
   margin-bottom: 1rem;
 }
 
@@ -98,7 +98,7 @@ h4, .h4 {
   font-weight: var(--weight-semibold);
   font-size: var(--text-xl);
   line-height: var(--leading-normal);
-  color: #2d3748;
+  color: var(--text-primary);
   margin-bottom: 0.875rem;
 }
 
@@ -107,7 +107,7 @@ h5, .h5 {
   font-weight: var(--weight-medium);
   font-size: var(--text-lg);
   line-height: var(--leading-normal);
-  color: #2d3748;
+  color: var(--text-primary);
   margin-bottom: 0.75rem;
 }
 
@@ -116,7 +116,7 @@ h6, .h6 {
   font-weight: var(--weight-medium);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
-  color: #4a5568;
+  color: var(--text-secondary);
   margin-bottom: 0.5rem;
 }
 
@@ -127,6 +127,7 @@ p {
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
   margin-bottom: 1rem;
+  color: var(--text-primary);
 }
 
 .lead {
@@ -142,7 +143,7 @@ p {
   font-family: var(--font-display) !important;
   font-weight: var(--weight-bold) !important;
   font-size: var(--text-2xl) !important;
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
   letter-spacing: -0.025em;
   text-transform: none;
 }
@@ -153,7 +154,7 @@ p {
   font-weight: var(--weight-medium) !important;
   font-size: var(--text-base) !important;
   letter-spacing: 0.025em;
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--text-secondary) !important;
   transition: all 0.3s ease;
 }
 
@@ -167,33 +168,68 @@ p {
 
 .countdown-number {
   font-size: var(--text-lg);
-  color: #0d6efd;
+  color: var(--accent-primary);
 }
 
 .countdown-unit {
   font-family: var(--font-primary);
   font-size: var(--text-sm);
   font-weight: var(--weight-normal);
-  color: #6c757d;
+  color: var(--text-muted);
   margin-left: 0.125rem;
 }
 
-/* Badges and Labels */
+/* Badges and Labels - FIX 4: Use consistent styling */
 .badge, .workout-badge {
   font-family: var(--font-accent) !important;
   font-weight: var(--weight-medium) !important;
   font-size: var(--text-sm) !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0.375rem 0.75rem;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 8px !important;
+  margin: 0.25rem !important;
+  border: 1px solid transparent !important;
+  transition: all 0.2s ease !important;
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* Badge Type Colors - Consistent with dark theme */
+.badge-status {
+  background: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--text-inverse) !important;
+}
+
+.badge-reps {
+  background: var(--accent-success) !important;
+  border-color: var(--accent-success) !important;
+  color: var(--text-inverse) !important;
+}
+
+.badge-weight {
+  background: #f59e0b !important;
+  border-color: #f59e0b !important;
+  color: var(--text-inverse) !important;
+}
+
+.badge-reflection {
+  background: var(--accent-recovery) !important;
+  border-color: var(--accent-recovery) !important;
+  color: var(--text-inverse) !important;
 }
 
 /* Exercise names and workout titles */
-.exercise-name, .workout-title {
+.exercise-name, .workout-title, .exercise-header {
   font-family: var(--font-display);
   font-weight: var(--weight-semibold);
   font-size: var(--text-lg);
-  color: #1a365d;
+  color: var(--text-primary) !important;
 }
 
 /* Set numbers and rep counts */
@@ -201,17 +237,16 @@ p {
   font-family: var(--font-mono);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
+  color: var(--text-primary) !important;
 }
 
-/* === CARDS === */
+/* === CARDS - FIX 2: Use dark theme background === */
 .card {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--surface-primary) !important;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-muted) !important;
   border-radius: 12px;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm) !important;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -221,7 +256,7 @@ p {
   font-family: var(--font-display);
   font-weight: var(--weight-semibold);
   font-size: var(--text-xl);
-  color: #1a365d;
+  color: var(--text-primary);
   margin-bottom: 0.75rem;
 }
 
@@ -230,54 +265,54 @@ p {
   font-weight: var(--weight-normal);
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
-  color: #4a5568;
+  color: var(--text-secondary);
 }
 
 /* Card hover effects */
 .card:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.15),
-    0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md) !important;
+  background: var(--surface-hover) !important;
+  border-color: var(--border-default) !important;
 }
 
 /* === NAVIGATION === */
 nav.navbar,
 .navbar.navbar-expand-lg {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: var(--surface-primary) !important;
   backdrop-filter: blur(10px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border-bottom: 1px solid var(--border-muted) !important;
+  box-shadow: var(--shadow-sm) !important;
   position: relative;
 }
 
 .nav-link:hover {
-  color: #ffffff !important;
+  color: var(--accent-primary) !important;
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* === FORMS === */
 .form-control, .form-select {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface-primary);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 16px 20px;
   font-family: var(--font-primary);
   font-size: var(--text-base);
   font-weight: var(--weight-normal);
-  color: #2d3748;
+  color: var(--text-primary);
   line-height: var(--leading-normal);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
 }
 
 .form-control:focus, .form-select:focus {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(13, 110, 253, 0.5);
+  background: var(--surface-hover);
+  border-color: var(--accent-primary);
   box-shadow:
-    0 4px 15px rgba(0, 0, 0, 0.1),
-    0 0 0 3px rgba(13, 110, 253, 0.1);
+    var(--shadow-sm),
+    0 0 0 3px rgba(88, 166, 255, 0.25);
   outline: 0;
 }
 
@@ -286,7 +321,7 @@ label, .form-label {
   font-family: var(--font-primary);
   font-weight: var(--weight-medium);
   font-size: var(--text-sm);
-  color: #1a365d;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   display: block;
   text-transform: uppercase;
@@ -308,16 +343,16 @@ label, .form-label {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #0a58ca 0%, #0d6efd 100%);
+  background: #4c9aff;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(13, 110, 253, 0.4);
-  color: #ffffff;
+  box-shadow: var(--shadow-md);
+  color: var(--text-inverse);
 }
 
 /* === ALERTS === */
@@ -344,6 +379,14 @@ label, .form-label {
   font-family: var(--font-accent) !important;
 }
 
+/* Force all text to be readable - catch-all for dark text */
+.exercise-block, .exercise-block *,
+.set-line, .set-line *,
+.workout-badge, .workout-badge *,
+span, div, p, h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+}
+
 .weight-light { font-weight: var(--weight-light) !important; }
 .weight-normal { font-weight: var(--weight-normal) !important; }
 .weight-medium { font-weight: var(--weight-medium) !important; }
@@ -364,7 +407,7 @@ label, .form-label {
 
 /* === LINKS === */
 a {
-  color: #1a365d;
+  color: var(--accent-primary);
   font-family: var(--font-primary);
   font-weight: var(--weight-normal);
   text-decoration: none;
@@ -372,7 +415,7 @@ a {
 }
 
 a:hover {
-  color: #276749;
+  color: var(--accent-info);
   text-decoration: underline;
 }
 
@@ -423,8 +466,8 @@ a:hover {
 
 /* === TEXT SELECTION === */
 ::selection {
-  background: rgba(26, 54, 93, 0.3);
-  color: #1a365d;
+  background: rgba(88, 166, 255, 0.3);
+  color: var(--text-primary);
 }
 
 /* === BOOTSTRAP ICON EXCLUSION === */
