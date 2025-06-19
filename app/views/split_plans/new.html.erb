@@ -1,8 +1,8 @@
-<h1 class="mb-4">🏋️ Create Your Split Plan</h1>
+<h1 class="mb-4">Choose Your Split Plan</h1>
 
 <%= simple_form_for @split_plan do |f| %>
   <div class="mb-4">
-    <h5>Choose Your Training Split:</h5>
+    <h5>Choose wisely</h5>
 
     <% @split_data.each do |key, days| %>
       <div class="form-check mb-3">
@@ -10,7 +10,12 @@
             class: "form-check-input",
             id: "split_#{key}" %>
         <%= label_tag "split_#{key}", class: "form-check-label" do %>
-          <strong><%= @label_data[key] %></strong><br>
+          <strong>
+            <%= @label_data[key] %>
+            <% if key.to_s == '8_day_split' %>
+              <span class="text-success">(Suggested)</span>
+            <% end %>
+          </strong><br>
           <small class="text-muted"><%= days.join(" → ") %></small>
         <% end %>
       </div>
