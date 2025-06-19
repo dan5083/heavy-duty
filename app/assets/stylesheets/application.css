@@ -1,33 +1,29 @@
-/*
- * This is a manifest file that'll be compiled into application.css.
- */
+/* app/assets/stylesheets/application.css */
 
-/*
- *= require components/buttons
- *= require pages/workout-logs
- */
+/* ===============================================
+   FONT IMPORTS - Oswald Primary Font
+   =============================================== */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap');
 
-/* Modern Typography System - Heavy Duty Workout App */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap');
+/* ===============================================
+   CSS CUSTOM PROPERTIES - DARK THEME FOUNDATION
+   =============================================== */
 
-/* === TYPOGRAPHY VARIABLES === */
 :root {
-  /* Font Families */
-  --font-primary: 'Oswald', 'Inter', system-ui, sans-serif;
-  --font-display: 'Oswald', 'Poppins', 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Oswald', 'Monaco', 'Inconsolata', monospace;
-  --font-accent: 'Oswald', 'Inter', sans-serif;
+  /* === TYPOGRAPHY SYSTEM - OSWALD PRIMARY === */
+  --font-primary: 'Oswald', 'Arial Black', sans-serif;
+  --font-display: 'Oswald', 'Arial Black', sans-serif;
+  --font-accent: 'Oswald', 'Arial Black', sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 
-  /* Font Weights */
+  /* === FONT WEIGHTS - OSWALD OPTIMIZED === */
   --weight-light: 300;
   --weight-normal: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
-  --weight-extrabold: 800;
-  --weight-black: 900;
 
-  /* Font Sizes */
+  /* === FONT SIZES - RESPONSIVE SCALE === */
   --text-xs: 0.75rem;     /* 12px */
   --text-sm: 0.875rem;    /* 14px */
   --text-base: 1rem;      /* 16px */
@@ -38,422 +34,273 @@
   --text-4xl: 2.25rem;    /* 36px */
   --text-5xl: 3rem;       /* 48px */
 
-  /* Line Heights */
+  /* === LINE HEIGHTS === */
   --leading-tight: 1.25;
+  --leading-snug: 1.375;
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
   --leading-loose: 2;
+
+  /* === LETTER SPACING === */
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+
+  /* === DARK THEME COLORS === */
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --bg-overlay: #30363d;
+
+  --surface-primary: #161b22;
+  --surface-hover: #21262d;
+  --surface-active: #30363d;
+
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --text-inverse: #0d1117;
+
+  --accent-primary: #58a6ff;
+  --accent-success: #3fb950;
+  --accent-warning: #f85149;
+  --accent-info: #79c0ff;
+  --accent-recovery: #a5a5a5;
+
+  --border-default: #30363d;
+  --border-muted: #21262d;
+  --border-emphasis: #f0f6fc;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+
+  /* === SPACING SCALE === */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* === BORDER RADIUS === */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-full: 9999px;
+
+  /* === TRANSITIONS === */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+  --transition-slow: 0.35s ease-in-out;
 }
 
-/* === BASE TYPOGRAPHY === */
+/* ===============================================
+   GLOBAL RESET & BASE STYLES
+   =============================================== */
+
 * {
-  font-family: var(--font-primary);
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-attachment: fixed;
-  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: var(--font-primary);
   font-weight: var(--weight-normal);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
-  color: var(--text-primary);
+  letter-spacing: var(--tracking-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
+/* ===============================================
+   TYPOGRAPHY HIERARCHY - OSWALD THROUGHOUT
+   =============================================== */
+
 /* === HEADINGS === */
-h1, .h1 {
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  margin: 0 0 var(--space-4) 0;
   font-family: var(--font-display);
-  font-weight: var(--weight-bold);
-  font-size: var(--text-4xl);
+  font-weight: var(--weight-semibold);
   line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
-  margin-bottom: 1.5rem;
-  letter-spacing: -0.025em;
+}
+
+h1, .h1 {
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
 }
 
 h2, .h2 {
-  font-family: var(--font-display);
-  font-weight: var(--weight-semibold);
   font-size: var(--text-3xl);
-  line-height: var(--leading-tight);
+  font-weight: var(--weight-semibold);
   color: var(--accent-success);
-  margin-bottom: 1.25rem;
-  letter-spacing: -0.025em;
 }
 
 h3, .h3 {
-  font-family: var(--font-display);
-  font-weight: var(--weight-semibold);
   font-size: var(--text-2xl);
-  line-height: var(--leading-tight);
+  font-weight: var(--weight-semibold);
   color: var(--accent-info);
-  margin-bottom: 1rem;
 }
 
 h4, .h4 {
-  font-family: var(--font-primary);
-  font-weight: var(--weight-semibold);
   font-size: var(--text-xl);
-  line-height: var(--leading-normal);
-  color: var(--text-primary);
-  margin-bottom: 0.875rem;
+  font-weight: var(--weight-medium);
 }
 
 h5, .h5 {
-  font-family: var(--font-primary);
-  font-weight: var(--weight-medium);
   font-size: var(--text-lg);
-  line-height: var(--leading-normal);
-  color: var(--text-primary);
-  margin-bottom: 0.75rem;
+  font-weight: var(--weight-medium);
 }
 
 h6, .h6 {
-  font-family: var(--font-primary);
-  font-weight: var(--weight-medium);
   font-size: var(--text-base);
-  line-height: var(--leading-normal);
+  font-weight: var(--weight-medium);
   color: var(--text-secondary);
-  margin-bottom: 0.5rem;
 }
 
 /* === BODY TEXT === */
 p {
+  margin: 0 0 var(--space-4) 0;
   font-family: var(--font-primary);
   font-weight: var(--weight-normal);
-  font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
-  margin-bottom: 1rem;
   color: var(--text-primary);
+  line-height: var(--leading-normal);
 }
 
-.lead {
-  font-size: var(--text-lg);
-  line-height: var(--leading-relaxed);
-  font-weight: var(--weight-normal);
-}
-
-/* === SPECIALIZED TYPOGRAPHY === */
+/* === SPECIALIZED TYPOGRAPHY CLASSES === */
 
 /* Brand/Logo */
-.navbar-brand {
+.brand-text, .navbar-brand {
   font-family: var(--font-display) !important;
   font-weight: var(--weight-bold) !important;
   font-size: var(--text-2xl) !important;
   color: var(--text-primary) !important;
-  letter-spacing: -0.025em;
-  text-transform: none;
+  letter-spacing: var(--tracking-wide) !important;
 }
 
 /* Navigation */
-.nav-link {
+.nav-text, .nav-link {
   font-family: var(--font-primary) !important;
   font-weight: var(--weight-medium) !important;
-  font-size: var(--text-base) !important;
-  letter-spacing: 0.025em;
   color: var(--text-secondary) !important;
-  transition: all 0.3s ease;
+  letter-spacing: var(--tracking-wide) !important;
 }
 
-/* Data/Numbers (Workout metrics, countdowns, etc.) */
-.data-text, .countdown-number, .metric-value {
+/* Data/Numbers - Monospace for precise alignment */
+.data-text, .metric-value, .countdown-number {
   font-family: var(--font-mono);
   font-weight: var(--weight-semibold);
-  letter-spacing: 0.05em;
-  font-variant-numeric: tabular-nums;
-}
-
-.countdown-number {
-  font-size: var(--text-lg);
   color: var(--accent-primary);
+  letter-spacing: var(--tracking-normal);
 }
 
 .countdown-unit {
   font-family: var(--font-primary);
-  font-size: var(--text-sm);
   font-weight: var(--weight-normal);
   color: var(--text-muted);
-  margin-left: 0.125rem;
 }
 
-/* Badges and Labels - FIX 4: Use consistent styling */
-.badge, .workout-badge {
-  font-family: var(--font-accent) !important;
-  font-weight: var(--weight-medium) !important;
-  font-size: var(--text-sm) !important;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.5rem 0.75rem !important;
-  border-radius: 8px !important;
-  margin: 0.25rem !important;
-  border: 1px solid transparent !important;
-  transition: all 0.2s ease !important;
-  min-height: 44px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
-  white-space: nowrap !important;
-}
-
-/* Badge Type Colors - Consistent with dark theme */
-.badge-status {
-  background: var(--accent-primary) !important;
-  border-color: var(--accent-primary) !important;
-  color: var(--text-inverse) !important;
-}
-
-.badge-reps {
-  background: var(--accent-success) !important;
-  border-color: var(--accent-success) !important;
-  color: var(--text-inverse) !important;
-}
-
-.badge-weight {
-  background: #f59e0b !important;
-  border-color: #f59e0b !important;
-  color: var(--text-inverse) !important;
-}
-
-.badge-reflection {
-  background: var(--accent-recovery) !important;
-  border-color: var(--accent-recovery) !important;
-  color: var(--text-inverse) !important;
-}
-
-/* Exercise names and workout titles */
-.exercise-name, .workout-title, .exercise-header {
+/* Exercise/Workout specific typography */
+.exercise-name, .workout-title {
   font-family: var(--font-display);
   font-weight: var(--weight-semibold);
-  font-size: var(--text-lg);
-  color: var(--text-primary) !important;
+  color: var(--text-primary);
+  letter-spacing: var(--tracking-wide);
 }
 
-/* Set numbers and rep counts */
-.set-number, .rep-count {
-  font-family: var(--font-mono);
+.set-number {
+  font-family: var(--font-accent);
   font-weight: var(--weight-bold);
-  font-variant-numeric: tabular-nums;
-  color: var(--text-primary) !important;
-}
-
-/* === CARDS - FIX 2: Use dark theme background === */
-.card {
-  background: var(--surface-primary) !important;
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border-muted) !important;
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm) !important;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.card-title {
-  font-family: var(--font-display);
-  font-weight: var(--weight-semibold);
-  font-size: var(--text-xl);
-  color: var(--text-primary);
-  margin-bottom: 0.75rem;
-}
-
-.card-text {
-  font-family: var(--font-primary);
-  font-weight: var(--weight-normal);
-  font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
-  color: var(--text-secondary);
-}
-
-/* Card hover effects */
-.card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: var(--shadow-md) !important;
-  background: var(--surface-hover) !important;
-  border-color: var(--border-default) !important;
-}
-
-/* === NAVIGATION === */
-nav.navbar,
-.navbar.navbar-expand-lg {
-  background: var(--surface-primary) !important;
-  backdrop-filter: blur(10px) !important;
-  border-bottom: 1px solid var(--border-muted) !important;
-  box-shadow: var(--shadow-sm) !important;
-  position: relative;
-}
-
-.nav-link:hover {
-  color: var(--accent-primary) !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* === FORMS === */
-.form-control, .form-select {
-  background: var(--surface-primary);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border-default);
-  border-radius: 8px;
-  padding: 16px 20px;
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  font-weight: var(--weight-normal);
-  color: var(--text-primary);
-  line-height: var(--leading-normal);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
-}
-
-.form-control:focus, .form-select:focus {
-  background: var(--surface-hover);
-  border-color: var(--accent-primary);
-  box-shadow:
-    var(--shadow-sm),
-    0 0 0 3px rgba(88, 166, 255, 0.25);
-  outline: 0;
-}
-
-/* Labels */
-label, .form-label {
-  font-family: var(--font-primary);
-  font-weight: var(--weight-medium);
-  font-size: var(--text-sm);
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  display: block;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* === BUTTONS === */
-.btn {
-  font-family: var(--font-primary);
-  font-weight: var(--weight-medium);
-  font-size: var(--text-base);
-  letter-spacing: 0.025em;
-  border-radius: 8px;
-  padding: 12px 24px;
-  transition: all 0.3s ease;
-  border: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-primary {
-  background: var(--accent-primary);
-  color: var(--text-inverse);
-  box-shadow: var(--shadow-sm);
-}
-
-.btn-primary:hover {
-  background: #4c9aff;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  color: var(--text-inverse);
-}
-
-/* === ALERTS === */
-.alert {
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
-  border: 1px solid transparent;
-}
-
-/* === UTILITY CLASSES === */
-.text-mono {
-  font-family: var(--font-mono) !important;
-  font-variant-numeric: tabular-nums;
-}
-
-.text-display {
-  font-family: var(--font-display) !important;
-}
-
-.text-accent {
-  font-family: var(--font-accent) !important;
-}
-
-/* Force all text to be readable - catch-all for dark text */
-.exercise-block, .exercise-block *,
-.set-line, .set-line *,
-.workout-badge, .workout-badge *,
-span, div, p, h1, h2, h3, h4, h5, h6 {
-  color: var(--text-primary) !important;
-}
-
-.weight-light { font-weight: var(--weight-light) !important; }
-.weight-normal { font-weight: var(--weight-normal) !important; }
-.weight-medium { font-weight: var(--weight-medium) !important; }
-.weight-semibold { font-weight: var(--weight-semibold) !important; }
-.weight-bold { font-weight: var(--weight-bold) !important; }
-.weight-extrabold { font-weight: var(--weight-extrabold) !important; }
-.weight-black { font-weight: var(--weight-black) !important; }
-
-.text-xs { font-size: var(--text-xs) !important; }
-.text-sm { font-size: var(--text-sm) !important; }
-.text-base { font-size: var(--text-base) !important; }
-.text-lg { font-size: var(--text-lg) !important; }
-.text-xl { font-size: var(--text-xl) !important; }
-.text-2xl { font-size: var(--text-2xl) !important; }
-.text-3xl { font-size: var(--text-3xl) !important; }
-.text-4xl { font-size: var(--text-4xl) !important; }
-.text-5xl { font-size: var(--text-5xl) !important; }
-
-/* === LINKS === */
-a {
   color: var(--accent-primary);
-  font-family: var(--font-primary);
-  font-weight: var(--weight-normal);
-  text-decoration: none;
-  transition: all 0.3s ease;
+  letter-spacing: var(--tracking-normal);
 }
 
-a:hover {
-  color: var(--accent-info);
-  text-decoration: underline;
+/* Form labels */
+.form-label, label {
+  font-family: var(--font-primary) !important;
+  font-weight: var(--weight-medium) !important;
+  color: var(--text-primary) !important;
+  letter-spacing: var(--tracking-wider) !important;
+  text-transform: uppercase;
+  font-size: var(--text-sm) !important;
 }
 
-/* === RESPONSIVE TYPOGRAPHY === */
-@media (max-width: 768px) {
-  :root {
-    --text-4xl: 2rem;      /* 32px */
-    --text-3xl: 1.75rem;   /* 28px */
-    --text-2xl: 1.5rem;    /* 24px */
-  }
+/* ===============================================
+   TYPOGRAPHY ANIMATIONS
+   =============================================== */
 
-  body {
-    font-size: var(--text-sm);
-    background-attachment: scroll;
-  }
+/* Typewriter Animation */
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
 
-  .navbar-brand {
-    font-size: var(--text-xl) !important;
-  }
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: var(--accent-primary); }
+}
 
-  .form-control, .form-select {
-    padding: 14px 16px;
-    font-size: var(--text-base);
-  }
+.typewriter-text {
+  overflow: hidden;
+  border-right: 0.15em solid var(--accent-primary);
+  white-space: nowrap;
+  margin: 0 auto;
+  letter-spacing: var(--tracking-wide);
+  animation:
+    typewriter 3.5s steps(40, end),
+    blink-caret 0.75s step-end infinite;
+}
 
-  .btn {
-    width: 100%;
-    padding: 16px 24px;
-    font-size: var(--text-base);
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* === ENTRANCE ANIMATIONS === */
-.container > * {
-  animation: fadeInUp 0.8s ease-out;
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
 }
 
-@keyframes fadeInUp {
+.fade-in-delay-1 { animation-delay: 0.2s; }
+.fade-in-delay-2 { animation-delay: 0.4s; }
+.fade-in-delay-3 { animation-delay: 0.6s; }
+
+/* Slide Up Animation */
+@keyframes slideUp {
   from {
     opacity: 0;
     transform: translateY(30px);
@@ -464,13 +311,183 @@ a:hover {
   }
 }
 
-/* === TEXT SELECTION === */
-::selection {
-  background: rgba(88, 166, 255, 0.3);
+.slide-up {
+  animation: slideUp 0.6s ease-out forwards;
+}
+
+.slide-up-delay-1 { animation-delay: 0.1s; }
+.slide-up-delay-2 { animation-delay: 0.2s; }
+.slide-up-delay-3 { animation-delay: 0.3s; }
+
+/* Character Animate */
+.char-animate {
+  display: inline-block;
+  opacity: 0;
+  animation: charFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes charFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) rotateX(90deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+  }
+}
+
+/* Highlight Animation */
+.highlight-text {
+  position: relative;
   color: var(--text-primary);
 }
 
-/* === BOOTSTRAP ICON EXCLUSION === */
-.bi, [class^="bi-"], [class*=" bi-"] {
-  font-family: "bootstrap-icons" !important;
+.highlight-text::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent-primary);
+  transition: width 0.6s ease-out;
+}
+
+.highlight-text.animate::after {
+  width: 100%;
+}
+
+/* ===============================================
+   LINKS & INTERACTIVE ELEMENTS
+   =============================================== */
+
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent-info);
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ===============================================
+   UTILITY CLASSES
+   =============================================== */
+
+/* Font Weight Utilities */
+.font-light { font-weight: var(--weight-light); }
+.font-normal { font-weight: var(--weight-normal); }
+.font-medium { font-weight: var(--weight-medium); }
+.font-semibold { font-weight: var(--weight-semibold); }
+.font-bold { font-weight: var(--weight-bold); }
+
+/* Font Size Utilities */
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-2xl { font-size: var(--text-2xl); }
+.text-3xl { font-size: var(--text-3xl); }
+.text-4xl { font-size: var(--text-4xl); }
+
+/* Color Utilities */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-accent { color: var(--accent-primary) !important; }
+.text-success { color: var(--accent-success) !important; }
+.text-warning { color: var(--accent-warning) !important; }
+
+/* ===============================================
+   RESPONSIVE TYPOGRAPHY
+   =============================================== */
+
+@media (max-width: 768px) {
+  :root {
+    --text-4xl: 2rem;      /* Smaller on mobile */
+    --text-3xl: 1.75rem;
+    --text-2xl: 1.5rem;
+    --text-xl: 1.25rem;
+  }
+
+  h1, .h1 { font-size: var(--text-4xl); }
+  h2, .h2 { font-size: var(--text-3xl); }
+  h3, .h3 { font-size: var(--text-2xl); }
+
+  body {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+  }
+
+  .brand-text, .navbar-brand {
+    font-size: var(--text-xl) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --text-4xl: 1.75rem;   /* Even smaller on very small screens */
+    --text-3xl: 1.5rem;
+    --text-2xl: 1.25rem;
+  }
+}
+
+/* ===============================================
+   ACCESSIBILITY & REDUCED MOTION
+   =============================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-default: #ffffff;
+    --accent-primary: #66b3ff;
+  }
+}
+
+/* ===============================================
+   PRINT STYLES
+   =============================================== */
+
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: black !important;
+    page-break-after: avoid;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
+  }
 }

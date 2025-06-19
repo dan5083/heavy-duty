@@ -1,45 +1,9 @@
 /* app/assets/stylesheets/themes/dark-theme.css */
 
 /* ===============================================
-   DARK THEME - CSS CUSTOM PROPERTIES
-   Heavy Duty Workout App - Mobile First, No Glass
+   DARK THEME - UNIFIED STYLING WITH OSWALD
+   Heavy Duty Workout App - Complete Dark Theme
    =============================================== */
-
-:root {
-  /* === CORE DARK COLORS === */
-  --bg-primary: #0d1117;          /* Deep dark background */
-  --bg-secondary: #161b22;        /* Card/panel background */
-  --bg-tertiary: #21262d;         /* Elevated surfaces */
-  --bg-overlay: #30363d;          /* Modals, dropdowns */
-
-  /* === SURFACE COLORS === */
-  --surface-primary: #161b22;     /* Card backgrounds */
-  --surface-hover: #21262d;       /* Hover states */
-  --surface-active: #30363d;      /* Active states */
-
-  /* === TEXT COLORS === */
-  --text-primary: #f0f6fc;        /* Main text */
-  --text-secondary: #8b949e;      /* Secondary text */
-  --text-muted: #6e7681;          /* Muted text */
-  --text-inverse: #0d1117;        /* Dark text on light bg */
-
-  /* === ACCENT COLORS === */
-  --accent-primary: #58a6ff;      /* Primary blue */
-  --accent-success: #3fb950;      /* Success green */
-  --accent-warning: #f85149;      /* Warning/danger red */
-  --accent-info: #79c0ff;         /* Info cyan */
-  --accent-recovery: #a5a5a5;     /* Recovery gray */
-
-  /* === BORDER COLORS === */
-  --border-default: #30363d;      /* Default borders */
-  --border-muted: #21262d;        /* Subtle borders */
-  --border-emphasis: #f0f6fc;     /* Emphasized borders */
-
-  /* === SHADOWS === */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
-}
 
 /* ===============================================
    GLOBAL DARK THEME APPLICATION
@@ -48,26 +12,25 @@
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
-  /* Keep the modern typography from application.css */
   font-family: var(--font-primary);
   font-weight: var(--weight-normal);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ===============================================
-   TYPOGRAPHY DARK THEME OVERRIDES
+   TYPOGRAPHY DARK THEME OVERRIDES - OSWALD
    =============================================== */
 
-/* === HEADINGS - Dark Theme Colors === */
+/* === HEADINGS - Oswald with Dark Theme Colors === */
 h1, .h1 {
   color: var(--text-primary);
-  /* Keep typography styles from application.css */
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
   font-size: var(--text-4xl);
   line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
 }
 
 h2, .h2 {
@@ -118,6 +81,7 @@ p {
   font-family: var(--font-display) !important;
   font-weight: var(--weight-bold) !important;
   font-size: var(--text-2xl) !important;
+  letter-spacing: var(--tracking-wide) !important;
 }
 
 /* Navigation */
@@ -125,6 +89,7 @@ p {
   color: var(--text-secondary) !important;
   font-family: var(--font-primary) !important;
   font-weight: var(--weight-medium) !important;
+  letter-spacing: var(--tracking-wide) !important;
 }
 
 .nav-link:hover {
@@ -154,12 +119,12 @@ p {
 /* Set numbers */
 .set-number {
   color: var(--accent-primary);
-  font-family: var(--font-mono);
+  font-family: var(--font-accent);
   font-weight: var(--weight-bold);
 }
 
 /* ===============================================
-   BOOTSTRAP COMPONENT OVERRIDES
+   BOOTSTRAP COMPONENT OVERRIDES - DARK THEME
    =============================================== */
 
 /* === CONTAINERS === */
@@ -222,14 +187,14 @@ p {
   font-family: var(--font-primary);
   font-weight: var(--weight-medium);
   font-size: var(--text-base);
-  letter-spacing: 0.025em;
+  letter-spacing: var(--tracking-wide);
   transition: all 0.2s ease;
 }
 
 .btn-primary {
   background: var(--accent-primary);
   border: 1px solid var(--accent-primary);
-  color: var(--text-inverse);
+  color: #ffffff;
   box-shadow: var(--shadow-sm);
 }
 
@@ -238,13 +203,13 @@ p {
   border-color: #4c9aff;
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
-  color: var(--text-inverse);
+  color: #ffffff;
 }
 
 .btn-success {
   background: var(--accent-success);
   border: 1px solid var(--accent-success);
-  color: var(--text-inverse);
+  color: #ffffff;
   box-shadow: var(--shadow-sm);
 }
 
@@ -253,7 +218,7 @@ p {
   border-color: #2ea043;
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
-  color: var(--text-inverse);
+  color: #ffffff;
 }
 
 .btn-outline-primary {
@@ -265,7 +230,7 @@ p {
 .btn-outline-primary:hover {
   background: var(--accent-primary);
   border-color: var(--accent-primary);
-  color: var(--text-inverse);
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
@@ -279,6 +244,30 @@ p {
   background: var(--surface-hover);
   border-color: var(--text-primary);
   color: var(--text-primary);
+}
+
+.btn-outline-success {
+  background: transparent;
+  border: 1px solid var(--accent-success);
+  color: var(--accent-success);
+}
+
+.btn-outline-success:hover {
+  background: var(--accent-success);
+  border-color: var(--accent-success);
+  color: #ffffff;
+}
+
+.btn-outline-danger {
+  background: transparent;
+  border: 1px solid var(--accent-warning);
+  color: var(--accent-warning);
+}
+
+.btn-outline-danger:hover {
+  background: var(--accent-warning);
+  border-color: var(--accent-warning);
+  color: #ffffff;
 }
 
 /* === ALERTS === */
@@ -346,12 +335,12 @@ p {
 }
 
 .form-label {
-  color: var(--text-primary);
-  font-family: var(--font-primary);
-  font-weight: var(--weight-medium);
-  font-size: var(--text-sm);
+  color: var(--text-primary) !important;
+  font-family: var(--font-primary) !important;
+  font-weight: var(--weight-medium) !important;
+  font-size: var(--text-sm) !important;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-wider) !important;
 }
 
 .form-check-input {
@@ -415,16 +404,18 @@ p {
   font-weight: var(--weight-medium);
   font-size: var(--text-sm);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-wider);
   padding: 0.375rem 0.75rem;
 }
 
 .bg-primary {
   background: var(--accent-primary) !important;
+  color: #ffffff !important;
 }
 
 .bg-success {
   background: var(--accent-success) !important;
+  color: #ffffff !important;
 }
 
 /* ===============================================
@@ -469,32 +460,33 @@ p {
   font-weight: var(--weight-medium) !important;
   font-size: var(--text-sm) !important;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-wider);
   padding: 0.5rem 0.75rem !important;
+  color: #ffffff !important;
 }
 
 .badge-status {
   background: var(--accent-primary) !important;
   border-color: var(--accent-primary) !important;
-  color: var(--text-inverse) !important;
+  color: #ffffff !important;
 }
 
 .badge-reps {
   background: var(--accent-success) !important;
   border-color: var(--accent-success) !important;
-  color: var(--text-inverse) !important;
+  color: #ffffff !important;
 }
 
 .badge-weight {
   background: #f59e0b !important;
   border-color: #f59e0b !important;
-  color: var(--text-inverse) !important;
+  color: #ffffff !important;
 }
 
 .badge-reflection {
   background: var(--accent-recovery) !important;
   border-color: var(--accent-recovery) !important;
-  color: var(--text-inverse) !important;
+  color: #ffffff !important;
 }
 
 .workout-badge:active {
@@ -557,6 +549,23 @@ p {
 }
 
 /* ===============================================
+   EMPTY STATES
+   =============================================== */
+
+.empty-exercise {
+  background: var(--surface-primary);
+  border: 1px dashed var(--border-default);
+  border-radius: 8px;
+  color: var(--text-muted);
+  padding: 2rem;
+  text-align: center;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ===============================================
    STICKY ELEMENTS
    =============================================== */
 
@@ -605,6 +614,29 @@ a:hover {
 
 .border-bottom {
   border-bottom: 1px solid var(--border-default) !important;
+}
+
+/* ===============================================
+   PROGRESS BARS
+   =============================================== */
+
+.progress {
+  background-color: var(--surface-hover);
+  border-radius: var(--radius-lg);
+}
+
+.progress-bar {
+  background-color: var(--accent-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+}
+
+.progress-bar.bg-success {
+  background-color: var(--accent-success) !important;
+}
+
+.progress-bar.bg-warning {
+  background-color: #f59e0b !important;
 }
 
 /* ===============================================

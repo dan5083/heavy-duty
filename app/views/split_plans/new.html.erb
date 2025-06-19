@@ -1,55 +1,21 @@
-<!-- app/views/workout_logs/new.html.erb -->
-<div data-controller="log-builder" class="workout-logger">
+<h1 class="mb-4">🏋️ Create Your Split Plan</h1>
 
-  <!-- Header -->
-  <div class="sticky-top bg-white border-bottom shadow-sm p-3 mb-4">
-    <div class="text-center">
-      <h2 class="mb-0">Today's <%= AppConstants::LABELS[@workout.muscle_group.to_sym] %> Workout</h2>
-      <p class="text-muted mb-0">Tap badges to edit • Add exercises with <code>+</code></p>
-    </div>
+<%= simple_form_for @split_plan do |f| %>
+  <div class="mb-4">
+    <h5>Choose Your Training Split:</h5>
+
+    <% @split_data.each do |key, days| %>
+      <div class="form-check mb-3">
+        <%= radio_button_tag :split_plan_choice, key, false,
+            class: "form-check-input",
+            id: "split_#{key}" %>
+        <%= label_tag "split_#{key}", class: "form-check-label" do %>
+          <strong><%= @label_data[key] %></strong><br>
+          <small class="text-muted"><%= days.join(" → ") %></small>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
-  <!-- Main Content: Badge Editor - FIX 3: Remove card wrapper entirely -->
-  <div class="px-3">
-    <!-- Badge Container - No more card wrapper! -->
-    <div class="badge-container"
-         data-log-builder-target="badgeContainer"
-         data-action="click->log-builder#addExercise">
-
-      <!-- Exercises will be rendered here -->
-      <div data-log-builder-target="exerciseList">
-        <!-- Initial content loaded from benchmark -->
-      </div>
-
-      <!-- Empty State -->
-      <div class="empty-exercise" data-log-builder-target="emptyState">
-        <i class="bi bi-plus-circle display-4 text-muted"></i>
-        <h5 class="text-muted mt-3">Tap anywhere to add your first exercise</h5>
-        <p class="text-muted">Start building your workout</p>
-      </div>
-
-    </div>
-
-    <!-- Help Text -->
-    <div class="p-3 border-top bg-light">
-      <div class="text-muted small">
-        <strong>Quick Tips:</strong>
-        <span class="badge badge-status ms-2">Status</span>
-        <span class="badge badge-reps ms-1">Reps</span>
-        <span class="badge badge-weight ms-1">Weight</span>
-        <span class="badge badge-reflection ms-1">Notes</span>
-        • Tap any badge to change it
-      </div>
-    </div>
-  </div>
-
-  <!-- Fixed Bottom Section: Finish Workout -->
-  <div class="fixed-bottom bg-white border-top shadow p-3">
-    <%= form_with model: [@workout.split_day.split_plan, @workout.split_day, @workout, @log],
-                  local: true,
-                  id: "workout-form",
-                  data: { log_builder_target: "form" } do |f| %>
-
-      <%= hidden_field_tag "workout_log[details]", "", data: { log_builder_target: "hiddenDetails" } %>
-
-      <div class="row align-items-center">
+  <%= f.button :submit, "Create Split Plan", class: "btn btn-success" %>
+<% end %>

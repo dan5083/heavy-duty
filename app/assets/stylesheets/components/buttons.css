@@ -1,13 +1,22 @@
 /* app/assets/stylesheets/components/buttons.css */
 
-/* Base Button Styles - Clean Modern Design */
+/* ===============================================
+   BASE BUTTON STYLES - DARK THEME WITH OSWALD
+   =============================================== */
+
 .btn {
-  border: 1px solid rgba(0,0,0,0.15);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: all 0.15s ease-in-out;
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
   position: relative;
   overflow: hidden;
-  font-weight: 500;
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-base);
+  letter-spacing: var(--tracking-wide);
+  border-radius: 8px;
+  text-transform: none;
+  line-height: var(--leading-normal);
 }
 
 .btn::before {
@@ -18,7 +27,7 @@
   right: 0;
   bottom: 0;
   background: rgba(255,255,255,0);
-  transition: background 0.15s ease-in-out;
+  transition: background var(--transition-fast);
   pointer-events: none;
 }
 
@@ -28,94 +37,526 @@
 
 .btn:active {
   transform: translateY(1px);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Button Variants */
-.btn-primary {
-  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-  color: #ffffff;
-  border: 1px solid #0d6efd;
+.btn:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  box-shadow: var(--shadow-sm), 0 0 0 0.2rem rgba(88, 166, 255, 0.25);
 }
+
+/* ===============================================
+   PRIMARY BUTTON VARIANTS - DARK THEME
+   =============================================== */
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+}
+
+.btn-primary:hover {
+  background: #4c9aff;
+  border-color: #4c9aff;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:focus {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm), 0 0 0 0.2rem rgba(88, 166, 255, 0.5);
+}
+
+.btn-primary:active {
+  background: #3d8bfd;
+  border-color: #3d8bfd;
+  color: #ffffff;
+}
+
+/* ===============================================
+   SUCCESS BUTTON VARIANTS - DARK THEME
+   =============================================== */
 
 .btn-success {
-  background: linear-gradient(135deg, #198754 0%, #146c43 100%);
-  color: white;
-  border-color: #198754;
+  background: var(--accent-success);
+  color: #ffffff;
+  border-color: var(--accent-success);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
 }
+
+.btn-success:hover {
+  background: #2ea043;
+  border-color: #2ea043;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-success:focus {
+  background: var(--accent-success);
+  border-color: var(--accent-success);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm), 0 0 0 0.2rem rgba(63, 185, 80, 0.5);
+}
+
+.btn-success:active {
+  background: #2d8738;
+  border-color: #2d8738;
+  color: #ffffff;
+}
+
+/* ===============================================
+   OUTLINE BUTTON VARIANTS - DARK THEME
+   =============================================== */
 
 .btn-outline-primary {
   background: transparent;
-  color: #0d6efd;
-  border-color: #0d6efd;
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
 }
 
 .btn-outline-primary:hover {
-  background: #0d6efd;
-  color: white;
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline-primary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.5);
+}
+
+.btn-outline-primary:active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #ffffff;
 }
 
 .btn-outline-success {
   background: transparent;
-  color: #198754;
-  border-color: #198754;
+  color: var(--accent-success);
+  border-color: var(--accent-success);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
 }
 
 .btn-outline-success:hover {
-  background: #198754;
-  color: white;
+  background: var(--accent-success);
+  border-color: var(--accent-success);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline-success:focus {
+  box-shadow: 0 0 0 0.2rem rgba(63, 185, 80, 0.5);
+}
+
+.btn-outline-success:active {
+  background: var(--accent-success);
+  border-color: var(--accent-success);
+  color: #ffffff;
 }
 
 .btn-outline-secondary {
   background: transparent;
-  color: #6c757d;
-  border-color: #6c757d;
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+}
+
+.btn-outline-secondary:hover {
+  background: var(--surface-hover);
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline-secondary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(139, 148, 158, 0.5);
+}
+
+.btn-outline-secondary:active {
+  background: var(--surface-hover);
+  border-color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 .btn-outline-danger {
   background: transparent;
-  color: #dc3545;
-  border-color: #dc3545;
+  color: var(--accent-warning);
+  border-color: var(--accent-warning);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
 }
 
 .btn-outline-danger:hover {
-  background: #dc3545;
-  color: white;
+  background: var(--accent-warning);
+  border-color: var(--accent-warning);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
-/* Size Variants */
+.btn-outline-danger:focus {
+  box-shadow: 0 0 0 0.2rem rgba(248, 81, 73, 0.5);
+}
+
+.btn-outline-danger:active {
+  background: var(--accent-warning);
+  border-color: var(--accent-warning);
+  color: #ffffff;
+}
+
+/* ===============================================
+   SECONDARY & LIGHT VARIANTS - DARK THEME
+   =============================================== */
+
+.btn-secondary {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+}
+
+.btn-secondary:hover {
+  background: var(--surface-active);
+  border-color: var(--border-emphasis);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:focus {
+  background: var(--surface-hover);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm), 0 0 0 0.2rem rgba(139, 148, 158, 0.5);
+}
+
+.btn-light {
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  border-color: var(--border-muted);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+}
+
+.btn-light:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-light:focus {
+  background: var(--surface-primary);
+  border-color: var(--border-muted);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm), 0 0 0 0.2rem rgba(161, 177, 194, 0.5);
+}
+
+/* ===============================================
+   BUTTON SIZES - OSWALD OPTIMIZED
+   =============================================== */
+
 .btn-sm {
-  font-size: 0.875rem;
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
   padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  letter-spacing: var(--tracking-normal);
 }
 
 .btn-lg {
-  font-size: 1.125rem;
+  font-family: var(--font-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   padding: 0.75rem 1.5rem;
-  font-weight: 600;
+  border-radius: 10px;
+  letter-spacing: var(--tracking-wide);
 }
 
-/* Mobile Optimizations */
+/* ===============================================
+   BUTTON STATES - DARK THEME
+   =============================================== */
+
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  background: var(--surface-hover);
+  border-color: var(--border-muted);
+  color: var(--text-muted);
+  box-shadow: none;
+  transform: none;
+}
+
+.btn.loading {
+  pointer-events: none;
+  position: relative;
+  color: transparent;
+}
+
+.btn.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1rem;
+  height: 1rem;
+  margin: -0.5rem 0 0 -0.5rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  border-right-color: transparent;
+  animation: btn-loading-spin 0.75s linear infinite;
+}
+
+@keyframes btn-loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===============================================
+   BUTTON GROUPS - DARK THEME
+   =============================================== */
+
+.btn-group .btn {
+  border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.btn-group .btn:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.btn-group .btn + .btn {
+  border-left: 0;
+}
+
+.btn-group .btn:hover,
+.btn-group .btn:focus {
+  z-index: 1;
+}
+
+/* ===============================================
+   LINK BUTTONS - DARK THEME
+   =============================================== */
+
+.btn-link {
+  background: transparent;
+  border: none;
+  color: var(--accent-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
+  text-decoration: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.btn-link:hover {
+  color: var(--accent-info);
+  text-decoration: underline;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-link:focus {
+  color: var(--accent-primary);
+  text-decoration: underline;
+  box-shadow: none;
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.btn-link:disabled {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+/* ===============================================
+   CLOSE BUTTONS - DARK THEME
+   =============================================== */
+
+.btn-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  line-height: 1;
+  opacity: 0.8;
+  padding: 0.25rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-close:hover {
+  color: var(--text-primary);
+  opacity: 1;
+  background: var(--surface-hover);
+  border-radius: 4px;
+}
+
+.btn-close:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+/* ===============================================
+   MOBILE OPTIMIZATIONS
+   =============================================== */
+
 @media (max-width: 768px) {
   .btn {
     min-height: 44px;
     touch-action: manipulation;
+    border-radius: 6px;
+    font-size: var(--text-base);
+    padding: 0.5rem 1rem;
   }
 
   .btn-sm {
     min-height: 40px;
     padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: var(--text-sm);
   }
 
   .btn-lg {
     min-height: 48px;
     padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: var(--text-lg);
+  }
+
+  .btn-group .btn {
+    flex: 1;
   }
 }
 
-/* Focus States for Accessibility */
-.btn:focus {
-  outline: 2px solid #0d6efd;
-  outline-offset: 2px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+/* ===============================================
+   WORKOUT-SPECIFIC BUTTON STYLES
+   =============================================== */
+
+.btn-workout {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border: 1px solid var(--accent-primary);
+  font-family: var(--font-accent);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-workout:hover {
+  background: #4c9aff;
+  border-color: #4c9aff;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-ready {
+  background: var(--accent-success);
+  color: #ffffff;
+  border: 1px solid var(--accent-success);
+  font-family: var(--font-accent);
+  font-weight: var(--weight-semibold);
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: var(--shadow-sm);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(63, 185, 80, 0.4);
+  }
+}
+
+.btn-ready:hover {
+  background: #2ea043;
+  border-color: #2ea043;
+  color: #ffffff;
+  animation: none;
+}
+
+/* ===============================================
+   ACCESSIBILITY & REDUCED MOTION
+   =============================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .btn:hover,
+  .btn:active {
+    transform: none !important;
+  }
+
+  .btn.loading::after {
+    animation: none !important;
+  }
+
+  .btn-ready {
+    animation: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .btn {
+    border-width: 2px;
+    font-weight: var(--weight-bold);
+  }
+
+  .btn:focus {
+    outline-width: 3px;
+  }
+}
+
+/* ===============================================
+   BUTTON ICON ALIGNMENT
+   =============================================== */
+
+.btn .bi {
+  vertical-align: -0.125em;
+  margin-right: 0.25rem;
+}
+
+.btn .bi:only-child {
+  margin-right: 0;
+}
+
+.btn-sm .bi {
+  margin-right: 0.2rem;
+}
+
+.btn-lg .bi {
+  margin-right: 0.3rem;
 }
