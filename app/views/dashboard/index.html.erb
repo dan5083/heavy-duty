@@ -1,22 +1,14 @@
 <div data-controller="typography-animator" data-typography-animator-delay-value="200" data-typography-animator-stagger-value="150">
-
   <h1 class="mb-4"
       data-typography-animator-target="typewriter">
     Training Dashboard
   </h1>
 
   <% if @next_ready %>
-    <div class="alert alert-info d-flex align-items-center mb-4 shadow-sm border-start border-4 border-primary fade-in-delay-1"
-         role="alert"
-         data-typography-animator-target="fadeIn">
-      <i class="bi bi-flag me-3 fs-4 text-primary"></i>
-      <div>
-        <strong data-typography-animator-target="highlight" class="highlight-text">Next-Up Muscle:</strong>
-        <span data-typography-animator-target="charAnimate"><%= @next_ready[:label] %></span><br>
-        <small class="text-muted">
-          Ready for <%= pluralize(@next_ready[:days_ready], "day") %>
-          (since <%= @next_ready[:ready_on].strftime("%b %d") %>)
-        </small>
+    <div class="alert alert-next-up d-flex align-items-center mb-4">
+      <div class="flex-grow-1">
+        <h4>NEXT UP: <%= @next_ready[:label] %></h4>
+        <p class="mb-0">Ready for <strong><%= @next_ready[:days_ready] %> days</strong> • Train this muscle next!</p>
       </div>
     </div>
   <% end %>
@@ -42,5 +34,4 @@
       </div>
     <% end %>
   </div>
-
 </div>
