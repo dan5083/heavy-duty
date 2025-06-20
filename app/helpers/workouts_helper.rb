@@ -107,20 +107,17 @@ module WorkoutsHelper
     nil
   end
 
-  # Extract status information (Working set, Drop set, etc.)
   def extract_status_badges(text)
-    status_patterns = [
-      /\b(working set|warmup set|drop set|super set|heavy set|light set|final set|first set|second set|third set)\b/i,
-      /\b(working|warmup|drop|super|heavy|light|final)\s+set\b/i
-    ]
+    valid_statuses = AppConstants::CLAUSE_LIBRARY[:status][:options]
+
+    # Create regex pattern from actual status options
+    status_pattern = /\b(#{valid_statuses.map { |s| Regexp.escape(s) }.join('|')})\b/i
 
     badges = []
-    status_patterns.each do |pattern|
-      if match = text.match(pattern)
-        badges << { type: 'status', content: match[0].titleize }
-        break
-      end
+    if match = text.match(status_pattern)
+      badges << { type: 'status', content: match[0].titleize }
     end
+
     badges
   end
 
@@ -185,27 +182,22 @@ module WorkoutsHelper
     badges
   end
 
-  # Extract reflection/notes (felt heavy, perfect form, etc.)
   def extract_reflection_badges(text)
-    reflection_patterns = [
-      /\b(felt heavy|felt light|felt good|felt strong)\b/i,
-      /\b(perfect form|good form|form broke down|sloppy form)\b/i,
-      /\b(could go heavier|next time go heavier|too easy|too hard)\b/i,
-      /\b(solid effort|great pump|burned|cramped)\b/i,
-      /\b(kept it smooth|slow and controlled|explosive)\b/i
-    ]
+    # Build patterns dynamically from AppConstants
+    valid_reflections = AppConstants::CLAUSE_LIBRARY[:reflection][:options]
+
+    # Create regex pattern from actual reflection options
+    reflection_pattern = /\b(#{valid_reflections.map { |r| Regexp.escape(r) }.join('|')})\b/i
 
     badges = []
-    reflection_patterns.each do |pattern|
-      if match = text.match(pattern)
-        badges << { type: 'reflection', content: match[0].downcase }
-        break
-      end
+
+    # Try to match any of our valid reflection options
+    if match = text.match(reflection_pattern)
+      badges << { type: 'reflection', content: match[0].downcase }
     end
 
     # If no specific reflection found but there's extra text, use it
     if badges.empty?
-      # Remove already extracted parts and see if there's meaningful text left
       cleaned = text.gsub(/\b(working|warmup|drop|super|heavy|light|final|first|second|third)\s+set\b/i, '')
                     .gsub(/\b\d+\s+reps?\b/i, '')
                     .gsub(/\b(to failure|amrap)\b/i, '')

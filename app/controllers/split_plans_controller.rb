@@ -102,20 +102,20 @@ class SplitPlansController < ApplicationController
     benchmark
   end
 
-  # FIX 2: Generate set description - ALWAYS 1 SET with 4 comma-separated badges
   def generate_set_description(set_number, exercise)
     # Generate 4 comma-separated values: status, reps, weight, reflection
-    status = "Working set"
-    reps = rand(8..12)  # Integer: 8-12
+    status = AppConstants::CLAUSE_LIBRARY[:status][:options].sample
+    reps = rand(8..12)
 
     # Handle bodyweight vs weighted exercises
     if exercise.include?("Push-Up") || exercise.include?("Pull-Up") || exercise.include?("Dip")
       weight = "bodyweight"
     else
-      weight = rand(60..90)  # Integer: 60-90
+      weight = rand(60..90)
     end
 
-    reflection = ["felt good", "solid effort", "kept it smooth"].sample
+    # Use AppConstants for reflection options
+    reflection = AppConstants::CLAUSE_LIBRARY[:reflection][:options].sample
 
     # Return comma-separated format for 4 badges
     "#{status}, #{reps}, #{weight}, #{reflection}"
