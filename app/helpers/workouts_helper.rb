@@ -74,18 +74,13 @@ module WorkoutsHelper
     sentence.ends_with?(".") ? sentence : "#{sentence}."
   end
 
-  # 🆕 Generate sample badges for new sets
+  # 🆕 Generate consistent default badges for new sets
   def generate_sample_badges(set_number = 1)
-    status_options = AppConstants::CLAUSE_LIBRARY[:status]
-    reps_options = ["8 reps", "10 reps", "12 reps", "to failure"]
-    weight_options = ["at #{rand(40..100)} kilos", "with bodyweight"]
-    reflection_options = AppConstants::CLAUSE_LIBRARY[:reflection]
-
     [
-      { type: 'status', content: status_options.sample },
-      { type: 'reps', content: reps_options.sample },
-      { type: 'weight', content: weight_options.sample },
-      { type: 'reflection', content: reflection_options.sample }
+      { type: 'status', content: 'Working set' },
+      { type: 'reps', content: '1 REPS' },
+      { type: 'weight', content: 'AT 1 KILOS' },
+      { type: 'reflection', content: 'solid effort' }
     ]
   end
 

@@ -50,7 +50,7 @@ class SplitPlansController < ApplicationController
     recovery_dates.each do |muscle_group, date|
       split_day = @split_plan.split_days.find_by(muscle_group: muscle_group)
 
-      # 🆕 Generate benchmark data using CLAUSE_LIBRARY instead of hardcoded BENCHMARK_DATA
+      # 🆕 Generate benchmark data using consistent defaults
       benchmark_data = generate_initial_benchmark(muscle_group.to_sym)
 
       # Create workout with proper name and details
@@ -71,8 +71,6 @@ class SplitPlansController < ApplicationController
     redirect_to dashboard_path, notice: "Recovery initialized successfully."
   end
 
-  # REMOVED: show action - no longer needed since we redirect to archive
-
   def destroy
     @split_plan = SplitPlan.find(params[:id])
     @split_plan.destroy
@@ -85,17 +83,17 @@ class SplitPlansController < ApplicationController
     params.require(:split_plan).permit(:name, :split_length)
   end
 
-  # 🆕 Generate initial benchmark using CLAUSE_LIBRARY patterns
+  # 🆕 Generate initial benchmark with consistent defaults
   def generate_initial_benchmark(muscle_group)
     exercises = AppConstants::WORKOUTS[muscle_group] || []
     return {} if exercises.empty?
 
-    # Pick 2-4 random exercises for the initial benchmark
-    sample_exercises = exercises.sample(rand(2..4))
+    # Pick 2-4 exercises for the initial benchmark (keeping exercise variety)
+    selected_exercises = exercises.sample(rand(2..4))
 
     benchmark = {}
-    sample_exercises.each do |exercise|
-      # Generate EXACTLY 1 SET using comma-separated format
+    selected_exercises.each do |exercise|
+      # Generate EXACTLY 1 SET using consistent default format
       benchmark[exercise] = [generate_set_description(1, exercise)]
     end
 
@@ -103,21 +101,7 @@ class SplitPlansController < ApplicationController
   end
 
   def generate_set_description(set_number, exercise)
-    # Generate 4 comma-separated values: status, reps, weight, reflection
-    status = AppConstants::CLAUSE_LIBRARY[:status][:options].sample
-    reps = rand(8..12)
-
-    # Handle bodyweight vs weighted exercises
-    if exercise.include?("Push-Up") || exercise.include?("Pull-Up") || exercise.include?("Dip")
-      weight = "bodyweight"
-    else
-      weight = rand(60..90)
-    end
-
-    # Use AppConstants for reflection options
-    reflection = AppConstants::CLAUSE_LIBRARY[:reflection][:options].sample
-
-    # Return comma-separated format for 4 badges
-    "#{status}, #{reps}, #{weight}, #{reflection}"
+    # Use consistent defaults that match JavaScript format
+    "Working set, 1 REPS, AT 1 KILOS, solid effort"
   end
 end
