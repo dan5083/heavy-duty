@@ -66,6 +66,96 @@
 }
 
 /* ===============================================
+   BENCHMARK MODAL
+   =============================================== */
+
+/* Add to app/assets/stylesheets/components/forms.css or similar */
+
+.benchmark-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+
+.benchmark-modal-content {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  padding: 2rem;
+  border-radius: 1rem;
+  max-width: 400px;
+  width: 90%;
+  margin: 0 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.benchmark-modal h3 {
+  font-family: var(--font-primary);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.benchmark-modal p {
+  color: var(--text-secondary);
+}
+
+.benchmark-modal .btn {
+  text-align: left;
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.benchmark-modal .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.benchmark-modal .btn-success {
+  background: linear-gradient(135deg, var(--accent-success) 0%, #20c997 100%);
+  border: none;
+  color: var(--text-primary);
+}
+
+.benchmark-modal .btn-outline-primary {
+  border: 2px solid var(--accent-primary);
+  background: transparent;
+  color: var(--accent-primary);
+}
+
+.benchmark-modal .btn-outline-primary:hover {
+  background: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.benchmark-modal small {
+  display: block;
+  font-weight: var(--weight-normal);
+  opacity: 0.8;
+  margin-top: 0.25rem;
+  color: var(--text-muted);
+}
+
+/* ===============================================
    FORM LABELS - OSWALD TYPOGRAPHY
    =============================================== */
 

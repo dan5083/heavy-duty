@@ -8,7 +8,9 @@ export default class extends Controller {
     "emptyState",
     "form",
     "hiddenDetails",
-    "submitButton"
+    "submitButton",
+    "benchmarkModal",
+    "benchmarkChoice"
   ]
 
   connect() {
@@ -20,10 +22,6 @@ export default class extends Controller {
     this.initializeBadgeInterface()
     this.element.addEventListener('badge-editor:badge-changed', this.handleBadgeChange.bind(this))
     this.element.addEventListener('badge-editor:add-badge', this.handleAddBadge.bind(this))
-
-    if (this.hasFormTarget) {
-      this.formTarget.addEventListener('submit', this.handleFormSubmit.bind(this))
-    }
 
     this.updateHiddenField()
   }
@@ -66,10 +64,10 @@ export default class extends Controller {
       <div class="exercise-block" data-exercise-id="${exerciseIndex}">
         <div class="exercise-header d-flex justify-content-between align-items-center">
           <span>🏋️ ${exerciseName}</span>
-          <button class="btn btn-sm btn-outline-danger"
+          <button class="btn btn-xs btn-danger exercise-delete-btn"
                   data-action="click->log-builder#deleteExercise"
                   data-exercise-id="${exerciseIndex}"
-                  onclick="event.stopPropagation()">
+                  type="button">
             <i class="bi bi-trash"></i>
           </button>
         </div>
@@ -130,9 +128,9 @@ export default class extends Controller {
 
     // Better fallbacks using your improved reflection options
     while (parts.length < 4) {
-      if (parts.length === 1) parts.push('1 REPS')           // Reasonable rep count
-      else if (parts.length === 2) parts.push('AT 1 KILOS')     // Reasonable weight
-      else if (parts.length === 3) parts.push('solid effort')  // From your new reflection list
+      if (parts.length === 1) parts.push('1 REPS')
+      else if (parts.length === 2) parts.push('AT 1 KILOS')
+      else if (parts.length === 3) parts.push('solid effort')
     }
 
     const [status, reps, weight, reflection] = parts.slice(0, 4)
@@ -208,7 +206,7 @@ export default class extends Controller {
 
     if (!this.benchmarkData[exerciseName]) {
       this.benchmarkData[exerciseName] = [
-        "Working set, 1 REPS, AT 1 KILOS, solid effort"  // Much clearer than "Work, 10, 70, good"
+        "Working set, 1 REPS, AT 1 KILOS, solid effort"
       ]
     }
 
@@ -237,7 +235,7 @@ export default class extends Controller {
     const exerciseName = exercises[exerciseId]
 
     if (exerciseName) {
-      this.benchmarkData[exerciseName].push("Working set, 1 REPS, AT 1 KILOS, solid effort")  // Better defaults
+      this.benchmarkData[exerciseName].push("Working set, 1 REPS, AT 1 KILOS, solid effort")
       this.renderWorkoutBadges()
       this.updateHiddenField()
 
@@ -261,7 +259,10 @@ export default class extends Controller {
   }
 
   deleteExercise(event) {
-    const exerciseId = event.target.dataset.exerciseId
+    event.preventDefault()
+    event.stopPropagation()
+
+    const exerciseId = event.target.closest('button').dataset.exerciseId
     console.log(`Deleting exercise ${exerciseId}`)
 
     this.updateWorkoutData()
@@ -280,9 +281,56 @@ export default class extends Controller {
     }
   }
 
-  handleFormSubmit(event) {
-    console.log("Form submitting - capturing current badge state...")
+  // 🆕 NEW: Show modal instead of immediately submitting
+  showBenchmarkModal(event) {
+    event.preventDefault()
+    console.log("Showing benchmark choice modal...")
+
+    // Update workout data first
     this.updateWorkoutData()
+
+    // Show the modal
+    this.benchmarkModalTarget.style.display = 'flex'
+    this.benchmarkModalTarget.style.cssText = `
+      display: flex !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    `
+
+    document.body.style.overflow = 'hidden'
+  }
+
+  // 🆕 NEW: Handle user's benchmark choice
+  chooseBenchmarkUpdate(event) {
+    const choice = event.target.dataset.choice
+    console.log(`User chose: ${choice}`)
+
+    // Set the hidden field value
+    this.benchmarkChoiceTarget.value = choice
+
+    // Close modal
+    this.closeBenchmarkModal()
+
+    // Submit the form
+    this.submitFormWithChoice()
+  }
+
+  // 🆕 NEW: Close the modal
+  closeBenchmarkModal() {
+    this.benchmarkModalTarget.style.display = 'none'
+    document.body.style.overflow = ''
+  }
+
+  // 🆕 NEW: Actually submit the form
+  submitFormWithChoice() {
+    console.log("Submitting form with benchmark choice:", this.benchmarkChoiceTarget.value)
 
     const allBadges = this.exerciseListTarget.querySelectorAll('.workout-badge')
     allBadges.forEach(badge => {
@@ -290,6 +338,9 @@ export default class extends Controller {
     })
 
     this.showSuccessFeedback('Saving workout...')
+
+    // Submit the form normally now
+    this.formTarget.submit()
   }
 
   handleBadgeChange(event) {

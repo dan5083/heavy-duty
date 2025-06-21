@@ -1,16 +1,28 @@
-
-
-
 # FYI to see decluttered tree use:
 tree -I "node_modules|.git|.DS_Store|*.log|coverage|build|dist|tmp"
+# Show all models with filenames as headers:
+for file in app/models/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 # Show all controllers.rb with filenames as headers:
 for file in app/controllers/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 # Show all views with filenames as headers:
 for file in app/views/**/*.html.erb; do echo "=== $file ==="; cat "$file"; echo; done
+# See the helpers
+for file in app/helpers/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
+# Check the routes to understand the flow
+echo "=== config/routes.rb ==="; cat config/routes.rb; echo
+# See the logic classes for recovery tracking
+for file in app/logic/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 # Show all js controllers with filenames as headers:
 for file in app/javascript/controllers/**/*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
-# For all CSS files in stylesheets directory
-for file in app/assets/stylesheets/**/*.css; do echo "=== $file ==="; cat "$file"; echo; done
+# For all CSS files in stylesheets/pages
+for file in app/assets/stylesheets/pages/*.css; do echo "=== $file ==="; cat "$file"; echo; done
+# For all CSS files in stylesheets/Themes
+for file in app/assets/stylesheets/themes/*.css; do echo "=== $file ==="; cat "$file"; echo; done
+# For all CSS files in stylesheets/Components A–C
+for file in app/assets/stylesheets/components/[a-c]*.css; do echo "=== $file ==="; cat "$file"; echo; done
+# For all CSS files in stylesheets/Components D–Z
+for file in app/assets/stylesheets/components/[d-z]*.css; do echo "=== $file ==="; cat "$file"; echo; done
+
 
 
 # 🚀 FEATURE BRANCH WORKFLOW

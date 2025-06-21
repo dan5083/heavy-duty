@@ -16,9 +16,9 @@
     </div>
   </div>
 
-  <!-- Main Content: Badge Editor - FIX 3: Remove card wrapper entirely -->
+  <!-- Main Content: Badge Editor -->
   <div class="px-3">
-    <!-- Badge Container - No more card wrapper! -->
+    <!-- Badge Container -->
     <div class="badge-container"
          data-log-builder-target="badgeContainer"
          data-action="click->log-builder#addExercise"
@@ -51,38 +51,60 @@
     </div>
   </div>
 
-  <!-- Fixed Bottom Section: Finish Workout -->
+  <!-- Fixed Bottom Section: Finish Workout (SIMPLIFIED) -->
   <div class="fixed-bottom bg-white border-top shadow p-3">
     <%= form_with model: [@workout.split_day.split_plan, @workout.split_day, @workout, @log],
                   local: true,
                   id: "workout-form",
-                  data: { log_builder_target: "form" } do |f| %>
+                  data: {
+                    log_builder_target: "form",
+                    action: "submit->log-builder#showBenchmarkModal"
+                  } do |f| %>
 
       <%= hidden_field_tag "workout_log[details]", "", data: { log_builder_target: "hiddenDetails" } %>
+      <%= hidden_field_tag "beat_benchmark", "", data: { log_builder_target: "benchmarkChoice" } %>
 
-      <div class="row align-items-center">
-        <div class="col-md-6">
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="beat_benchmark" id="beat_yes" value="yes">
-            <label class="form-check-label" for="beat_yes">
-              <strong class="text-success">Update my benchmark</strong>
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="beat_benchmark" id="beat_no" value="no">
-            <label class="form-check-label" for="beat_no">
-              <strong class="text-muted">Just save this workout</strong>
-            </label>
-          </div>
-        </div>
-
-        <div class="col-md-6 text-end">
-          <%= f.submit "Finish Workout",
-                       class: "btn btn-success btn-lg px-4",
-                       data: { log_builder_target: "submitButton" } %>
-        </div>
+      <div class="text-center">
+        <%= f.submit "Finish Workout",
+                     class: "btn btn-success btn-lg px-5",
+                     data: { log_builder_target: "submitButton" } %>
       </div>
     <% end %>
+  </div>
+
+  <!-- Benchmark Choice Modal (Hidden by default) - MOVED INSIDE THE CONTROLLER DIV -->
+  <div class="benchmark-modal" data-log-builder-target="benchmarkModal" style="display: none;">
+    <div class="benchmark-modal-content">
+      <div class="text-center mb-4">
+        <h3>Save this workout</h3>
+        <p class="text-muted">Did you beat your benchmark today?</p>
+      </div>
+
+      <div class="d-grid gap-3">
+        <button class="btn btn-success btn-lg"
+                data-action="click->log-builder#chooseBenchmarkUpdate"
+                data-choice="yes">
+          <i class="bi bi-trophy-fill me-2"></i>
+          <strong>Yes! Update my benchmark</strong>
+          <br><small class="text-light">This becomes your new personal best</small>
+        </button>
+
+        <button class="btn btn-outline-primary btn-lg"
+                data-action="click->log-builder#chooseBenchmarkUpdate"
+                data-choice="no">
+          <i class="bi bi-bookmark-fill me-2"></i>
+          <strong>Just save this workout</strong>
+          <br><small class="text-muted">Keep existing benchmark unchanged</small>
+        </button>
+      </div>
+
+      <div class="text-center mt-3">
+        <button class="btn btn-link text-muted"
+                data-action="click->log-builder#closeBenchmarkModal">
+          Cancel
+        </button>
+      </div>
+    </div>
   </div>
 
 </div>

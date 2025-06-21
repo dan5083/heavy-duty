@@ -26,29 +26,26 @@ class WorkoutLogsController < ApplicationController
     @log = @workout.workout_logs.build(details: formatted_details, user: current_user)
 
     if @log.save
-      # Handle benchmark updates - simplified logic
+      # 🆕 EXPLICIT CHOICE: Respect user's decision exactly
       if beat_benchmark && formatted_details.present?
         begin
           # User explicitly chose to update benchmark - use their submitted data
           updated_benchmark = JSON.parse(formatted_details)
           @workout.update(details: updated_benchmark.to_json)
 
-          Rails.logger.info "Benchmark updated with user's workout data"
+          Rails.logger.info "Benchmark updated with user's explicit choice"
 
-          # FIXED: Redirect to training archive instead of split plan
-          redirect_to training_archive_path,
+          redirect_to archive_path,
                       notice: "Workout saved and benchmark updated! 🎉"
         rescue JSON::ParserError => e
           Rails.logger.error "Failed to parse workout details for benchmark update: #{e.message}"
 
-          # FIXED: Redirect to training archive instead of split plan
-          redirect_to training_archive_path,
+          redirect_to archive_path,
                       notice: "Workout saved, but benchmark update failed."
         end
       else
-        # User chose just to save workout without updating benchmark
-        # FIXED: Redirect to training archive instead of split plan
-        redirect_to training_archive_path,
+        # User explicitly chose just to save workout without updating benchmark
+        redirect_to archive_path,
                     notice: "Workout saved."
       end
     else
