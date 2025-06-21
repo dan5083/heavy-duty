@@ -1,0 +1,99 @@
+const CACHE_NAME = 'heavy-duty-v2';
+const OFFLINE_URL = '/dashboard';
+
+// Assets to cache immediately
+const urlsToCache = [
+  '/',
+  '/dashboard',
+  '/archive',
+  '/manifest.json',
+  '/icon.png',
+  '/icon-192x192.png',
+  '/icon-512x512.png'
+];
+
+// Install event - cache core assets
+self.addEventListener('install', function(event) {
+  console.log('[ServiceWorker] Install');
+
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('[ServiceWorker] Caching app shell');
+        return cache.addAll(urlsToCache);
+      })
+      .then(function() {
+        return self.skipWaiting();
+      })
+  );
+});
+
+// Activate event - clean up old caches
+self.addEventListener('activate', function(event) {
+  console.log('[ServiceWorker] Activate');
+
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            console.log('[ServiceWorker] Removing old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(function() {
+      return self.clients.claim();
+    })
+  );
+});
+
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', function(event) {
+  // Skip non-HTTP requests
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
+  // Handle navigation requests (pages)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(function() {
+          return caches.match(OFFLINE_URL);
+        })
+    );
+    return;
+  }
+
+  // Handle other requests
+  event.respondWith(
+    caches.match(event.request)
+      .then(function(response) {
+        if (response) {
+          return response;
+        }
+
+        const fetchRequest = event.request.clone();
+
+        return fetch(fetchRequest).then(function(response) {
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
+
+          const responseToCache = response.clone();
+
+          caches.open(CACHE_NAME)
+            .then(function(cache) {
+              if (event.request.method === 'GET') {
+                cache.put(event.request, responseToCache);
+              }
+            });
+
+          return response;
+        }).catch(function() {
+          return caches.match(event.request);
+        });
+      })
+  );
+});

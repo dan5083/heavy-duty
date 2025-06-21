@@ -10,6 +10,15 @@
 
     <%= yield :head %>
 
+    <!-- iOS PWA Enhanced Support -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Heavy Duty">
+
+    <!-- Enhanced PWA meta -->
+    <meta name="theme-color" content="#dc3545">
+    <meta name="msapplication-TileColor" content="#dc3545">
+    <meta name="description" content="Track your workouts, manage recovery, and beat your benchmarks">
+
     <!-- ✅ Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 
@@ -19,7 +28,13 @@
     <!-- Favicon and Touch Icons -->
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
+
+    <!-- iOS Icons for different devices -->
     <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-180x180.png">
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
@@ -35,6 +50,7 @@
         "components/dropdowns",
         "pages/workout-logs",
         "data-turbo-track": "reload" %>
+
     <!-- ✅ JavaScript (Importmap + Turbo + Stimulus) -->
     <%= javascript_importmap_tags %>
 
@@ -53,6 +69,91 @@
               console.log('ServiceWorker registration failed: ', registrationError);
             });
         });
+      }
+    </script>
+
+    <!-- iOS PWA Install Prompt -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+        const isStandalone = window.navigator.standalone
+        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
+
+        if (isIOS && !isStandalone && isSafari) {
+          const dismissed = sessionStorage.getItem('ios-install-dismissed')
+
+          if (!dismissed) {
+            setTimeout(showIOSInstallPrompt, 3000) // Show after 3 seconds
+          }
+        }
+      })
+
+      function showIOSInstallPrompt() {
+        const promptHTML = `
+          <div id="ios-install-prompt" style="
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--surface-primary);
+            border: 1px solid #dc3545;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            z-index: 9999;
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            animation: slideUp 0.3s ease-out;
+          ">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <img src="/icon.png" style="width: 48px; height: 48px; border-radius: 8px;">
+              <div style="flex: 1;">
+                <h4 style="margin: 0; font-size: 1rem; font-weight: 600; color: var(--text-primary);">Add Heavy Duty to Home Screen</h4>
+                <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: var(--text-secondary);">
+                  Get the full app experience
+                </p>
+              </div>
+              <button id="ios-install-close" style="
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0.25rem;
+              ">&times;</button>
+            </div>
+
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-muted); font-size: 0.875rem; color: var(--text-secondary);">
+              1. Tap the <strong style="color: #dc3545;">Share</strong> button ⬆️<br>
+              2. Select <strong style="color: #dc3545;">"Add to Home Screen"</strong>
+            </div>
+          </div>
+
+          <style>
+            @keyframes slideUp {
+              from { transform: translateY(100%); opacity: 0; }
+              to { transform: translateY(0); opacity: 1; }
+            }
+          </style>
+        `
+
+        document.body.insertAdjacentHTML('beforeend', promptHTML)
+
+        document.getElementById('ios-install-close').addEventListener('click', function() {
+          const prompt = document.getElementById('ios-install-prompt')
+          prompt.style.animation = 'slideUp 0.3s ease-out reverse'
+          setTimeout(() => prompt.remove(), 300)
+          sessionStorage.setItem('ios-install-dismissed', 'true')
+        })
+
+        // Auto-hide after 8 seconds
+        setTimeout(() => {
+          const prompt = document.getElementById('ios-install-prompt')
+          if (prompt) {
+            prompt.style.animation = 'slideUp 0.3s ease-out reverse'
+            setTimeout(() => prompt.remove(), 300)
+          }
+        }, 8000)
       }
     </script>
   </head>

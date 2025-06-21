@@ -29,4 +29,7 @@ Rails.application.routes.draw do
 
   # ✅ Root
   root "dashboard#index"
+
+  get '/manifest.json', to: 'pwa#manifest'
+  get '/service-worker.js', to: 'pwa#service_worker'
 end
