@@ -32,6 +32,7 @@ for file in app/assets/stylesheets/components/[d-z]*.css; do echo "=== $file ===
 # 1️⃣ CREATE & SWITCH TO NEW BRANCH
 git checkout -b feature-name
 
+
 # 2️⃣ DO YOUR WORK
 # - Make changes in VS Code
 # - Test locally: rails server (visit localhost:3000)

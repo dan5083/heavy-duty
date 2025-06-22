@@ -16,8 +16,12 @@ export default class extends Controller {
   connect() {
     console.log("🏷️ Badge-based workout editor connected!")
 
+    // 🔧 FIX: Data is already an object, don't parse it
     this.benchmarkData = window.benchmarkData || {}
     this.availableExercises = window.availableExercises || []
+
+    console.log("Benchmark data:", this.benchmarkData)
+    console.log("Available exercises:", this.availableExercises)
 
     this.initializeBadgeInterface()
     this.element.addEventListener('badge-editor:badge-changed', this.handleBadgeChange.bind(this))
@@ -27,9 +31,13 @@ export default class extends Controller {
   }
 
   initializeBadgeInterface() {
+    console.log("Initializing badge interface with data:", this.benchmarkData)
+
     if (Object.keys(this.benchmarkData).length === 0) {
+      console.log("No benchmark data - showing empty state")
       this.showEmptyState()
     } else {
+      console.log("Benchmark data found - rendering workout badges")
       this.renderWorkoutBadges()
       this.hideEmptyState()
     }
@@ -202,26 +210,29 @@ export default class extends Controller {
   }
 
   selectExercise(exerciseName) {
-    console.log(`Adding exercise: ${exerciseName}`)
+      console.log(`Adding exercise: ${exerciseName}`)
 
-    if (!this.benchmarkData[exerciseName]) {
-      this.benchmarkData[exerciseName] = [
-        "Working set, 1 REPS, AT 1 KILOS, solid effort"
-      ]
-    }
+      // 🔧 FIX: Capture current badge state BEFORE adding new exercise
+      this.updateWorkoutData()
 
-    this.hideEmptyState()
-    this.renderWorkoutBadges()
-    this.updateHiddenField()
-
-    setTimeout(() => {
-      const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
-      const newExercise = exerciseBlocks[exerciseBlocks.length - 2]
-      if (newExercise) {
-        newExercise.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+      if (!this.benchmarkData[exerciseName]) {
+        this.benchmarkData[exerciseName] = [
+          "Working set, 1 REPS, AT 1 KILOS, solid effort"
+        ]
       }
-    }, 50)
-  }
+
+      this.hideEmptyState()
+      this.renderWorkoutBadges()  // Now this uses the updated data with user edits preserved
+      this.updateHiddenField()
+
+      setTimeout(() => {
+        const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
+        const newExercise = exerciseBlocks[exerciseBlocks.length - 2]
+        if (newExercise) {
+          newExercise.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+        }
+      }, 50)
+    }
 
   addSet(event) {
     event.preventDefault()

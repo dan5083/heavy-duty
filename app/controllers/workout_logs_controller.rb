@@ -35,17 +35,17 @@ class WorkoutLogsController < ApplicationController
 
           Rails.logger.info "Benchmark updated with user's explicit choice"
 
-          redirect_to archive_path,
+          redirect_to dashboard_path,
                       notice: "Workout saved and benchmark updated! 🎉"
         rescue JSON::ParserError => e
           Rails.logger.error "Failed to parse workout details for benchmark update: #{e.message}"
 
-          redirect_to archive_path,
+          redirect_to dashboard_path,
                       notice: "Workout saved, but benchmark update failed."
         end
       else
         # User explicitly chose just to save workout without updating benchmark
-        redirect_to archive_path,
+        redirect_to dashboard_path,
                     notice: "Workout saved."
       end
     else
