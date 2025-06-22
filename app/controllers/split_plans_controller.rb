@@ -9,8 +9,23 @@ class SplitPlansController < ApplicationController
     @label_data = AppConstants::LABELS
   end
 
+  # 🆕 Custom split builder page
+  def build_custom
+    @split_plan = SplitPlan.new
+    @available_muscles = AppConstants::CUSTOM_SPLIT_MUSCLES
+    @recovery_options = AppConstants::RECOVERY_OPTIONS
+    @muscle_labels = AppConstants::LABELS
+  end
+
   def create
     selected_label = params[:split_plan_choice]
+
+    # 🆕 Handle custom split creation
+    if selected_label == 'custom_split'
+      redirect_to build_custom_split_plans_path
+      return
+    end
+
     selected_split = AppConstants::SPLITS[selected_label.to_sym]
 
     # Create the plan
@@ -32,6 +47,50 @@ class SplitPlansController < ApplicationController
                 notice: "Split plan created! Now let's set up your recent training."
   end
 
+  # 🆕 Create custom split
+  def create_custom
+    muscle_selections = params[:muscle_selections] || {}
+    recovery_days = params[:recovery_days] || {}
+
+    # Filter only selected muscles with their recovery days
+    custom_config = {}
+    muscle_selections.each do |muscle, selected|
+      if selected == '1' && recovery_days[muscle].present?
+        custom_config[muscle] = recovery_days[muscle].to_i
+      end
+    end
+
+    # Validate we have at least one muscle
+    if custom_config.empty?
+      redirect_to build_custom_split_plan_path,
+                  alert: "Please select at least one muscle group."
+      return
+    end
+
+    # Create the custom split plan
+    @split_plan = current_user.split_plans.new
+    @split_plan.set_custom_config(custom_config)
+
+    if @split_plan.save
+      # Create split days for each selected muscle
+      custom_config.each_with_index do |(muscle_group, _recovery_days), index|
+        @split_plan.split_days.create!(
+          day_number: index + 1,
+          muscle_group: muscle_group.to_s
+        )
+      end
+
+      # Redirect to recovery initialization
+      redirect_to initialize_recovery_split_plan_path(@split_plan),
+                  notice: "Custom split created! Now let's set up your recent training."
+    else
+      @available_muscles = AppConstants::CUSTOM_SPLIT_MUSCLES
+      @recovery_options = AppConstants::RECOVERY_OPTIONS
+      @muscle_labels = AppConstants::LABELS
+      render :build_custom, alert: "Failed to create custom split: #{@split_plan.errors.full_messages.join(', ')}"
+    end
+  end
+
   def initialize_recovery
     @split_plan = SplitPlan.find(params[:id])
     @muscles = @split_plan.split_days.pluck(:muscle_group).uniq.map(&:to_sym)
@@ -40,7 +99,7 @@ class SplitPlansController < ApplicationController
   def submit_recovery
     @split_plan = SplitPlan.find(params[:id])
 
-    if params[:skip] == 'true'
+    if params[:skip].present?  # Instead of == 'true' or == '1'
       muscles = @split_plan.split_days.pluck(:muscle_group).uniq.map(&:to_sym)
       recovery_dates = muscles.to_h { |muscle| [muscle.to_s, 3.weeks.ago.to_date] }
     else

@@ -25,7 +25,6 @@ SPLITS = {
   ]
 }.freeze
 
-
   # Symbol-based workout dictionary per muscle group
 WORKOUTS = {
   entire_body: [
@@ -336,6 +335,15 @@ WORKOUTS = {
   ]
 }.freeze
 
+
+# 🆕 All available muscle groups for custom splits
+CUSTOM_SPLIT_MUSCLES = WORKOUTS.keys.freeze
+
+# 🆕 Recovery day options for custom splits (3-10 days)
+RECOVERY_OPTIONS = (3..10).to_a.freeze
+
+
+
   # Recovery cycle durations (in days) per muscle group
   TRAINING_CYCLE = {
   entire_body: 10,
@@ -454,6 +462,7 @@ end
   core_abs_and_obliques: "Core (Abs & Obliques)",
   forearms_and_grip_strength: "Forearms & Grip Strength",
   neck_and_mobility_stretching: "Neck & Mobility/Stretching",
+  custom_split: "Custom Split",
   :"1_day_split" => "1 Day Split",
   :"2_day_split" => "2 Day Split",
   :"3_day_split" => "3 Day Split",

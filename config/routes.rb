@@ -8,6 +8,12 @@ Rails.application.routes.draw do
       post :submit_recovery
     end
 
+    collection do
+      # 🆕 Custom split routes
+      get :build_custom
+      post :create_custom
+    end
+
     resources :split_days, only: [:edit, :update] do
       resources :workouts, only: [:new, :create, :update, :destroy, :show] do
         post :promote, on: :member

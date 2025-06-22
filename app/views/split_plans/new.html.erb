@@ -2,7 +2,20 @@
 
 <%= simple_form_for @split_plan do |f| %>
   <div class="mb-4">
-    <h5>Choose wisely</h5>
+    <h5>Choose wisely...(although you can switch at anytime)</h5>
+
+    <!-- Custom Split Option (Integrated) -->
+    <div class="form-check mb-3">
+      <%= radio_button_tag :split_plan_choice, 'custom_split', false,
+          class: "form-check-input",
+          id: "split_custom" %>
+      <%= label_tag "split_custom", class: "form-check-label" do %>
+        <strong>
+          <%= AppConstants::LABELS[:custom_split] %>
+        </strong><br>
+        <small class="text-muted">Design your own split with custom muscle groups and recovery times</small>
+      <% end %>
+    </div>
 
     <% @split_data.each do |key, days| %>
       <div class="form-check mb-3">
@@ -22,5 +35,5 @@
     <% end %>
   </div>
 
-  <%= f.button :submit, "Create Split Plan", class: "btn btn-success" %>
+  <%= f.button :submit, "Continue", class: "btn btn-success" %>
 <% end %>

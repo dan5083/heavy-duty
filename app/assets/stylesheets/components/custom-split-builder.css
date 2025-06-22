@@ -1,0 +1,407 @@
+/* app/assets/stylesheets/components/custom-split-builder.css */
+
+/* ===============================================
+   CUSTOM SPLIT BUILDER - DARK THEME
+   =============================================== */
+
+.custom-split-builder {
+  font-family: var(--font-primary);
+}
+
+.custom-split-builder h1 {
+  font-family: var(--font-primary);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* ===============================================
+   MUSCLE GROUP CARDS
+   =============================================== */
+
+.muscle-group-card {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all var(--transition-fast);
+  position: relative;
+  cursor: pointer;
+}
+
+.muscle-group-card:hover {
+  border-color: var(--accent-primary);
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.muscle-group-card.selected {
+  border-color: var(--accent-primary);
+  background: var(--surface-hover);
+  box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.25);
+}
+
+.muscle-group-card .form-check {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.muscle-group-card .form-check-label {
+  flex: 1;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
+  line-height: var(--leading-relaxed);
+}
+
+.muscle-group-card .form-check-label strong {
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.muscle-group-card .form-check-label small {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+/* ===============================================
+   RECOVERY SELECTOR
+   =============================================== */
+
+.recovery-selector {
+  border-top: 1px solid var(--border-muted);
+  padding-top: 0.75rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+.recovery-selector .form-label {
+  color: var(--text-secondary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  margin-bottom: 0.5rem;
+}
+
+.recovery-selector .form-select {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  padding: 0.375rem 0.75rem;
+}
+
+.recovery-selector .form-select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.25);
+}
+
+/* ===============================================
+   SPLIT PREVIEW CARD
+   =============================================== */
+
+.card.sticky-top {
+  top: 1rem;
+}
+
+.muscle-preview-item {
+  background: var(--surface-hover) !important;
+  border: 1px solid var(--border-muted);
+  transition: all var(--transition-fast);
+}
+
+.muscle-preview-item:hover {
+  background: var(--surface-active) !important;
+  border-color: var(--accent-primary);
+}
+
+.muscle-preview-item strong {
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+}
+
+.muscle-preview-item small {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.muscle-preview-item .badge {
+  background: var(--accent-primary) !important;
+  color: #ffffff;
+  font-family: var(--font-primary);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-xs);
+}
+
+/* ===============================================
+   STATS DISPLAY
+   =============================================== */
+
+.stat-box {
+  text-align: center;
+}
+
+.stat-box .h4 {
+  font-family: var(--font-primary);
+  font-weight: var(--weight-bold);
+  margin-bottom: 0.25rem;
+}
+
+.stat-box small {
+  color: var(--text-muted);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+
+/* ===============================================
+   SPLIT ROTATION PREVIEW
+   =============================================== */
+
+.rotation-preview .badge {
+  background: var(--surface-hover) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-default);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
+  font-size: var(--text-xs);
+  padding: 0.375rem 0.75rem;
+  margin: 0.125rem;
+}
+
+.rotation-preview .badge:hover {
+  background: var(--accent-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-primary);
+}
+
+/* ===============================================
+   ANIMATIONS
+   =============================================== */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: var(--shadow-sm);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+  }
+}
+
+/* ===============================================
+   EMPTY STATE
+   =============================================== */
+
+.custom-split-builder .text-center.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.custom-split-builder .text-center.text-muted i {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.custom-split-builder .text-center.text-muted p {
+  color: var(--text-muted);
+  font-family: var(--font-primary);
+  font-weight: var(--weight-normal);
+}
+
+/* ===============================================
+   SUBMIT BUTTON STATES
+   =============================================== */
+
+.custom-split-builder .btn-success:disabled {
+  background: var(--surface-hover);
+  border-color: var(--border-muted);
+  color: var(--text-muted);
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.custom-split-builder .btn-success:not(:disabled) {
+  animation: pulseGlow 2s infinite;
+}
+
+.custom-split-builder .btn-success:not(:disabled):hover {
+  animation: none;
+}
+
+/* ===============================================
+   MOBILE OPTIMIZATIONS
+   =============================================== */
+
+@media (max-width: 768px) {
+  .custom-split-builder .row {
+    margin: 0;
+  }
+
+  .custom-split-builder .col-lg-8,
+  .custom-split-builder .col-lg-4 {
+    padding: 0;
+  }
+
+  .custom-split-builder .col-lg-4 {
+    margin-top: 2rem;
+  }
+
+  .muscle-group-card {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .muscle-group-card .form-check {
+    gap: 0.5rem;
+  }
+
+  .recovery-selector {
+    padding-top: 0.5rem;
+  }
+
+  .muscle-preview-item {
+    padding: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .stat-box .h4 {
+    font-size: 1.25rem;
+  }
+
+  .rotation-preview .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .card.sticky-top {
+    position: static !important;
+    top: auto !important;
+  }
+}
+
+/* ===============================================
+   ACCESSIBILITY & REDUCED MOTION
+   =============================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .muscle-group-card,
+  .recovery-selector,
+  .muscle-preview-item {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .custom-split-builder .btn-success:not(:disabled) {
+    animation: none !important;
+  }
+
+  @keyframes slideDown {
+    from, to {
+      opacity: 1;
+      max-height: 200px;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from, to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .muscle-group-card {
+    border-width: 2px;
+  }
+
+  .muscle-group-card.selected {
+    border-width: 3px;
+  }
+
+  .muscle-group-card .form-check-label strong {
+    font-weight: var(--weight-bold);
+  }
+}
+
+/* ===============================================
+   FOCUS STATES
+   =============================================== */
+
+.muscle-group-card:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.25);
+  outline: none;
+}
+
+.muscle-group-card .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.25);
+  border-color: var(--accent-primary);
+}
+
+/* ===============================================
+   LOADING STATES
+   =============================================== */
+
+.muscle-group-card.loading {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+}
+
+.muscle-group-card.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  width: 1rem;
+  height: 1rem;
+  margin-top: -0.5rem;
+  border: 2px solid var(--accent-primary);
+  border-radius: 50%;
+  border-right-color: transparent;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
