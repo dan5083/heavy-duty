@@ -10,48 +10,46 @@ class WorkoutLogsController < ApplicationController
   end
 
   def create
-    raw_details = workout_log_params[:details]
+    Rails.logger.info "DEBUG: beat_benchmark param = #{params[:beat_benchmark].inspect}"
+
+    @log = @workout.workout_logs.build(user: current_user)
+
+    # Parse the exercise sets from params
+    exercise_sets_data = JSON.parse(params[:exercise_sets] || '[]')
     beat_benchmark = params[:beat_benchmark] == 'yes'
 
-    # Defensive parse for safety
-    begin
-      parsed = JSON.parse(raw_details)
-      raise unless parsed.is_a?(Hash) && parsed.any?
+    ActiveRecord::Base.transaction do
+      if @log.save
+        # Create exercise sets
+        exercise_sets_data.each do |set_data|
+          @log.exercise_sets.create!(
+            exercise_name: set_data['exercise_name'],
+            set_number: set_data['set_number'],
+            set_type: set_data['set_type'] || 'working',
+            reps: set_data['reps'],
+            weight_kg: set_data['weight_kg'],
+            weight_unit: set_data['weight_unit'] || 'kg',
+            notes: set_data['notes']
+          )
+        end
 
-      formatted_details = JSON.pretty_generate(parsed)
-    rescue
-      formatted_details = raw_details.to_s.strip
-    end
-
-    @log = @workout.workout_logs.build(details: formatted_details, user: current_user)
-
-    if @log.save
-      # 🆕 EXPLICIT CHOICE: Respect user's decision exactly
-      if beat_benchmark && formatted_details.present?
-        begin
-          # User explicitly chose to update benchmark - use their submitted data
-          updated_benchmark = JSON.parse(formatted_details)
-          @workout.update(details: updated_benchmark.to_json)
-
-          Rails.logger.info "Benchmark updated with user's explicit choice"
-
-          redirect_to dashboard_path,
-                      notice: "Workout saved and benchmark updated! 🎉"
-        rescue JSON::ParserError => e
-          Rails.logger.error "Failed to parse workout details for benchmark update: #{e.message}"
-
-          redirect_to dashboard_path,
-                      notice: "Workout saved, but benchmark update failed."
+        # Handle benchmark choice
+        if beat_benchmark
+          @log.update!(is_benchmark: true)
+          redirect_to dashboard_path, notice: "Workout saved and benchmark updated! 🎉"
+        else
+          redirect_to dashboard_path, notice: "Workout saved."
         end
       else
-        # User explicitly chose just to save workout without updating benchmark
-        redirect_to dashboard_path,
-                    notice: "Workout saved."
+        render :new, status: :unprocessable_entity
       end
-    else
-      # If save failed, render the form again with errors
-      render :new, status: :unprocessable_entity
     end
+  rescue JSON::ParserError => e
+    Rails.logger.error "Failed to parse exercise sets: #{e.message}"
+    redirect_to dashboard_path, alert: "Failed to save workout data."
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error "Failed to save exercise sets: #{e.message}"
+    redirect_to dashboard_path, alert: "Failed to save workout: #{e.message}"
   end
 
   def render_set_inputs
@@ -69,14 +67,4 @@ class WorkoutLogsController < ApplicationController
   def set_workout
     @workout = Workout.find(params[:workout_id])
   end
-
-  def workout_log_params
-    params.require(:workout_log).permit(:details)
-  end
-
-  # REMOVED: Complex merge_benchmark_selectively method
-  # REMOVED: Complex sets_were_modified? method
-  #
-  # Simplified approach: If user says "update benchmark", use their data.
-  # If they say "just save", keep existing benchmark unchanged.
 end

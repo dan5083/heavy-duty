@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_10_171457) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_22_133505) do
+  create_table "exercise_sets", force: :cascade do |t|
+    t.integer "workout_log_id", null: false
+    t.string "exercise_name", null: false
+    t.integer "set_number", null: false
+    t.string "set_type", default: "working"
+    t.integer "reps"
+    t.decimal "weight_kg", precision: 6, scale: 2
+    t.string "weight_unit", default: "kg"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workout_log_id", "exercise_name", "set_number"], name: "index_exercise_sets_on_log_exercise_set"
+    t.index ["workout_log_id"], name: "index_exercise_sets_on_workout_log_id"
+  end
+
   create_table "split_days", force: :cascade do |t|
     t.integer "split_plan_id", null: false
     t.string "muscle_group"
@@ -46,10 +61,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_171457) do
   create_table "workout_logs", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "workout_id", null: false
-    t.text "details"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_benchmark", default: false
     t.index ["user_id"], name: "index_workout_logs_on_user_id"
+    t.index ["workout_id", "is_benchmark"], name: "index_workout_logs_on_workout_id_and_is_benchmark"
     t.index ["workout_id"], name: "index_workout_logs_on_workout_id"
   end
 
@@ -57,12 +73,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_171457) do
     t.integer "split_day_id", null: false
     t.string "name"
     t.string "muscle_group"
-    t.text "details"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["split_day_id"], name: "index_workouts_on_split_day_id"
   end
 
+  add_foreign_key "exercise_sets", "workout_logs"
   add_foreign_key "split_days", "split_plans"
   add_foreign_key "split_plans", "users"
   add_foreign_key "workout_logs", "users"

@@ -122,11 +122,19 @@ export default class extends Controller {
   }
 
   getAlternatives() {
+    // Use data passed from Rails AppConstants
+    const clauseLibrary = window.clauseLibrary || {}
+
     switch(this.typeValue) {
       case 'status':
-        return ["Working set", "Warmup set", "Drop set", "Super set", "Heavy set", "Light set"]
+        return clauseLibrary.status?.options || ["Working set", "Warmup set", "Drop set", "Super set", "Heavy set", "Light set"]
 
       case 'reps':
+        if (clauseLibrary.reps?.options) {
+          return clauseLibrary.reps.options.map(num => num === 1 ? "1 rep" : `${num} reps`)
+                   .concat(["to failure", "AMRAP"])
+        }
+        // Fallback if no AppConstants data
         const repsOptions = []
         for (let i = 1; i <= 35; i++) {
           repsOptions.push(i === 1 ? "1 rep" : `${i} reps`)
@@ -134,15 +142,19 @@ export default class extends Controller {
         return [...repsOptions, "to failure", "AMRAP"]
 
       case 'weight':
-        const weightOptions = []
-        for (let i = 1; i <= 300; i++) {
-          weightOptions.push(`at ${i} kilos`)
+        if (clauseLibrary.weight?.options) {
+          const weightOptions = clauseLibrary.weight.options.map(num => `at ${num} kg`)
+          return ["bodyweight", ...weightOptions]
         }
-        return ["with bodyweight", ...weightOptions]
+        // Fallback
+        const fallbackWeights = []
+        for (let i = 1; i <= 300; i++) {
+          fallbackWeights.push(`at ${i} kg`)
+        }
+        return ["bodyweight", ...fallbackWeights]
 
       case 'reflection':
-        return ["kept it smooth", "felt heavy", "perfect form", "could go heavier",
-                "solid effort", "form broke down", "great pump", "good mind-muscle connection"]
+        return clauseLibrary.reflection?.options || ["solid effort", "perfect form", "good pump"]
 
       default:
         return []

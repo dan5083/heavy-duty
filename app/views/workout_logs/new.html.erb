@@ -51,7 +51,7 @@
     </div>
   </div>
 
-  <!-- Fixed Bottom Section: Finish Workout (SIMPLIFIED) -->
+  <!-- Fixed Bottom Section: Finish Workout -->
   <div class="fixed-bottom bg-white border-top shadow p-3">
     <%= form_with model: [@workout.split_day.split_plan, @workout.split_day, @workout, @log],
                   local: true,
@@ -61,7 +61,7 @@
                     action: "submit->log-builder#showBenchmarkModal"
                   } do |f| %>
 
-      <%= hidden_field_tag "workout_log[details]", "", data: { log_builder_target: "hiddenDetails" } %>
+      <%= hidden_field_tag "exercise_sets", "", data: { log_builder_target: "hiddenDetails" } %>
       <%= hidden_field_tag "beat_benchmark", "", data: { log_builder_target: "benchmarkChoice" } %>
 
       <div class="text-center">
@@ -72,7 +72,7 @@
     <% end %>
   </div>
 
-  <!-- Benchmark Choice Modal (Hidden by default) - MOVED INSIDE THE CONTROLLER DIV -->
+  <!-- Benchmark Choice Modal -->
   <div class="benchmark-modal" data-log-builder-target="benchmarkModal" style="display: none;">
     <div class="benchmark-modal-content">
       <div class="text-center mb-4">
@@ -111,6 +111,39 @@
 
 <!-- Pass exercise and benchmark data to JavaScript -->
 <script>
-  window.benchmarkData = <%= raw(@workout.details.present? ? @workout.details : '{}') %>;
+  // Convert benchmark ExerciseSets to JavaScript format
+  <% benchmark_data = {} %>
+  <% if @workout.benchmark_log %>
+    <% @workout.benchmark_log.exercises_hash.each do |exercise_name, sets| %>
+      <% benchmark_data[exercise_name] = sets.map do |exercise_set| %>
+        <% {
+          set_number: exercise_set.set_number,
+          set_type: exercise_set.set_type,
+          reps: exercise_set.reps,
+          weight_kg: exercise_set.weight_kg,
+          weight_unit: exercise_set.weight_unit,
+          notes: exercise_set.notes
+        } %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  window.benchmarkData = <%= raw(benchmark_data.to_json) %>;
   window.availableExercises = <%= raw(AppConstants::WORKOUTS[@workout.muscle_group.to_sym].to_json) %>;
+
+  // Pass AppConstants clause library to JavaScript
+  window.clauseLibrary = {
+    status: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:status][:options].to_json) %>
+    },
+    reps: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reps][:options].to_json) %>
+    },
+    weight: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:weight][:options].to_json) %>
+    },
+    reflection: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reflection][:options].to_json) %>
+    }
+  };
 </script>

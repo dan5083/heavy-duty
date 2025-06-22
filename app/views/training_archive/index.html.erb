@@ -26,40 +26,44 @@
       <div class="col-md-6 mb-4">
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center">
-            <h6 class="mb-0">
-              <%= log.created_at.strftime("%b %d, %Y") %>
-            </h6>
+            <div>
+              <h6 class="mb-0">
+                <%= log.created_at.strftime("%b %d, %Y") %>
+              </h6>
+              <% if log.is_benchmark? %>
+                <span class="badge bg-warning text-dark">
+                  <i class="bi bi-trophy"></i> Benchmark
+                </span>
+              <% end %>
+            </div>
             <span class="badge bg-primary">
               <%= AppConstants::LABELS[log.workout.muscle_group.to_sym] %>
             </span>
           </div>
           <div class="card-body">
-            <% if log.details.present? %>
-              <% begin %>
-                <% parsed_details = JSON.parse(log.details) %>
-                <% if parsed_details.is_a?(Hash) && parsed_details.any? %>
-                  <% parsed_details.each do |exercise, sets| %>
-                    <div class="mb-3">
-                      <strong class="text-primary"><%= exercise %></strong>
-                      <% if sets.is_a?(Array) %>
-                        <% sets.each_with_index do |set, index| %>
-                          <div class="small text-muted">
-                            <strong>Set <%= index + 1 %>:</strong> <%= set %>
-                          </div>
-                        <% end %>
+            <% if log.exercise_sets.any? %>
+              <% log.exercises_hash.each do |exercise_name, sets| %>
+                <div class="mb-3">
+                  <strong class="text-primary"><%= exercise_name %></strong>
+                  <% sets.each_with_index do |exercise_set, index| %>
+                    <div class="small text-muted">
+                      <strong>Set <%= index + 1 %>:</strong>
+                      <%= exercise_set.set_type.titleize %> set,
+                      <% if exercise_set.reps %>
+                        <%= exercise_set.reps %> reps
+                      <% else %>
+                        to failure
+                      <% end %>,
+                      <%= exercise_set.weight_display %>
+                      <% if exercise_set.notes.present? %>
+                        • <%= exercise_set.notes %>
                       <% end %>
                     </div>
                   <% end %>
-                <% else %>
-                  <div class="text-muted small">No structured data recorded</div>
-                <% end %>
-              <% rescue JSON::ParserError %>
-                <div class="text-muted small">
-                  <%= log.details.present? ? log.details : "No details recorded" %>
                 </div>
               <% end %>
             <% else %>
-              <div class="text-muted small">No details recorded</div>
+              <div class="text-muted small">No exercises recorded</div>
             <% end %>
           </div>
         </div>

@@ -16,7 +16,7 @@ export default class extends Controller {
   connect() {
     console.log("🏷️ Badge-based workout editor connected!")
 
-    // 🔧 FIX: Data is already an object, don't parse it
+    // Get benchmark data from ExerciseSet structure
     this.benchmarkData = window.benchmarkData || {}
     this.availableExercises = window.availableExercises || []
 
@@ -64,8 +64,8 @@ export default class extends Controller {
   }
 
   renderExerciseBlock(exerciseName, sets, exerciseIndex) {
-    const setsHtml = sets.map((setDescription, setIndex) => {
-      return this.renderSetLine(setDescription, exerciseIndex, setIndex)
+    const setsHtml = sets.map((setData, setIndex) => {
+      return this.renderSetLine(setData, exerciseIndex, setIndex)
     }).join('')
 
     return `
@@ -91,8 +91,8 @@ export default class extends Controller {
     `
   }
 
-  renderSetLine(setDescription, exerciseIndex, setIndex) {
-    const badges = this.parseSetIntoBadges(setDescription)
+  renderSetLine(setData, exerciseIndex, setIndex) {
+    const badges = this.exerciseSetToBadges(setData)
     const badgesHtml = badges.map((badge, badgeIndex) => {
       return this.renderBadge(badge, exerciseIndex, setIndex, badgeIndex)
     }).join('')
@@ -131,24 +131,63 @@ export default class extends Controller {
     `
   }
 
-  parseSetIntoBadges(setDescription) {
-    const parts = setDescription.split(',').map(part => part.trim())
+  // Convert ExerciseSet data to badge format
+  exerciseSetToBadges(setData) {
+    return [
+      { type: 'status', content: `${setData.set_type || 'Working'} set` },
+      { type: 'reps', content: setData.reps ? `${setData.reps} reps` : 'to failure' },
+      { type: 'weight', content: setData.weight_kg ? `at ${setData.weight_kg} ${setData.weight_unit || 'kg'}` : 'bodyweight' },
+      { type: 'reflection', content: setData.notes || 'solid effort' }
+    ]
+  }
 
-    // Better fallbacks using your improved reflection options
-    while (parts.length < 4) {
-      if (parts.length === 1) parts.push('1 REPS')
-      else if (parts.length === 2) parts.push('AT 1 KILOS')
-      else if (parts.length === 3) parts.push('solid effort')
+  // Convert badges back to ExerciseSet format
+  badgesToExerciseSet(badges, exerciseName, setNumber) {
+    const statusBadge = badges.find(b => b.type === 'status')
+    const repsBadge = badges.find(b => b.type === 'reps')
+    const weightBadge = badges.find(b => b.type === 'weight')
+    const reflectionBadge = badges.find(b => b.type === 'reflection')
+
+    return {
+      exercise_name: exerciseName,
+      set_number: setNumber,
+      set_type: this.extractSetType(statusBadge?.content),
+      reps: this.extractReps(repsBadge?.content),
+      weight_kg: this.extractWeight(weightBadge?.content)?.weight,
+      weight_unit: this.extractWeight(weightBadge?.content)?.unit || 'kg',
+      notes: reflectionBadge?.content || 'solid effort'
+    }
+  }
+
+  extractSetType(statusContent) {
+    if (!statusContent) return 'working'
+    const lower = statusContent.toLowerCase()
+    if (lower.includes('warmup')) return 'warmup'
+    if (lower.includes('drop')) return 'drop'
+    if (lower.includes('super')) return 'super'
+    if (lower.includes('heavy')) return 'heavy'
+    if (lower.includes('light')) return 'light'
+    return 'working'
+  }
+
+  extractReps(repsContent) {
+    if (!repsContent || repsContent.toLowerCase().includes('failure')) return null
+    const match = repsContent.match(/(\d+)/)
+    return match ? parseInt(match[1]) : null
+  }
+
+  extractWeight(weightContent) {
+    if (!weightContent || weightContent.toLowerCase().includes('bodyweight')) {
+      return { weight: null, unit: 'kg' }
     }
 
-    const [status, reps, weight, reflection] = parts.slice(0, 4)
-
-    return [
-      { type: 'status', content: status || 'Working set' },
-      { type: 'reps', content: reps || '1 REPS' },
-      { type: 'weight', content: weight || 'AT 1 KILOS' },
-      { type: 'reflection', content: reflection || 'solid effort' }
-    ]
+    const match = weightContent.match(/(\d+(?:\.\d+)?)\s*(kg|kilos?|lbs?|pounds?)?/i)
+    if (match) {
+      const weight = parseFloat(match[1])
+      const unit = match[2]?.toLowerCase().includes('lb') ? 'lbs' : 'kg'
+      return { weight, unit }
+    }
+    return { weight: null, unit: 'kg' }
   }
 
   addExercise(event) {
@@ -210,29 +249,33 @@ export default class extends Controller {
   }
 
   selectExercise(exerciseName) {
-      console.log(`Adding exercise: ${exerciseName}`)
+    console.log(`Adding exercise: ${exerciseName}`)
 
-      // 🔧 FIX: Capture current badge state BEFORE adding new exercise
-      this.updateWorkoutData()
+    this.updateWorkoutData()
 
-      if (!this.benchmarkData[exerciseName]) {
-        this.benchmarkData[exerciseName] = [
-          "Working set, 1 REPS, AT 1 KILOS, solid effort"
-        ]
-      }
-
-      this.hideEmptyState()
-      this.renderWorkoutBadges()  // Now this uses the updated data with user edits preserved
-      this.updateHiddenField()
-
-      setTimeout(() => {
-        const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
-        const newExercise = exerciseBlocks[exerciseBlocks.length - 2]
-        if (newExercise) {
-          newExercise.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-        }
-      }, 50)
+    if (!this.benchmarkData[exerciseName]) {
+      this.benchmarkData[exerciseName] = [{
+        set_number: 1,
+        set_type: 'working',
+        reps: 1,
+        weight_kg: 1,
+        weight_unit: 'kg',
+        notes: 'solid effort'
+      }]
     }
+
+    this.hideEmptyState()
+    this.renderWorkoutBadges()
+    this.updateHiddenField()
+
+    setTimeout(() => {
+      const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
+      const newExercise = exerciseBlocks[exerciseBlocks.length - 2]
+      if (newExercise) {
+        newExercise.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+      }
+    }, 50)
+  }
 
   addSet(event) {
     event.preventDefault()
@@ -246,7 +289,18 @@ export default class extends Controller {
     const exerciseName = exercises[exerciseId]
 
     if (exerciseName) {
-      this.benchmarkData[exerciseName].push("Working set, 1 REPS, AT 1 KILOS, solid effort")
+      const currentSets = this.benchmarkData[exerciseName]
+      const newSetNumber = currentSets.length + 1
+
+      this.benchmarkData[exerciseName].push({
+        set_number: newSetNumber,
+        set_type: 'working',
+        reps: 1,
+        weight_kg: 1,
+        weight_unit: 'kg',
+        notes: 'solid effort'
+      })
+
       this.renderWorkoutBadges()
       this.updateHiddenField()
 
@@ -292,15 +346,12 @@ export default class extends Controller {
     }
   }
 
-  // 🆕 NEW: Show modal instead of immediately submitting
   showBenchmarkModal(event) {
     event.preventDefault()
     console.log("Showing benchmark choice modal...")
 
-    // Update workout data first
     this.updateWorkoutData()
 
-    // Show the modal
     this.benchmarkModalTarget.style.display = 'flex'
     this.benchmarkModalTarget.style.cssText = `
       display: flex !important;
@@ -318,13 +369,26 @@ export default class extends Controller {
     document.body.style.overflow = 'hidden'
   }
 
-  // 🆕 NEW: Handle user's benchmark choice
   chooseBenchmarkUpdate(event) {
-    const choice = event.target.dataset.choice
-    console.log(`User chose: ${choice}`)
+    event.preventDefault()  // Prevent any default behavior
 
-    // Set the hidden field value
-    this.benchmarkChoiceTarget.value = choice
+    // Find the button element (in case we clicked on a child element)
+    const button = event.target.closest('button')
+    const choice = button ? button.dataset.choice : event.target.dataset.choice
+
+    console.log(`User chose: ${choice}`)
+    console.log(`Event target:`, event.target)
+    console.log(`Button found:`, button)
+
+    // Find the hidden field more defensively
+    const benchmarkField = document.querySelector('[data-log-builder-target="benchmarkChoice"]')
+
+    if (benchmarkField) {
+      benchmarkField.value = choice === 'yes' ? 'yes' : 'no'
+      console.log(`Hidden field set to: ${benchmarkField.value}`)
+    } else {
+      console.error('Could not find benchmark choice field')
+    }
 
     // Close modal
     this.closeBenchmarkModal()
@@ -333,15 +397,14 @@ export default class extends Controller {
     this.submitFormWithChoice()
   }
 
-  // 🆕 NEW: Close the modal
   closeBenchmarkModal() {
     this.benchmarkModalTarget.style.display = 'none'
     document.body.style.overflow = ''
   }
 
-  // 🆕 NEW: Actually submit the form
   submitFormWithChoice() {
-    console.log("Submitting form with benchmark choice:", this.benchmarkChoiceTarget.value)
+    const benchmarkField = document.querySelector('[data-log-builder-target="benchmarkChoice"]')
+    console.log("Submitting form with benchmark choice:", benchmarkField?.value)
 
     const allBadges = this.exerciseListTarget.querySelectorAll('.workout-badge')
     allBadges.forEach(badge => {
@@ -350,7 +413,6 @@ export default class extends Controller {
 
     this.showSuccessFeedback('Saving workout...')
 
-    // Submit the form normally now
     this.formTarget.submit()
   }
 
@@ -390,7 +452,7 @@ export default class extends Controller {
   }
 
   updateWorkoutData() {
-    const newBenchmarkData = {}
+    const exerciseSetsArray = []
 
     const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
 
@@ -399,40 +461,66 @@ export default class extends Controller {
       if (!exerciseHeader) return
 
       const exerciseName = exerciseHeader.textContent.replace('🏋️ ', '').trim()
-      newBenchmarkData[exerciseName] = []
-
       const setLines = block.querySelectorAll('.set-line[data-set-index]')
 
-      setLines.forEach((setLine) => {
+      setLines.forEach((setLine, setIndex) => {
         const badges = setLine.querySelectorAll('[data-controller="badge-editor"]')
-        const badgeTexts = []
+        const badgeData = []
 
         badges.forEach(badge => {
+          const type = badge.getAttribute('data-badge-editor-type-value')
           const content = badge.getAttribute('data-badge-editor-content-value')
-          if (content) {
-            badgeTexts.push(content)
+          if (type && content) {
+            badgeData.push({ type, content })
           }
         })
 
-        if (badgeTexts.length > 0) {
-          const setDescription = badgeTexts.join(', ')
-          newBenchmarkData[exerciseName].push(setDescription)
+        if (badgeData.length > 0) {
+          const exerciseSetData = this.badgesToExerciseSet(badgeData, exerciseName, setIndex + 1)
+          exerciseSetsArray.push(exerciseSetData)
         }
       })
     })
 
-    this.benchmarkData = newBenchmarkData
-    this.updateHiddenField()
+    // Group back into benchmark format for rendering
+    this.benchmarkData = {}
+    exerciseSetsArray.forEach(setData => {
+      if (!this.benchmarkData[setData.exercise_name]) {
+        this.benchmarkData[setData.exercise_name] = []
+      }
+      this.benchmarkData[setData.exercise_name].push(setData)
+    })
 
-    console.log("Rebuilt workout data from current badge state:", this.benchmarkData)
+    this.updateHiddenField(exerciseSetsArray)
+
+    console.log("Rebuilt workout data:", this.benchmarkData)
+    console.log("Exercise sets array:", exerciseSetsArray)
   }
 
-  updateHiddenField() {
-    this.hiddenDetailsTarget.value = JSON.stringify(this.benchmarkData)
+  updateHiddenField(exerciseSetsArray = null) {
+    if (!exerciseSetsArray) {
+      // Convert current benchmarkData to exercise sets array
+      exerciseSetsArray = []
+      Object.entries(this.benchmarkData).forEach(([exerciseName, sets]) => {
+        sets.forEach(setData => {
+          exerciseSetsArray.push({
+            exercise_name: exerciseName,
+            set_number: setData.set_number || 1,
+            set_type: setData.set_type || 'working',
+            reps: setData.reps,
+            weight_kg: setData.weight_kg,
+            weight_unit: setData.weight_unit || 'kg',
+            notes: setData.notes || 'solid effort'
+          })
+        })
+      })
+    }
 
-    const hasContent = Object.keys(this.benchmarkData).length > 0
+    this.hiddenDetailsTarget.value = JSON.stringify(exerciseSetsArray)
+
+    const hasContent = exerciseSetsArray.length > 0
     this.submitButtonTarget.disabled = !hasContent
 
-    console.log("Updated workout data:", this.benchmarkData)
+    console.log("Updated exercise sets data:", exerciseSetsArray)
   }
 }

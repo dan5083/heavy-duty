@@ -27,7 +27,7 @@ class SplitPlansController < ApplicationController
       )
     end
 
-    # 🆕 Redirect to post-creation recovery seeding
+    # Redirect to post-creation recovery seeding
     redirect_to initialize_recovery_split_plan_path(@split_plan),
                 notice: "Split plan created! Now let's set up your recent training."
   end
@@ -47,28 +47,39 @@ class SplitPlansController < ApplicationController
       recovery_dates = params[:recovery_dates] || {}
     end
 
-    recovery_dates.each do |muscle_group, date|
-      split_day = @split_plan.split_days.find_by(muscle_group: muscle_group)
+    ActiveRecord::Base.transaction do
+      recovery_dates.each do |muscle_group, date|
+        split_day = @split_plan.split_days.find_by(muscle_group: muscle_group)
 
-      # 🆕 Generate benchmark data using consistent defaults
-      benchmark_data = generate_initial_benchmark(muscle_group.to_sym)
+        # Create workout with proper name
+        workout = split_day.workouts.create!(
+          name: AppConstants::LABELS[muscle_group.to_sym],
+          muscle_group: muscle_group
+        )
 
-      # Create workout with proper name and details
-      workout = split_day.workouts.create!(
-        name: AppConstants::LABELS[muscle_group.to_sym],
-        muscle_group: muscle_group,
-        details: benchmark_data.to_json
-      )
+        # Create workout log and exercise sets in one transaction
+        workout_log = WorkoutLog.new(
+          user: current_user,
+          workout: workout,
+          created_at: date.to_date
+        )
 
-      WorkoutLog.create!(
-        user: current_user,
-        workout: workout,
-        details: benchmark_data.to_json,
-        created_at: date.to_date
-      )
+        # Create initial benchmark exercise sets BEFORE saving the workout_log
+        generate_initial_exercise_sets(workout_log, muscle_group.to_sym)
+
+        # Now save the workout_log with exercise_sets already present
+        workout_log.save!
+
+        # Mark this workout log as the benchmark
+        workout_log.update!(is_benchmark: true)
+      end
     end
 
     redirect_to dashboard_path, notice: "Recovery initialized successfully."
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error "Failed to initialize recovery: #{e.message}"
+    redirect_to initialize_recovery_split_plan_path(@split_plan),
+                alert: "Failed to initialize recovery: #{e.message}"
   end
 
   def destroy
@@ -83,25 +94,25 @@ class SplitPlansController < ApplicationController
     params.require(:split_plan).permit(:name, :split_length)
   end
 
-  # 🆕 Generate initial benchmark with consistent defaults
-  def generate_initial_benchmark(muscle_group)
+  # Generate initial benchmark with consistent defaults using ExerciseSet
+  def generate_initial_exercise_sets(workout_log, muscle_group)
     exercises = AppConstants::WORKOUTS[muscle_group] || []
-    return {} if exercises.empty?
+    return if exercises.empty?
 
-    # Pick 2-4 exercises for the initial benchmark (keeping exercise variety)
+    # Pick 2-4 exercises for the initial benchmark
     selected_exercises = exercises.sample(rand(2..4))
 
-    benchmark = {}
-    selected_exercises.each do |exercise|
-      # Generate EXACTLY 1 SET using consistent default format
-      benchmark[exercise] = [generate_set_description(1, exercise)]
+    selected_exercises.each_with_index do |exercise_name, index|
+      # Build exercise sets (don't create yet, just build)
+      workout_log.exercise_sets.build(
+        exercise_name: exercise_name,
+        set_number: 1,
+        set_type: 'working',
+        reps: 1,
+        weight_kg: 1.0,
+        weight_unit: 'kg',
+        notes: 'solid effort'
+      )
     end
-
-    benchmark
-  end
-
-  def generate_set_description(set_number, exercise)
-    # Use consistent defaults that match JavaScript format
-    "Working set, 1 REPS, AT 1 KILOS, solid effort"
   end
 end

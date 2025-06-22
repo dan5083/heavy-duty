@@ -1,7 +1,40 @@
 <div class="alert alert-secondary shadow-sm">
-  <h5 class="mb-2">Your Benchmark</h5>
+  <h5 class="mb-2">
+    <i class="bi bi-trophy text-warning me-2"></i>
+    Your Benchmark
+  </h5>
 
-  <%= render_benchmark_details(workout.details) %>
+  <% if workout.benchmark_log %>
+    <% workout.benchmark_log.exercises_hash.each do |exercise_name, sets| %>
+      <div class="mb-3">
+        <strong class="text-primary d-block"><%= exercise_name %></strong>
+        <% sets.each_with_index do |exercise_set, index| %>
+          <div class="small text-muted ms-3">
+            <span class="fw-bold">Set <%= index + 1 %>:</span>
+            <%= exercise_set.set_type.titleize %> set,
+            <% if exercise_set.reps %>
+              <strong><%= exercise_set.reps %> reps</strong>
+            <% else %>
+              <strong>to failure</strong>
+            <% end %>
+            at <strong><%= exercise_set.weight_display %></strong>
+            <% if exercise_set.notes.present? %>
+              • <em><%= exercise_set.notes %></em>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
 
-  <small class="text-muted">Try to beat this today!</small>
+    <small class="text-muted">
+      <i class="bi bi-calendar3 me-1"></i>
+      Set on <%= workout.benchmark_log.created_at.strftime("%b %d, %Y") %>
+      • Try to beat this today!
+    </small>
+  <% else %>
+    <div class="text-muted">
+      <i class="bi bi-info-circle me-2"></i>
+      No benchmark set yet. Complete a workout to establish your baseline!
+    </div>
+  <% end %>
 </div>

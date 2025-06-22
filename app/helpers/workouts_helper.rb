@@ -1,213 +1,114 @@
 module WorkoutsHelper
-  def render_log_details(details)
-    parsed = parse_workout_details(details)
-
-    return simple_format(details) unless parsed.is_a?(Hash)
+  def render_log_details(workout_log)
+    return content_tag(:em, "No exercises recorded") if workout_log.exercise_sets.empty?
 
     content_tag(:div) do
-      parsed.map do |exercise, sets|
+      workout_log.exercises_hash.map do |exercise_name, sets|
         content_tag(:div, class: "mb-2") do
-          content_tag(:strong, exercise) +
+          content_tag(:strong, exercise_name) +
           content_tag(:ul) do
-            sets.map { |set| content_tag(:li, set) }.join.html_safe
+            sets.map { |set| content_tag(:li, set.description) }.join.html_safe
           end
         end
       end.join.html_safe
     end
   end
 
-  def render_benchmark_details(details)
-    parsed = parse_workout_details(details)
+  def render_benchmark_details(workout)
+    benchmark_log = workout.benchmark_log
+    return content_tag(:em, "No benchmark set") unless benchmark_log
 
-    return simple_format(details) unless parsed.is_a?(Hash)
-
-    content_tag(:div) do
-      parsed.map do |exercise, sets|
-        content_tag(:div, class: "mb-2") do
-          content_tag(:strong, exercise) +
-          content_tag(:ul) do
-            sets.map { |set| content_tag(:li, set) }.join.html_safe
-          end
-        end
-      end.join.html_safe
-    end
+    render_log_details(benchmark_log)
   end
 
   # 🆕 Parse set description into structured badges
-  def parse_set_into_badges(set_description)
-    badges = []
-    text = set_description.to_s.strip
-
-    # Try to extract structured information using patterns
-    badges += extract_status_badges(text)
-    badges += extract_reps_badges(text)
-    badges += extract_weight_badges(text)
-    badges += extract_reflection_badges(text)
-
-    # If no structured badges found, create a generic text badge
-    if badges.empty?
-      badges << { type: 'reflection', content: text }
-    end
-
-    badges
+  def parse_set_into_badges(exercise_set)
+    [
+      { type: 'status', content: "#{exercise_set.set_type.titleize} set" },
+      { type: 'reps', content: exercise_set.reps ? "#{exercise_set.reps} reps" : "to failure" },
+      { type: 'weight', content: exercise_set.weight_display },
+      { type: 'reflection', content: exercise_set.notes || "solid effort" }
+    ]
   end
 
-  # 🆕 Convert badge data back to natural language text
-  def badges_to_text(badges_array)
-    return "" if badges_array.blank?
+  # 🆕 Convert badge data to ExerciseSet attributes
+  def badges_to_exercise_set_attrs(badges_array, exercise_name, set_number)
+    status_badge = badges_array.find { |b| b[:type] == 'status' }
+    reps_badge = badges_array.find { |b| b[:type] == 'reps' }
+    weight_badge = badges_array.find { |b| b[:type] == 'weight' }
+    reflection_badge = badges_array.find { |b| b[:type] == 'reflection' }
 
-    # Group badges by type for natural sentence construction
-    status = badges_array.find { |b| b[:type] == 'status' }&.dig(:content)
-    reps = badges_array.find { |b| b[:type] == 'reps' }&.dig(:content)
-    weight = badges_array.find { |b| b[:type] == 'weight' }&.dig(:content)
-    reflection = badges_array.find { |b| b[:type] == 'reflection' }&.dig(:content)
+    # Parse set type from status badge
+    set_type = extract_set_type(status_badge&.dig(:content))
 
-    # Build natural sentence
-    parts = []
-    parts << status if status.present?
-    parts << "was" if status.present? && !status.include?("was")
-    parts << reps if reps.present?
-    parts << weight if weight.present?
-    parts << reflection if reflection.present?
+    # Parse reps
+    reps = extract_reps(reps_badge&.dig(:content))
 
-    sentence = parts.join(" ")
-    sentence.ends_with?(".") ? sentence : "#{sentence}."
+    # Parse weight
+    weight_data = extract_weight(weight_badge&.dig(:content))
+
+    {
+      exercise_name: exercise_name,
+      set_number: set_number,
+      set_type: set_type,
+      reps: reps,
+      weight_kg: weight_data[:weight],
+      weight_unit: weight_data[:unit],
+      notes: reflection_badge&.dig(:content) || "solid effort"
+    }
   end
 
   # 🆕 Generate consistent default badges for new sets
   def generate_sample_badges(set_number = 1)
     [
       { type: 'status', content: 'Working set' },
-      { type: 'reps', content: '1 REPS' },
-      { type: 'weight', content: 'AT 1 KILOS' },
+      { type: 'reps', content: '1 reps' },
+      { type: 'weight', content: 'at 1 kg' },
       { type: 'reflection', content: 'solid effort' }
     ]
   end
 
   private
 
-  def parse_workout_details(details)
-    return nil if details.blank?
+  def extract_set_type(status_content)
+    return 'working' unless status_content.present?
 
-    JSON.parse(details).yield_self do |parsed|
-      if parsed.is_a?(Array) && parsed.first.is_a?(Hash)
-        parsed.to_h { |entry| [entry["exercise"], entry["sets"]] }
-      elsif parsed.is_a?(Hash)
-        parsed
-      else
-        nil
-      end
+    case status_content.downcase
+    when /working/ then 'working'
+    when /warmup/ then 'warmup'
+    when /drop/ then 'drop'
+    when /super/ then 'super'
+    when /heavy/ then 'heavy'
+    when /light/ then 'light'
+    else 'working'
     end
-  rescue JSON::ParserError
-    nil
   end
 
-  def extract_status_badges(text)
-    valid_statuses = AppConstants::CLAUSE_LIBRARY[:status][:options]
+  def extract_reps(reps_content)
+    return nil unless reps_content.present?
+    return nil if reps_content.downcase.include?('failure')
 
-    # Create regex pattern from actual status options
-    status_pattern = /\b(#{valid_statuses.map { |s| Regexp.escape(s) }.join('|')})\b/i
-
-    badges = []
-    if match = text.match(status_pattern)
-      badges << { type: 'status', content: match[0].titleize }
-    end
-
-    badges
+    # Extract number from "12 reps" or just "12"
+    match = reps_content.match(/(\d+)/)
+    match ? match[1].to_i : nil
   end
 
-  # Extract reps information (12 reps, to failure, etc.)
-  def extract_reps_badges(text)
-    reps_patterns = [
-      /\b(\d+)\s+reps?\b/i,
-      /\b(\d+-\d+)\s+reps?\b/i,
-      /\bto failure\b/i,
-      /\bAMRAP\b/i,
-      /\bas many reps as possible\b/i
-    ]
+  def extract_weight(weight_content)
+    return { weight: nil, unit: 'kg' } unless weight_content.present?
+    return { weight: nil, unit: 'kg' } if weight_content.downcase.include?('bodyweight')
 
-    badges = []
-    reps_patterns.each do |pattern|
-      if match = text.match(pattern)
-        content = case match[0].downcase
-                  when /to failure/
-                    "to failure"
-                  when /amrap/
-                    "AMRAP"
-                  when /as many reps/
-                    "AMRAP"
-                  else
-                    "#{match[1]} reps"
-                  end
-        badges << { type: 'reps', content: content }
-        break
-      end
+    # Extract from "at 75 kg" or "75 kg" or "75"
+    match = weight_content.match(/(\d+(?:\.\d+)?)\s*(kg|kilos?|lbs?|pounds?)?/i)
+
+    if match
+      weight = match[1].to_f
+      unit = case match[2]&.downcase
+             when /lb|pound/ then 'lbs'
+             else 'kg'
+             end
+      { weight: weight, unit: unit }
+    else
+      { weight: nil, unit: 'kg' }
     end
-    badges
-  end
-
-  # Extract weight information (at 75 kilos, with bodyweight, etc.)
-  def extract_weight_badges(text)
-    weight_patterns = [
-      /\bat (\d+(?:\.\d+)?)\s*(kilos?|kgs?|lbs?|pounds?)\b/i,
-      /\bwith (\d+(?:\.\d+)?)\s*(kilos?|kgs?|lbs?|pounds?)\b/i,
-      /\b(\d+(?:\.\d+)?)\s*(kilos?|kgs?|lbs?|pounds?)\b/i,
-      /\bwith bodyweight\b/i,
-      /\bbodyweight\b/i,
-      /\bat (\d+)%\s*1RM\b/i
-    ]
-
-    badges = []
-    weight_patterns.each do |pattern|
-      if match = text.match(pattern)
-        content = case match[0].downcase
-                  when /bodyweight/
-                    "with bodyweight"
-                  when /1rm/
-                    "at #{match[1]}% 1RM"
-                  when /at/
-                    "at #{match[1]} #{match[2].downcase.gsub(/s$/, '')}"
-                  else
-                    "at #{match[1]} #{match[2]&.downcase&.gsub(/s$/, '') || 'kilos'}"
-                  end
-        badges << { type: 'weight', content: content }
-        break
-      end
-    end
-    badges
-  end
-
-  def extract_reflection_badges(text)
-    # Build patterns dynamically from AppConstants
-    valid_reflections = AppConstants::CLAUSE_LIBRARY[:reflection][:options]
-
-    # Create regex pattern from actual reflection options
-    reflection_pattern = /\b(#{valid_reflections.map { |r| Regexp.escape(r) }.join('|')})\b/i
-
-    badges = []
-
-    # Try to match any of our valid reflection options
-    if match = text.match(reflection_pattern)
-      badges << { type: 'reflection', content: match[0].downcase }
-    end
-
-    # If no specific reflection found but there's extra text, use it
-    if badges.empty?
-      cleaned = text.gsub(/\b(working|warmup|drop|super|heavy|light|final|first|second|third)\s+set\b/i, '')
-                    .gsub(/\b\d+\s+reps?\b/i, '')
-                    .gsub(/\b(to failure|amrap)\b/i, '')
-                    .gsub(/\bat \d+(?:\.\d+)?\s*(kilos?|kgs?|lbs?|pounds?)\b/i, '')
-                    .gsub(/\bwith bodyweight\b/i, '')
-                    .gsub(/\bwas\b/i, '')
-                    .strip
-                    .gsub(/^,|,$/, '')
-                    .strip
-
-      if cleaned.present? && cleaned.length > 3
-        badges << { type: 'reflection', content: cleaned }
-      end
-    end
-
-    badges
   end
 end
