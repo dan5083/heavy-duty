@@ -11,7 +11,6 @@ export default class extends Controller {
     "preview",
     "previewStats",
     "muscleCount",
-    "avgRecovery",
     "submitButton"
   ]
 
@@ -133,12 +132,8 @@ export default class extends Controller {
 
   updateStats(selectedMuscles) {
     const muscleCount = selectedMuscles.length
-    const avgRecovery = muscleCount > 0
-      ? Math.round(selectedMuscles.reduce((sum, m) => sum + m.recoveryDays, 0) / muscleCount)
-      : 0
 
     this.muscleCountTarget.textContent = muscleCount
-    this.avgRecoveryTarget.textContent = `${avgRecovery}d`
 
     this.previewStatsTarget.style.display = muscleCount > 0 ? 'block' : 'none'
 

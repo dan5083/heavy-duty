@@ -14,11 +14,12 @@ class RecoveryTracker
     return Date.today if last_log.nil?
 
     cooldown = AppConstants::TRAINING_CYCLE[muscle]
-    last_log.created_at.to_date + cooldown
+    last_log.created_at + cooldown.days  # Remove .to_date
   end
 
   def countdown_days_for(muscle)
-    (ready_date_for(muscle) - Date.today).to_i
+    ready_date = ready_date_for(muscle).to_date  # Convert to Date
+    (ready_date - Date.today).to_i
   end
 
   def forecast(days_ahead: 10)
