@@ -1,6 +1,6 @@
 class WorkoutsController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_can_view_user!, if: -> { params[:client_id] }
+  before_action :ensure_can_act_on_behalf!  # NEW
   before_action :set_split_day
   before_action :set_workout, only: [:show, :update, :destroy, :promote]
 
@@ -20,7 +20,8 @@ class WorkoutsController < ApplicationController
   def show
     @workout = Workout.find(params[:id])
     @logs = @workout.workout_logs.order(created_at: :desc)
-    @recovery = RecoveryTracker.new(viewing_user)
+    # Use acting_user instead of viewing_user
+    @recovery = RecoveryTracker.new(user_context.acting_user)
   end
 
   def update

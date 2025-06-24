@@ -1,15 +1,22 @@
+# config/routes.rb
+
 Rails.application.routes.draw do
   # Use custom registration controller
   devise_for :users, controllers: {
     registrations: 'users/registrations'
   }
 
-  # NEW: Personal trainer management
+  # NEW: Impersonation routes
+  post '/impersonate/:id', to: 'impersonation#start', as: :start_impersonation
+  delete '/stop_impersonation', to: 'impersonation#stop', as: :stop_impersonation
+
+  # Personal trainer management
   resources :personal_trainers, only: [:show] do
     resources :client_assignments, only: [:create, :destroy]
   end
 
-  # ✅ Nested workout logging structure with recovery seeding routes
+  # Nested workout logging structure with recovery seeding routes
+  # REMOVED: All client_id parameter handling - now uses session-based context
   resources :split_plans, only: [:index, :new, :create, :destroy] do
     member do
       get :initialize_recovery
@@ -17,7 +24,7 @@ Rails.application.routes.draw do
     end
 
     collection do
-      # 🆕 Custom split routes
+      # Custom split routes
       get :build_custom
       post :create_custom
     end
@@ -27,23 +34,25 @@ Rails.application.routes.draw do
         post :promote, on: :member
         resources :workout_logs, only: [:new, :create, :index] do
           collection do
-            post :render_set_inputs # 🆕 Turbo step 2 handler
+            post :render_set_inputs # Turbo step 2 handler
           end
         end
       end
     end
   end
 
-  # ✅ Dashboard and archive
+  # Dashboard and archive
+  # REMOVED: No more client_id parameters needed
   get "dashboard", to: "dashboard#index", as: :dashboard
   get "archive", to: "training_archive#index", as: :training_archive
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # ✅ Root
+  # Root
   root "dashboard#index"
 
+  # PWA routes
   get '/manifest.json', to: 'pwa#manifest'
   get '/service-worker.js', to: 'pwa#service_worker'
 end

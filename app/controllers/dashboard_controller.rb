@@ -1,15 +1,18 @@
+# app/controllers/dashboard_controller.rb
+
 class DashboardController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_can_view_user!, if: -> { params[:client_id] }
+  before_action :ensure_can_act_on_behalf!
 
   def index
     # NEW: Show client switcher for trainers
     if current_user.trainer?
-      @clients = current_user.personal_trainer.clients.includes(:split_plans)
-      @viewing_client = viewing_user unless viewing_user == current_user
+      @clients = user_context.available_clients.includes(:split_plans)
+      @viewing_client = user_context.acting_user unless user_context.acting_user == current_user
     end
 
-    latest_plan = viewing_user.split_plans.last
+    # Use acting_user instead of viewing_user
+    latest_plan = user_context.acting_user.split_plans.last
     unless latest_plan
       return redirect_to new_split_plan_path, alert: "Please create a split plan first."
     end
@@ -21,7 +24,8 @@ class DashboardController < ApplicationController
       .group_by { |w| w.muscle_group.to_sym }
       .transform_values(&:first)
 
-    recovery = RecoveryTracker.new(viewing_user)
+    # Use acting_user for recovery tracking
+    recovery = RecoveryTracker.new(user_context.acting_user)
     all_data = recovery.full_map
 
     muscles = latest_plan.split_days.pluck(:muscle_group).map(&:to_sym).uniq

@@ -1,54 +1,80 @@
-<div class="row">
-  <div class="col-md-8">
-    <h1>My Clients</h1>
+<!-- app/views/personal_trainers/show.html.erb -->
 
-    <% if @clients.any? %>
-      <div class="list-group mb-4">
-        <% @clients.each do |client| %>
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong><%= client.email %></strong>
-              <br>
-              <small class="text-muted">
-                Plans: <%= client.split_plans.count %> •
-                Workouts: <%= client.workout_logs.count %>
-              </small>
-            </div>
-            <div>
-              <%= link_to "View Dashboard", dashboard_path(client_id: client.id),
-                          class: "btn btn-sm btn-primary me-2" %>
-              <%= link_to "Remove", personal_trainer_client_assignment_path(@personal_trainer,
-                          @personal_trainer.client_assignments.find_by(user: client)),
-                          method: :delete,
-                          class: "btn btn-sm btn-outline-danger",
-                          confirm: "Remove #{client.email}?" %>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    <% else %>
-      <div class="alert alert-info">
-        <h5>No clients yet</h5>
-        <p class="mb-0">Add users as clients to start managing their workouts.</p>
-      </div>
-    <% end %>
-  </div>
+<div data-controller="safety"
+     data-safety-destructive-action-value="true">
 
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">Create New Client</h5>
-      </div>
-      <div class="card-body">
-        <%= form_with url: personal_trainer_client_assignments_path(@personal_trainer),
-                      method: :post, local: true do |f| %>
-          <div class="mb-3">
-            <%= f.email_field :email, placeholder: "client@example.com",
-                              class: "form-control", required: true %>
-            <small class="form-text text-muted">We'll create their account and send login details</small>
-          </div>
-          <%= f.submit "Create Client", class: "btn btn-success w-100" %>
-        <% end %>
+  <div class="row">
+    <div class="col-md-8">
+      <h1>My Clients</h1>
+
+      <% if @clients.any? %>
+        <div class="list-group mb-4">
+          <% @clients.each do |client| %>
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <strong><%= client.email %></strong>
+                <br>
+                <small class="text-muted">
+                  Plans: <%= client.split_plans.count %> •
+                  Workouts: <%= client.workout_logs.count %>
+                </small>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <!-- FIXED: Use button_to for reliable POST request -->
+                <%= button_to "View Dashboard", start_impersonation_path(client),
+                              method: :post,
+                              class: "btn btn-sm btn-primary",
+                              form_class: "d-inline-block",
+                              data: {
+                                safety_confirm: "Switch to Client Dashboard",
+                                confirm: "Start acting as #{client.email}?"
+                              } %>
+
+                <!-- ENHANCED: Add safety confirmation for remove -->
+                <%= link_to "Remove", personal_trainer_client_assignment_path(@personal_trainer,
+                            @personal_trainer.client_assignments.find_by(user: client)),
+                            method: :delete,
+                            class: "btn btn-sm btn-outline-danger",
+                            data: {
+                              turbo_method: :delete,
+                              confirm: "Remove #{client.email} as your client? They will lose access to your training programs.",
+                              safety_confirm: "Remove Client"
+                            } %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="alert alert-info">
+          <h5>No clients yet</h5>
+          <p class="mb-0">Add users as clients to start managing their workouts.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Create New Client</h5>
+        </div>
+        <div class="card-body">
+          <%= form_with url: personal_trainer_client_assignments_path(@personal_trainer),
+                        method: :post,
+                        local: true do |f| %>
+            <div class="mb-3">
+              <%= f.email_field :email,
+                                placeholder: "client@example.com",
+                                class: "form-control",
+                                required: true %>
+              <small class="form-text text-muted">We'll create their account and send login details</small>
+            </div>
+            <%= f.submit "Create Client", class: "btn btn-success w-100" %>
+          <% end %>
+        </div>
       </div>
     </div>
+  </div>
 </div>
+
+<!-- Don't forget to include the safety modal -->
+<%= render 'shared/safety_modal' %>

@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  performer: one
+  subject: one
+  action: MyString
+  resource_type: MyString
+  resource_id: 1
+  metadata: MyText
+  created_at: 2025-06-24 18:43:43
+
+two:
+  performer: two
+  subject: two
+  action: MyString
+  resource_type: MyString
+  resource_id: 1
+  metadata: MyText
+  created_at: 2025-06-24 18:43:43

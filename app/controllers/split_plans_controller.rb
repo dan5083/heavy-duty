@@ -1,9 +1,10 @@
 class SplitPlansController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_can_view_user!, if: -> { params[:client_id] }
+  before_action :ensure_can_act_on_behalf!  # NEW
 
   def index
-    @split_plans = viewing_user.split_plans.order(created_at: :desc)
+    # Use acting_user instead of viewing_user
+    @split_plans = user_context.acting_user.split_plans.order(created_at: :desc)
   end
 
   def new
@@ -12,7 +13,7 @@ class SplitPlansController < ApplicationController
     @label_data = AppConstants::LABELS
   end
 
-  # 🆕 Custom split builder page
+  # Custom split builder page
   def build_custom
     @split_plan = SplitPlan.new
     @available_muscles = AppConstants::CUSTOM_SPLIT_MUSCLES
@@ -23,7 +24,7 @@ class SplitPlansController < ApplicationController
   def create
     selected_label = params[:split_plan_choice]
 
-    # 🆕 Handle custom split creation
+    # Handle custom split creation
     if selected_label == 'custom_split'
       redirect_to build_custom_split_plans_path
       return
@@ -31,8 +32,8 @@ class SplitPlansController < ApplicationController
 
     selected_split = AppConstants::SPLITS[selected_label.to_sym]
 
-    # Create the plan
-    @split_plan = viewing_user.split_plans.create!(
+    # Create the plan for acting_user instead of viewing_user
+    @split_plan = user_context.acting_user.split_plans.create!(
       name: selected_label,
       split_length: selected_split.length
     )
@@ -50,7 +51,7 @@ class SplitPlansController < ApplicationController
                 notice: "Split plan created! Now let's set up your recent training."
   end
 
-  # 🆕 Create custom split
+  # Create custom split
   def create_custom
     muscle_selections = params[:muscle_selections] || {}
     recovery_days = params[:recovery_days] || {}
@@ -70,8 +71,8 @@ class SplitPlansController < ApplicationController
       return
     end
 
-    # Create the custom split plan
-    @split_plan = viewing_user.split_plans.new
+    # Create the custom split plan for acting_user instead of viewing_user
+    @split_plan = user_context.acting_user.split_plans.new
     @split_plan.set_custom_config(custom_config)
 
     if @split_plan.save
@@ -121,7 +122,7 @@ class SplitPlansController < ApplicationController
 
         # Create workout log and exercise sets in one transaction
         workout_log = WorkoutLog.new(
-          user: viewing_user,
+          user: user_context.acting_user,  # Use acting_user instead of viewing_user
           workout: workout,
           created_at: date.to_date
         )

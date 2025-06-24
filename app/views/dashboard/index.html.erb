@@ -6,21 +6,8 @@
         <%= @viewing_client ? "#{@viewing_client.email}'s Dashboard" : "Training Dashboard" %>
       </h1>
 
-      <div class="dropdown">
-        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-          <%= @viewing_client ? @viewing_client.email : "Select Client" %>
-        </button>
-        <ul class="dropdown-menu">
-          <li><%= link_to "My Dashboard", dashboard_path, class: "dropdown-item" %></li>
-          <li><hr class="dropdown-divider"></li>
-          <% @clients.each do |client| %>
-            <li>
-              <%= link_to client.email, dashboard_path(client_id: client.id),
-                          class: "dropdown-item #{'active' if @viewing_client == client}" %>
-            </li>
-          <% end %>
-        </ul>
-      </div>
+      <!-- REMOVED: Old dropdown - now handled by navbar and context indicator -->
+      <!-- This client switcher is redundant since we have it in navbar -->
     </div>
   <% else %>
     <h1 class="mb-4" data-typography-animator-target="typewriter">

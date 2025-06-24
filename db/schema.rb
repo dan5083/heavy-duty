@@ -10,7 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_24_112506) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_24_174343) do
+  create_table "audit_logs", force: :cascade do |t|
+    t.integer "performer_id", null: false
+    t.integer "subject_id", null: false
+    t.string "action", null: false
+    t.string "resource_type"
+    t.integer "resource_id"
+    t.text "metadata"
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.index ["action", "created_at"], name: "index_audit_logs_on_action_and_created_at"
+    t.index ["created_at"], name: "index_audit_logs_on_created_at"
+    t.index ["performer_id", "created_at"], name: "index_audit_logs_on_performer_id_and_created_at"
+    t.index ["performer_id"], name: "index_audit_logs_on_performer_id"
+    t.index ["resource_type", "resource_id"], name: "index_audit_logs_on_resource_type_and_resource_id"
+    t.index ["subject_id", "created_at"], name: "index_audit_logs_on_subject_id_and_created_at"
+    t.index ["subject_id"], name: "index_audit_logs_on_subject_id"
+  end
+
   create_table "client_assignments", force: :cascade do |t|
     t.integer "personal_trainer_id", null: false
     t.integer "user_id", null: false
@@ -99,6 +118,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_112506) do
     t.index ["split_day_id"], name: "index_workouts_on_split_day_id"
   end
 
+  add_foreign_key "audit_logs", "users", column: "performer_id"
+  add_foreign_key "audit_logs", "users", column: "subject_id"
   add_foreign_key "client_assignments", "personal_trainers"
   add_foreign_key "client_assignments", "users"
   add_foreign_key "exercise_sets", "workout_logs"

@@ -1,22 +1,36 @@
-<h1 class="mb-4">My Splits</h1>
+<div data-controller="safety"
+     data-safety-impersonation-mode-value="<%= user_context&.impersonation_mode? || false %>"
+     data-safety-destructive-action-value="true">
 
-<% if @split_plans.any? %>
-  <div class="list-group mb-4">
-    <% @split_plans.each do |plan| %>
-      <div class="list-group-item d-flex justify-content-between align-items-center">
-        <div>
-          <strong><%= plan.name %></strong>
-          <br>
-          <small class="text-muted">Length: <%= pluralize(plan.split_days.count, "day") %></small>
-        </div>
-        <div>
-          <%= link_to "View", split_plan_path(plan), class: "btn btn-sm btn-outline-primary" %>
-        </div>
-      </div>
-    <% end %>
-  </div>
-<% else %>
-  <p class="text-muted">No split plans found. Let's create one!</p>
-<% end %>
+  <h1 class="mb-4">My Splits</h1>
 
-<%= link_to "Create New Split", new_split_plan_path, class: "btn btn-success" %>
+  <% if @split_plans.any? %>
+    <div class="list-group mb-4">
+      <% @split_plans.each do |plan| %>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong><%= plan.name %></strong>
+            <br>
+            <small class="text-muted">Length: <%= pluralize(plan.split_days.count, "day") %></small>
+          </div>
+          <div>
+            <%= link_to "View", split_plan_path(plan), class: "btn btn-sm btn-outline-primary" %>
+            <!-- ENHANCED: Add safety confirmation for delete -->
+            <%= link_to "Delete", split_plan_path(plan),
+                        method: :delete,
+                        class: "btn btn-sm btn-danger ms-2",
+                        data: {
+                          turbo_method: :delete,
+                          confirm: "Delete split plan '#{plan.name}'? This cannot be undone.",
+                          safety_confirm: "Delete Split Plan"
+                        } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted">No split plans found. Let's create one!</p>
+  <% end %>
+
+  <%= link_to "Create New Split", new_split_plan_path, class: "btn btn-success" %>
+</div>

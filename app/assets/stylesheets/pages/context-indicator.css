@@ -1,0 +1,56 @@
+/* app/assets/stylesheets/pages/context-indicator.css */
+
+.context-indicator {
+  background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+  border-bottom: 1px solid #dee2e6;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.context-indicator.impersonation-mode {
+  background: linear-gradient(135deg, #856404 0%, #ffc107 15%, #856404 100%);
+  border-bottom: 2px solid #ffc107;
+  animation: impersonation-pulse 3s ease-in-out infinite;
+}
+
+@keyframes impersonation-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(255, 193, 7, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.6);
+  }
+}
+
+.context-indicator .dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.context-indicator .btn {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+}
+
+.context-indicator .dropdown-item {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+
+.context-indicator .dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Dark theme compatibility */
+.context-indicator .dropdown-menu {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+}
+
+.context-indicator .dropdown-header {
+  color: #6c757d;
+  font-weight: 600;
+}

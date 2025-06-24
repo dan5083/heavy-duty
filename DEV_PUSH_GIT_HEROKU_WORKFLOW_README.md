@@ -20,7 +20,10 @@ echo "=== config/routes.rb ==="; cat config/routes.rb; echo
 for file in app/logic/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 
 # Show all js controllers with filenames as headers:
-for file in app/javascript/controllers/**/*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
+for file in app/javascript/controllers/**/[a-i]*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
+
+for file in app/javascript/controllers/**/[j-z]*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
+
 # For all CSS files in stylesheets/pages
 for file in app/assets/stylesheets/pages/*.css; do echo "=== $file ==="; cat "$file"; echo; done
 # For all CSS files in stylesheets/Themes

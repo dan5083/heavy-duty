@@ -1,6 +1,8 @@
+# app/controllers/workout_logs_controller.rb
+
 class WorkoutLogsController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_can_view_user!, if: -> { params[:client_id] }
+  before_action :ensure_can_act_on_behalf!  # NEW
   before_action :set_workout
 
   def index
@@ -14,7 +16,8 @@ class WorkoutLogsController < ApplicationController
   def create
     Rails.logger.info "DEBUG: beat_benchmark param = #{params[:beat_benchmark].inspect}"
 
-    @log = @workout.workout_logs.build(user: viewing_user)
+    # Use acting_user instead of viewing_user
+    @log = @workout.workout_logs.build(user: user_context.acting_user)
 
     # Parse the exercise sets from params
     exercise_sets_data = JSON.parse(params[:exercise_sets] || '[]')
@@ -35,12 +38,33 @@ class WorkoutLogsController < ApplicationController
           )
         end
 
+        # Log the workout creation
+        log_audit_action(
+          action: 'create_workout_log',
+          resource: @log,
+          metadata: {
+            exercise_count: exercise_sets_data.length,
+            beat_benchmark: beat_benchmark,
+            muscle_group: @workout.muscle_group
+          }
+        )
+
         # Handle benchmark choice
         if beat_benchmark
           @log.update!(is_benchmark: true)
-          redirect_to dashboard_path(client_id: params[:client_id]), notice: "Workout saved and benchmark updated! 🎉"
+
+          # Log benchmark update
+          log_audit_action(
+            action: 'update_benchmark',
+            resource: @log,
+            metadata: { muscle_group: @workout.muscle_group }
+          )
+
+          # REMOVED: client_id parameter from redirect
+          redirect_to dashboard_path, notice: "Workout saved and benchmark updated! 🎉"
         else
-          redirect_to dashboard_path(client_id: params[:client_id]), notice: "Workout saved."
+          # REMOVED: client_id parameter from redirect
+          redirect_to dashboard_path, notice: "Workout saved."
         end
       else
         render :new, status: :unprocessable_entity
@@ -48,10 +72,12 @@ class WorkoutLogsController < ApplicationController
     end
   rescue JSON::ParserError => e
     Rails.logger.error "Failed to parse exercise sets: #{e.message}"
-    redirect_to dashboard_path(client_id: params[:client_id]), alert: "Failed to save workout data."
+    # REMOVED: client_id parameter from redirect
+    redirect_to dashboard_path, alert: "Failed to save workout data."
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error "Failed to save exercise sets: #{e.message}"
-    redirect_to dashboard_path(client_id: params[:client_id]), alert: "Failed to save workout: #{e.message}"
+    # REMOVED: client_id parameter from redirect
+    redirect_to dashboard_path, alert: "Failed to save workout: #{e.message}"
   end
 
   def render_set_inputs

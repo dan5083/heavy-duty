@@ -1,3 +1,5 @@
+# config/application.rb
+
 require_relative "boot"
 
 require "rails/all"
@@ -23,5 +25,13 @@ module HeavyDuty
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # NEW: Session configuration for impersonation security
+    config.session_store :cookie_store,
+                         key: '_heavy_duty_session',
+                         secure: Rails.env.production?,
+                         httponly: true,
+                         same_site: :lax,
+                         expire_after: 24.hours
   end
 end
