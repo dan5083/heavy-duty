@@ -6,19 +6,17 @@ class ClientAssignmentsController < ApplicationController
     @personal_trainer = current_user.personal_trainer
     email = params[:email]
 
-    # Create new user with temporary password
     user = User.new(email: email)
     temp_password = user.generate_temporary_password!
 
     if user.save
-      # Assign to trainer
       @personal_trainer.client_assignments.create!(user: user)
 
-      # Send welcome email
-      ClientMailer.welcome(user, temp_password, @personal_trainer).deliver_now
+      # TODO: Configure SMTP on Heroku before enabling
+      # ClientMailer.welcome(user, temp_password, @personal_trainer).deliver_now
 
       redirect_to personal_trainer_path(@personal_trainer),
-                  notice: "Client #{email} created and invited!"
+                  notice: "Client #{email} created! Temp password: #{temp_password}"
     else
       redirect_to personal_trainer_path(@personal_trainer),
                   alert: "Failed to create client: #{user.errors.full_messages.join(', ')}"
