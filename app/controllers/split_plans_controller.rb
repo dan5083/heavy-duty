@@ -1,6 +1,9 @@
 class SplitPlansController < ApplicationController
+  before_action :authenticate_user!
+  before_action :ensure_can_view_user!, if: -> { params[:client_id] }
+
   def index
-    @split_plans = current_user.split_plans.order(created_at: :desc)
+    @split_plans = viewing_user.split_plans.order(created_at: :desc)
   end
 
   def new
@@ -29,7 +32,7 @@ class SplitPlansController < ApplicationController
     selected_split = AppConstants::SPLITS[selected_label.to_sym]
 
     # Create the plan
-    @split_plan = current_user.split_plans.create!(
+    @split_plan = viewing_user.split_plans.create!(
       name: selected_label,
       split_length: selected_split.length
     )
@@ -68,7 +71,7 @@ class SplitPlansController < ApplicationController
     end
 
     # Create the custom split plan
-    @split_plan = current_user.split_plans.new
+    @split_plan = viewing_user.split_plans.new
     @split_plan.set_custom_config(custom_config)
 
     if @split_plan.save
@@ -118,7 +121,7 @@ class SplitPlansController < ApplicationController
 
         # Create workout log and exercise sets in one transaction
         workout_log = WorkoutLog.new(
-          user: current_user,
+          user: viewing_user,
           workout: workout,
           created_at: date.to_date
         )

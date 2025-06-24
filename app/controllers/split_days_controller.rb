@@ -1,4 +1,7 @@
 class SplitDaysController < ApplicationController
+  before_action :authenticate_user!
+  before_action :ensure_can_view_user!, if: -> { params[:client_id] }
+
   def edit
     @split_day = SplitDay.find(params[:id])
     @available_exercises = AppConstants::WORKOUTS[@split_day.muscle_group.to_sym]

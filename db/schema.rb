@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_22_160240) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_24_112506) do
+  create_table "client_assignments", force: :cascade do |t|
+    t.integer "personal_trainer_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["personal_trainer_id"], name: "index_client_assignments_on_personal_trainer_id"
+    t.index ["user_id"], name: "index_client_assignments_on_user_id"
+  end
+
   create_table "exercise_sets", force: :cascade do |t|
     t.integer "workout_log_id", null: false
     t.string "exercise_name", null: false
@@ -24,6 +33,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_22_160240) do
     t.datetime "updated_at", null: false
     t.index ["workout_log_id", "exercise_name", "set_number"], name: "index_exercise_sets_on_log_exercise_set"
     t.index ["workout_log_id"], name: "index_exercise_sets_on_workout_log_id"
+  end
+
+  create_table "personal_trainers", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name"
+    t.text "bio"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_personal_trainers_on_user_id"
   end
 
   create_table "split_days", force: :cascade do |t|
@@ -81,7 +99,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_22_160240) do
     t.index ["split_day_id"], name: "index_workouts_on_split_day_id"
   end
 
+  add_foreign_key "client_assignments", "personal_trainers"
+  add_foreign_key "client_assignments", "users"
   add_foreign_key "exercise_sets", "workout_logs"
+  add_foreign_key "personal_trainers", "users"
   add_foreign_key "split_days", "split_plans"
   add_foreign_key "split_plans", "users"
   add_foreign_key "workout_logs", "users"

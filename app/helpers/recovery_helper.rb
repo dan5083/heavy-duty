@@ -22,19 +22,25 @@ module RecoveryHelper
   end
 
   def current_split_muscles
-    current_user.split_plans.last&.split_days&.pluck(:muscle_group)&.map(&:to_sym)&.uniq || []
+    viewing_user.split_plans.last&.split_days&.pluck(:muscle_group)&.map(&:to_sym)&.uniq || []
   end
 
   def log_path_for_muscle(muscle, workouts_by_muscle)
     workout = workouts_by_muscle[muscle]
     return nil unless workout
 
-    # Go directly to workout logging instead of split_day
-    new_split_plan_split_day_workout_workout_log_path(
+    path = new_split_plan_split_day_workout_workout_log_path(
       workout.split_day.split_plan,
       workout.split_day,
       workout
     )
+
+    # Add client_id if viewing as trainer
+    if params[:client_id].present?
+      path += "?client_id=#{params[:client_id]}"
+    end
+
+    path
   end
 
   def readiness_label(days_left)

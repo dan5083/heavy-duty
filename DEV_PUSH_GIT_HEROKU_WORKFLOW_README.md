@@ -6,8 +6,11 @@ for file in app/models/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 # Show all controllers.rb with filenames as headers:
 for file in app/controllers/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 
-# Show all views with filenames as headers:
-for file in app/views/**/*.html.erb; do echo "=== $file ==="; cat "$file"; echo; done
+# For all views in folders A–R
+for file in app/views/[a-r]*/*.html.erb; do echo "=== $file ==="; cat "$file"; echo; done
+
+# For all views in folders S–Z
+for file in app/views/[s-z]*/*.html.erb; do echo "=== $file ==="; cat "$file"; echo; done
 
 # See the helpers
 for file in app/helpers/*.rb; do echo "=== $file ==="; cat "$file"; echo; done

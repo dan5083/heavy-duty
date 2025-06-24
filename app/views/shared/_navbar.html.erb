@@ -24,6 +24,11 @@
           <li class="nav-item">
             <%= link_to("Archive", training_archive_path, class: "nav-link") %>
           </li>
+          <% if current_user.trainer? %>
+            <li class="nav-item">
+              <%= link_to("My Clients", personal_trainer_path(current_user.personal_trainer), class: "nav-link") %>
+            </li>
+          <% end %>
         </ul>
 
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

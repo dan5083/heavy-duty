@@ -1,7 +1,10 @@
 class TrainingArchiveController < ApplicationController
+  before_action :authenticate_user!
+  before_action :ensure_can_view_user!, if: -> { params[:client_id] }
+
   def index
-    # Get only muscle groups that the current user actually has workouts for
-    user_muscle_groups = current_user.workout_logs
+    # Get only muscle groups that the viewing user actually has workouts for
+    user_muscle_groups = viewing_user.workout_logs
                                     .joins(:workout)
                                     .distinct
                                     .pluck('workouts.muscle_group')
@@ -14,7 +17,7 @@ class TrainingArchiveController < ApplicationController
 
     @selected_muscle = params[:muscle]
 
-    @logs = current_user.workout_logs.includes(:workout).order(created_at: :desc)
+    @logs = viewing_user.workout_logs.includes(:workout).order(created_at: :desc)
 
     if @selected_muscle.present?
       @logs = @logs.select do |log|

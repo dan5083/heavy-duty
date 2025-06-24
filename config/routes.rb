@@ -1,5 +1,13 @@
 Rails.application.routes.draw do
-  devise_for :users
+  # Use custom registration controller
+  devise_for :users, controllers: {
+    registrations: 'users/registrations'
+  }
+
+  # NEW: Personal trainer management
+  resources :personal_trainers, only: [:show] do
+    resources :client_assignments, only: [:create, :destroy]
+  end
 
   # ✅ Nested workout logging structure with recovery seeding routes
   resources :split_plans, only: [:index, :new, :create, :destroy] do
