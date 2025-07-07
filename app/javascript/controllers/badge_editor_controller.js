@@ -122,7 +122,6 @@ export default class extends Controller {
   }
 
   getAlternatives() {
-    // Use data passed from Rails AppConstants
     const clauseLibrary = window.clauseLibrary || {}
 
     switch(this.typeValue) {
@@ -132,9 +131,8 @@ export default class extends Controller {
       case 'reps':
         if (clauseLibrary.reps?.options) {
           return clauseLibrary.reps.options.map(num => num === 1 ? "1 rep" : `${num} reps`)
-                   .concat(["to failure", "AMRAP"])
+                  .concat(["to failure", "AMRAP"])
         }
-        // Fallback if no AppConstants data
         const repsOptions = []
         for (let i = 1; i <= 35; i++) {
           repsOptions.push(i === 1 ? "1 rep" : `${i} reps`)
@@ -146,12 +144,18 @@ export default class extends Controller {
           const weightOptions = clauseLibrary.weight.options.map(num => `at ${num} kg`)
           return ["bodyweight", ...weightOptions]
         }
-        // Fallback
         const fallbackWeights = []
         for (let i = 1; i <= 300; i++) {
           fallbackWeights.push(`at ${i} kg`)
         }
         return ["bodyweight", ...fallbackWeights]
+
+      // 🆕 NEW: Cardio badge types (simplified)
+      case 'time':
+        return clauseLibrary.time?.options || ["30 minutes", "45 minutes", "60 minutes"]
+
+      case 'energy':
+        return clauseLibrary.energy?.options || ["100 calories", "200 calories", "300 calories"]
 
       case 'reflection':
         return clauseLibrary.reflection?.options || ["solid effort", "perfect form", "good pump"]

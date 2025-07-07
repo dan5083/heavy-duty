@@ -19,9 +19,11 @@ export default class extends Controller {
     // Get benchmark data from ExerciseSet structure
     this.benchmarkData = window.benchmarkData || {}
     this.availableExercises = window.availableExercises || []
+    this.cardioExercises = window.cardioExercises || []
 
     console.log("Benchmark data:", this.benchmarkData)
     console.log("Available exercises:", this.availableExercises)
+    console.log("Cardio exercises:", this.cardioExercises)
 
     this.initializeBadgeInterface()
     this.element.addEventListener('badge-editor:badge-changed', this.handleBadgeChange.bind(this))
@@ -59,19 +61,19 @@ export default class extends Controller {
       html += this.renderExerciseBlock(exerciseName, sets, exerciseIndex)
     })
 
-    html += this.renderAddExerciseButton()
+    html += this.renderAddExerciseButtons()
     this.exerciseListTarget.innerHTML = html
   }
 
   renderExerciseBlock(exerciseName, sets, exerciseIndex) {
     const setsHtml = sets.map((setData, setIndex) => {
-      return this.renderSetLine(setData, exerciseIndex, setIndex)
+      return this.renderSetLine(setData, exerciseIndex, setIndex, exerciseName)
     }).join('')
 
     return `
       <div class="exercise-block" data-exercise-id="${exerciseIndex}">
         <div class="exercise-header d-flex justify-content-between align-items-center">
-          <span>🏋️ ${exerciseName}</span>
+          <span>${exerciseName}</span>
           <button class="btn btn-xs btn-danger exercise-delete-btn"
                   data-action="click->log-builder#deleteExercise"
                   data-exercise-id="${exerciseIndex}"
@@ -91,8 +93,8 @@ export default class extends Controller {
     `
   }
 
-  renderSetLine(setData, exerciseIndex, setIndex) {
-    const badges = this.exerciseSetToBadges(setData)
+  renderSetLine(setData, exerciseIndex, setIndex, exerciseName) {
+    const badges = this.exerciseSetToBadges(setData, exerciseName)
     const badgesHtml = badges.map((badge, badgeIndex) => {
       return this.renderBadge(badge, exerciseIndex, setIndex, badgeIndex)
     }).join('')
@@ -120,43 +122,100 @@ export default class extends Controller {
     `
   }
 
-  renderAddExerciseButton() {
+  renderAddExerciseButtons() {
     return `
       <div class="text-center mt-4 mb-4">
+        <button class="btn btn-outline-info me-3"
+                data-action="click->log-builder#addCardioExercise">
+          <i class="bi bi-heart-pulse"></i> Add Cardiovascular Exercise
+        </button>
         <button class="btn btn-outline-success"
-                data-action="click->log-builder#addExercise">
-          <i class="bi bi-plus-lg"></i> Add Exercise
+                data-action="click->log-builder#addLiftingExercise">
+          <i class="bi bi-plus-lg"></i> Add Lifting Exercise
         </button>
       </div>
     `
   }
 
-  // Convert ExerciseSet data to badge format
-  exerciseSetToBadges(setData) {
-    return [
-      { type: 'status', content: `${setData.set_type || 'Working'} set` },
-      { type: 'reps', content: setData.reps ? `${setData.reps} reps` : 'to failure' },
-      { type: 'weight', content: setData.weight_kg ? `at ${setData.weight_kg} ${setData.weight_unit || 'kg'}` : 'bodyweight' },
-      { type: 'reflection', content: setData.notes || 'solid effort' }
-    ]
+  // 🆕 NEW: Check if an exercise is cardio
+  isCardioExercise(exerciseName) {
+    return this.cardioExercises.includes(exerciseName)
   }
 
-  // Convert badges back to ExerciseSet format
+  // Updated: Convert ExerciseSet data to badge format (now handles cardio)
+  exerciseSetToBadges(setData, exerciseName) {
+    if (this.isCardioExercise(exerciseName)) {
+      // Cardio badges - just time and energy
+      return [
+        { type: 'time', content: setData.duration_seconds ? `${Math.round(setData.duration_seconds / 60)} minutes` : '30 minutes' },
+        { type: 'energy', content: setData.energy_calories ? `${setData.energy_calories} calories` : '100 calories' }
+      ]
+    } else {
+      // Strength badges
+      return [
+        { type: 'status', content: `${setData.set_type || 'Working'} set` },
+        { type: 'reps', content: setData.reps ? `${setData.reps} reps` : 'to failure' },
+        { type: 'weight', content: setData.weight_kg ? `at ${setData.weight_kg} ${setData.weight_unit || 'kg'}` : 'bodyweight' },
+        { type: 'reflection', content: setData.notes || 'solid effort' }
+      ]
+    }
+  }
+
+  // Updated: Convert badges back to ExerciseSet format (now handles cardio)
   badgesToExerciseSet(badges, exerciseName, setNumber) {
     const statusBadge = badges.find(b => b.type === 'status')
-    const repsBadge = badges.find(b => b.type === 'reps')
-    const weightBadge = badges.find(b => b.type === 'weight')
     const reflectionBadge = badges.find(b => b.type === 'reflection')
 
-    return {
+    let exerciseSetData = {
       exercise_name: exerciseName,
       set_number: setNumber,
-      set_type: this.extractSetType(statusBadge?.content),
-      reps: this.extractReps(repsBadge?.content),
-      weight_kg: this.extractWeight(weightBadge?.content)?.weight,
-      weight_unit: this.extractWeight(weightBadge?.content)?.unit || 'kg',
+      set_type: this.extractSetType(statusBadge?.content) || 'working',
       notes: reflectionBadge?.content || 'solid effort'
     }
+
+    if (this.isCardioExercise(exerciseName)) {
+      // Cardio fields - just time and energy
+      const timeBadge = badges.find(b => b.type === 'time')
+      const energyBadge = badges.find(b => b.type === 'energy')
+
+      exerciseSetData.duration_seconds = this.extractDuration(timeBadge?.content)
+      exerciseSetData.energy_calories = this.extractCalories(energyBadge?.content)
+    } else {
+      // Strength fields
+      const repsBadge = badges.find(b => b.type === 'reps')
+      const weightBadge = badges.find(b => b.type === 'weight')
+
+      exerciseSetData.reps = this.extractReps(repsBadge?.content)
+      const weightData = this.extractWeight(weightBadge?.content)
+      exerciseSetData.weight_kg = weightData?.weight
+      exerciseSetData.weight_unit = weightData?.unit || 'kg'
+    }
+
+    return exerciseSetData
+  }
+
+  // 🆕 NEW: Extract duration from time badge (converts minutes to seconds)
+  extractDuration(timeContent) {
+    if (!timeContent) return null
+
+    // Extract from "30 minutes", "1 minute"
+    const match = timeContent.match(/(\d+)\s*minute/)
+    if (match) {
+      return parseInt(match[1]) * 60 // Convert to seconds
+    }
+    return null
+  }
+
+  // 🆕 NEW: Extract calories from energy badge
+  extractCalories(energyContent) {
+    if (!energyContent) return null
+
+    // Extract from "100 calories"
+    const match = energyContent.match(/(\d+)\s*calorie/)
+    if (match) {
+      return parseInt(match[1])
+    }
+    return null
   }
 
   extractSetType(statusContent) {
@@ -190,13 +249,24 @@ export default class extends Controller {
     return { weight: null, unit: 'kg' }
   }
 
-  addExercise(event) {
+  // 🆕 NEW: Add cardio exercise
+  addCardioExercise(event) {
     event.preventDefault()
-    console.log("Adding new exercise...")
-    this.showExerciseSelector(event.target)
+    console.log("Adding new cardio exercise...")
+    this.showExerciseSelector(event.target, true)
   }
 
-  showExerciseSelector(triggerElement) {
+  // 🆕 NEW: Add lifting exercise (renamed from addExercise)
+  addLiftingExercise(event) {
+    event.preventDefault()
+    console.log("Adding new lifting exercise...")
+    this.showExerciseSelector(event.target, false)
+  }
+
+  showExerciseSelector(triggerElement, isCardio = false) {
+    const exercises = isCardio ? this.cardioExercises : this.availableExercises
+    const exerciseType = isCardio ? 'cardio' : 'lifting'
+
     const dropdown = document.createElement('div')
     dropdown.className = 'exercise-selector-dropdown position-absolute bg-white border rounded shadow-lg'
     dropdown.style.cssText = `
@@ -208,19 +278,19 @@ export default class extends Controller {
       border-color: #dee2e6;
     `
 
-    const exercisesHtml = this.availableExercises.map(exercise => `
+    const exercisesHtml = exercises.map(exercise => `
       <div class="exercise-option px-3 py-2 cursor-pointer"
            style="cursor: pointer;"
            onmouseover="this.style.backgroundColor='#f8f9fa'"
            onmouseout="this.style.backgroundColor=''"
            data-exercise="${exercise}">
-        🏋️ ${exercise}
+        ${exercise}
       </div>
     `).join('')
 
     dropdown.innerHTML = `
       <div class="p-3 border-bottom">
-        <strong>Choose an exercise:</strong>
+        <strong>Choose a ${exerciseType} exercise:</strong>
       </div>
       ${exercisesHtml}
     `
@@ -233,7 +303,7 @@ export default class extends Controller {
 
     dropdown.querySelectorAll('.exercise-option').forEach(option => {
       option.addEventListener('click', (e) => {
-        this.selectExercise(e.target.dataset.exercise)
+        this.selectExercise(e.target.dataset.exercise, isCardio)
         dropdown.remove()
       })
     })
@@ -248,20 +318,32 @@ export default class extends Controller {
     }, 100)
   }
 
-  selectExercise(exerciseName) {
-    console.log(`Adding exercise: ${exerciseName}`)
+  selectExercise(exerciseName, isCardio = false) {
+    console.log(`Adding ${isCardio ? 'cardio' : 'lifting'} exercise: ${exerciseName}`)
 
     this.updateWorkoutData()
 
     if (!this.benchmarkData[exerciseName]) {
-      this.benchmarkData[exerciseName] = [{
-        set_number: 1,
-        set_type: 'working',
-        reps: 1,
-        weight_kg: 1,
-        weight_unit: 'kg',
-        notes: 'solid effort'
-      }]
+      if (isCardio) {
+        // Default cardio set - just time and energy
+        this.benchmarkData[exerciseName] = [{
+          set_number: 1,
+          set_type: 'working',
+          duration_seconds: 1800, // 30 minutes
+          energy_calories: 100,
+          notes: 'solid effort'
+        }]
+      } else {
+        // Default lifting set
+        this.benchmarkData[exerciseName] = [{
+          set_number: 1,
+          set_type: 'working',
+          reps: 1,
+          weight_kg: 1,
+          weight_unit: 'kg',
+          notes: 'solid effort'
+        }]
+      }
     }
 
     this.hideEmptyState()
@@ -291,15 +373,28 @@ export default class extends Controller {
     if (exerciseName) {
       const currentSets = this.benchmarkData[exerciseName]
       const newSetNumber = currentSets.length + 1
+      const isCardio = this.isCardioExercise(exerciseName)
 
-      this.benchmarkData[exerciseName].push({
-        set_number: newSetNumber,
-        set_type: 'working',
-        reps: 1,
-        weight_kg: 1,
-        weight_unit: 'kg',
-        notes: 'solid effort'
-      })
+      if (isCardio) {
+        // Default cardio set - just time and energy
+        this.benchmarkData[exerciseName].push({
+          set_number: newSetNumber,
+          set_type: 'working',
+          duration_seconds: 1800, // 30 minutes
+          energy_calories: 100,
+          notes: 'solid effort'
+        })
+      } else {
+        // Default lifting set
+        this.benchmarkData[exerciseName].push({
+          set_number: newSetNumber,
+          set_type: 'working',
+          reps: 1,
+          weight_kg: 1,
+          weight_unit: 'kg',
+          notes: 'solid effort'
+        })
+      }
 
       this.renderWorkoutBadges()
       this.updateHiddenField()
@@ -370,17 +465,13 @@ export default class extends Controller {
   }
 
   chooseBenchmarkUpdate(event) {
-    event.preventDefault()  // Prevent any default behavior
+    event.preventDefault()
 
-    // Find the button element (in case we clicked on a child element)
     const button = event.target.closest('button')
     const choice = button ? button.dataset.choice : event.target.dataset.choice
 
     console.log(`User chose: ${choice}`)
-    console.log(`Event target:`, event.target)
-    console.log(`Button found:`, button)
 
-    // Find the hidden field more defensively
     const benchmarkField = document.querySelector('[data-log-builder-target="benchmarkChoice"]')
 
     if (benchmarkField) {
@@ -390,10 +481,7 @@ export default class extends Controller {
       console.error('Could not find benchmark choice field')
     }
 
-    // Close modal
     this.closeBenchmarkModal()
-
-    // Submit the form
     this.submitFormWithChoice()
   }
 
@@ -460,7 +548,7 @@ export default class extends Controller {
       const exerciseHeader = block.querySelector('.exercise-header span')
       if (!exerciseHeader) return
 
-      const exerciseName = exerciseHeader.textContent.replace('🏋️ ', '').trim()
+      const exerciseName = exerciseHeader.textContent.trim()
       const setLines = block.querySelectorAll('.set-line[data-set-index]')
 
       setLines.forEach((setLine, setIndex) => {
@@ -499,19 +587,28 @@ export default class extends Controller {
 
   updateHiddenField(exerciseSetsArray = null) {
     if (!exerciseSetsArray) {
-      // Convert current benchmarkData to exercise sets array
       exerciseSetsArray = []
       Object.entries(this.benchmarkData).forEach(([exerciseName, sets]) => {
         sets.forEach(setData => {
-          exerciseSetsArray.push({
+          let exerciseSetData = {
             exercise_name: exerciseName,
             set_number: setData.set_number || 1,
             set_type: setData.set_type || 'working',
-            reps: setData.reps,
-            weight_kg: setData.weight_kg,
-            weight_unit: setData.weight_unit || 'kg',
             notes: setData.notes || 'solid effort'
-          })
+          }
+
+          if (this.isCardioExercise(exerciseName)) {
+            // Cardio fields - just time and energy
+            exerciseSetData.duration_seconds = setData.duration_seconds
+            exerciseSetData.energy_calories = setData.energy_calories
+          } else {
+            // Strength fields
+            exerciseSetData.reps = setData.reps
+            exerciseSetData.weight_kg = setData.weight_kg
+            exerciseSetData.weight_unit = setData.weight_unit || 'kg'
+          }
+
+          exerciseSetsArray.push(exerciseSetData)
         })
       })
     }

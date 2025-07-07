@@ -23,12 +23,21 @@ module WorkoutsHelper
 
   # 🆕 Parse set description into structured badges
   def parse_set_into_badges(exercise_set)
+    if AppConstants.cardio_exercise?(exercise_set.exercise_name)
+    # Cardio badges - just time and energy
     [
-      { type: 'status', content: "#{exercise_set.set_type.titleize} set" },
-      { type: 'reps', content: exercise_set.reps ? "#{exercise_set.reps} reps" : "to failure" },
-      { type: 'weight', content: exercise_set.weight_display },
-      { type: 'reflection', content: exercise_set.notes || "solid effort" }
+      { type: 'time', content: exercise_set.duration_seconds ? "#{exercise_set.duration_seconds / 60} minutes" : "30 minutes" },
+      { type: 'energy', content: exercise_set.energy_calories ? "#{exercise_set.energy_calories} calories" : "100 calories" }
     ]
+    else
+      # Existing strength badges
+      [
+        { type: 'status', content: "#{exercise_set.set_type.titleize} set" },
+        { type: 'reps', content: exercise_set.reps ? "#{exercise_set.reps} reps" : "to failure" },
+        { type: 'weight', content: exercise_set.weight_display },
+        { type: 'reflection', content: exercise_set.notes || "solid effort" }
+      ]
+    end
   end
 
   # 🆕 Convert badge data to ExerciseSet attributes

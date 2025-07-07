@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_24_174343) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_07_191508) do
   create_table "audit_logs", force: :cascade do |t|
     t.integer "performer_id", null: false
     t.integer "subject_id", null: false
@@ -50,6 +50,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_174343) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "duration_seconds"
+    t.decimal "distance_value", precision: 8, scale: 2
+    t.string "distance_unit"
+    t.integer "energy_calories"
+    t.index ["distance_value", "distance_unit"], name: "index_exercise_sets_on_distance_value_and_distance_unit"
+    t.index ["duration_seconds"], name: "index_exercise_sets_on_duration_seconds"
+    t.index ["energy_calories"], name: "index_exercise_sets_on_energy_calories"
     t.index ["workout_log_id", "exercise_name", "set_number"], name: "index_exercise_sets_on_log_exercise_set"
     t.index ["workout_log_id"], name: "index_exercise_sets_on_workout_log_id"
   end

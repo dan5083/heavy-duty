@@ -332,6 +332,21 @@ WORKOUTS = {
     "Shoulder Rolls", "Stretches (Calf)", "Stretches (Chest)", "Stretches (Hamstring)",
     "Stretches (Hip Flexor)", "Stretches (IT Band)", "Stretches (Quad)",
     "Thread the Needle", "Yoga Poses"
+  ],
+
+  cardio: [
+    "Bike (Air)", "Bike (Assault)", "Bike (Outdoor)", "Bike (Recumbent)", "Bike (Road)", "Bike (Spin)", "Bike (Stationary)",
+    "Boxing", "Burpees", "Circuit Training",
+    "Cycling (Mountain)", "Cycling (Outdoor)", "Cycling (Road)",
+    "Dance Cardio", "Elliptical",
+    "HIIT Circuit", "High Knees", "Hiking",
+    "Jumping Jacks", "Jump Rope", "Jumps (Box)", "Jumps (Plyometric)",
+    "Kickboxing",
+    "Mountain Climbers",
+    "Rowing (Concept2)", "Rowing (Machine)", "Rowing (Water)", "Running (Interval)", "Running (Outdoor)", "Running (Track)", "Running (Trail)",
+    "Soccer", "Stairs (Climber)", "Stairs (Master)", "Stairs (Mill)", "Swimming (Backstroke)", "Swimming (Breaststroke)", "Swimming (Butterfly)", "Swimming (Freestyle)",
+    "Tabata", "Tennis", "Treadmill (Incline)", "Treadmill (Running)", "Treadmill (Sprints)", "Treadmill (Walking)",
+    "Walking", "Walking (Incline)", "Walking (Power)", "Water Jogging"
   ]
 }.freeze
 
@@ -393,6 +408,18 @@ CLAUSE_LIBRARY = {
     color: "yellow",
     css_class: "badge-weight"
   },
+  # 🆕 NEW: Time badge for cardio duration
+  time: {
+    options: (1..120).map { |min| "#{min} minute#{'s' if min > 1}" },
+    color: "orange",
+    css_class: "badge-time"
+  },
+  # 🆕 NEW: Energy badge for cardio calories
+  energy: {
+    options: (10..750).step(10).map { |cal| "#{cal} calories" },
+    color: "red",
+    css_class: "badge-energy"
+  },
   reflection: {
     options: [
       "perfect form", "form broke down", "rushed the reps", "felt heavy", "too easy",
@@ -412,6 +439,8 @@ BADGE_TYPES = {
   status: { icon: "🏃", description: "Set type (Working, Drop, etc.)" },
   reps: { icon: "🔢", description: "Repetition count" },
   weight: { icon: "⚖️", description: "Weight used" },
+  time: { icon: "⏱️", description: "Duration" },
+  energy: { icon: "🔥", description: "Calories burned" },
   reflection: { icon: "💭", description: "Notes and feelings" }
 }.freeze
 
@@ -430,6 +459,56 @@ end
 
 def self.all_badge_types
   BADGE_TYPES.keys
+end
+
+# 🆕 Helper methods for time/distance generation
+def self.generate_time_options
+  options = []
+
+  # Seconds: 15, 30, 45 for short intervals
+  [15, 30, 45].each { |sec| options << "#{sec} seconds" }
+
+  # Minutes: 1-60 for main cardio sessions
+  (1..60).each { |min| options << "#{min} minute#{'s' if min > 1}" }
+
+  # Hours: 1-3 for long endurance sessions
+  (1..3).each { |hour| options << "#{hour} hour#{'s' if hour > 1}" }
+
+  options
+end
+
+def self.generate_distance_options
+  options = []
+
+  # Meters for shorter distances
+  [50, 100, 200, 400, 800, 1000].each { |m| options << "#{m}m" }
+
+  # Kilometers for running/cycling
+  [0.5, 1, 1.5, 2, 2.5, 3, 5, 10, 15, 20, 25, 30, 42.2].each { |km|
+    options << "#{km}km"
+  }
+
+  # Miles for those who prefer imperial
+  [0.5, 1, 1.5, 2, 3, 5, 10, 13.1, 26.2].each { |miles|
+    options << "#{miles} mile#{'s' if miles != 1}"
+  }
+
+  options
+end
+
+# 🆕 Detect if an exercise is cardio-based
+def self.cardio_exercise?(exercise_name)
+  return false unless exercise_name.present?
+  WORKOUTS[:cardio].include?(exercise_name)
+end
+
+# 🆕 Get appropriate badge types for an exercise
+def self.badge_types_for_exercise(exercise_name)
+  if cardio_exercise?(exercise_name)
+    [:time, :energy]
+  else
+    [:status, :reps, :weight, :reflection]
+  end
 end
 
   # Mapping from internal symbols to display strings

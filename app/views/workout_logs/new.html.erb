@@ -130,9 +130,11 @@
 
   window.benchmarkData = <%= raw(benchmark_data.to_json) %>;
   window.availableExercises = <%= raw(AppConstants::WORKOUTS[@workout.muscle_group.to_sym].to_json) %>;
+  window.cardioExercises = <%= raw(AppConstants::WORKOUTS[:cardio].to_json) %>;
 
   // Pass AppConstants clause library to JavaScript
-  window.clauseLibrary = {
+// Pass AppConstants clause library to JavaScript
+window.clauseLibrary = {
     status: {
       options: <%= raw(AppConstants::CLAUSE_LIBRARY[:status][:options].to_json) %>
     },
@@ -141,6 +143,12 @@
     },
     weight: {
       options: <%= raw(AppConstants::CLAUSE_LIBRARY[:weight][:options].to_json) %>
+    },
+    time: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:time][:options].to_json) %>
+    },
+    energy: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:energy][:options].to_json) %>
     },
     reflection: {
       options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reflection][:options].to_json) %>
