@@ -20,17 +20,16 @@
                 </small>
               </div>
               <div class="d-flex align-items-center gap-2">
-                <!-- FIXED: Use button_to for reliable POST request -->
-                <%= button_to "View Dashboard", start_impersonation_path(client),
-                              method: :post,
-                              class: "btn btn-sm btn-primary",
-                              form_class: "d-inline-block",
-                              data: {
-                                safety_confirm: "Switch to Client Dashboard",
-                                confirm: "Start acting as #{client.email}?"
-                              } %>
+                <!-- Simplified: Basic link to switch clients -->
+                <%= link_to "Switch to Client", start_impersonation_path(client),
+                            method: :post,
+                            class: "btn btn-sm btn-primary",
+                            data: {
+                              turbo_method: :post,
+                              confirm: "Switch to #{client.email}'s dashboard?"
+                            } %>
 
-                <!-- ENHANCED: Add safety confirmation for remove -->
+                <!-- Keep remove functionality with safety confirmation -->
                 <%= link_to "Remove", personal_trainer_client_assignment_path(@personal_trainer,
                             @personal_trainer.client_assignments.find_by(user: client)),
                             method: :delete,

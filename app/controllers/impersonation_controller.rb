@@ -11,25 +11,21 @@ class ImpersonationController < ApplicationController
       session[:impersonation_started_at] = Time.current.iso8601
 
       # Log impersonation start
-      AuditLog.log_action(
-        performer: current_user,
-        subject: @target_user,
+      log_audit_action(
         action: 'start_impersonation',
+        subject: @target_user,
         metadata: {
           session_started_at: session[:impersonation_started_at],
           client_count: current_user.personal_trainer.clients.count
         }
       )
 
-      Rails.logger.info "User #{current_user.id} (#{current_user.email}) started impersonating user #{@target_user.id} (#{@target_user.email})"
-
       redirect_to dashboard_path, notice: "Now acting as #{@target_user.email}"
     else
       # Log unauthorized impersonation attempt
-      AuditLog.log_action(
-        performer: current_user,
-        subject: @target_user,
+      log_audit_action(
         action: 'unauthorized_impersonation_attempt',
+        subject: @target_user,
         metadata: {
           reason: 'not_a_client',
           target_user_id: @target_user.id
@@ -58,18 +54,15 @@ class ImpersonationController < ApplicationController
 
       # Log impersonation stop
       if impersonated_user
-        AuditLog.log_action(
-          performer: current_user,
-          subject: impersonated_user,
+        log_audit_action(
           action: 'stop_impersonation',
+          subject: impersonated_user,
           metadata: {
             session_duration_seconds: session_duration,
             stopped_manually: true
           }
         )
       end
-
-      Rails.logger.info "User #{current_user.id} (#{current_user.email}) stopped impersonating user #{session[:impersonating_user_id]} (#{impersonated_email})"
 
       clear_impersonation_session
 
@@ -91,5 +84,17 @@ class ImpersonationController < ApplicationController
     @target_user = User.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to dashboard_path, alert: "User not found."
+  end
+
+  # Use the centralized method from ApplicationController
+  def log_audit_action(action:, subject: nil, metadata: {})
+    super(
+      action: action,
+      resource: subject,
+      metadata: metadata.merge(
+        performer_email: current_user.email,
+        subject_email: subject&.email
+      )
+    )
   end
 end

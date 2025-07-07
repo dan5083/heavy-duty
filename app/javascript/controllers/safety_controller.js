@@ -21,23 +21,23 @@ export default class extends Controller {
   }
 
   setupSafetyChecks() {
-    // FIXED: Only target specific dangerous elements, not form inputs
+    // FIXED: Only target ACTUALLY dangerous elements - very specific selectors
     const dangerousActions = this.element.querySelectorAll([
       'button[data-turbo-method="delete"]',
       'a[data-turbo-method="delete"]',
-      '.btn-danger',
-      '.btn-warning',
+      'form[method="delete"]',
       '[data-safety-confirm]',
-      'input[type="submit"]'  // Only submit buttons, not text inputs
+      '.btn-danger[data-confirm]',  // Only danger buttons WITH confirm attribute
+      'input[type="submit"][data-confirm]'  // Only submit buttons WITH confirm attribute
     ].join(','))
 
     dangerousActions.forEach(element => {
       element.addEventListener('click', this.handleDangerousAction.bind(this))
     })
 
-    // FIXED: Handle form submissions separately, not clicks on form elements
-    const forms = this.element.querySelectorAll('form[method="delete"], form[data-safety-confirm]')
-    forms.forEach(form => {
+    // Handle form submissions for delete forms only
+    const deleteForms = this.element.querySelectorAll('form[method="delete"]')
+    deleteForms.forEach(form => {
       form.addEventListener('submit', this.handleDangerousAction.bind(this))
     })
 
@@ -48,23 +48,34 @@ export default class extends Controller {
   }
 
   handleDangerousAction(event) {
-    // FIXED: Don't interfere with normal form input interactions
     const element = event.target
 
-    // Allow normal input field interactions
-    if (element.matches('input[type="text"], input[type="email"], textarea, select')) {
-      return // Let the event proceed normally
+    // FIXED: NEVER interfere with normal form inputs
+    if (element.matches('input[type="text"], input[type="email"], input[type="password"], textarea, select')) {
+      return // Always allow normal form interactions
     }
 
-    // Only intercept dangerous actions
-    const actionElement = event.target.closest('form, button, a, input[type="submit"]')
-    const actionType = this.getActionType(actionElement)
-    const confirmMessage = this.getConfirmMessage(actionElement, actionType)
+    // FIXED: Don't interfere with harmless buttons (view toggles, navigation, etc.)
+    if (element.matches('.btn-primary, .btn-secondary, .btn-outline-primary, .btn-outline-secondary')) {
+      // Only intercept if they have explicit safety attributes
+      if (!element.dataset.safetyConfirm && !element.dataset.confirm && element.dataset.turboMethod !== 'delete') {
+        return // Let harmless buttons work normally
+      }
+    }
 
-    // Only show confirmation for truly dangerous actions
-    if (this.isDangerousAction(actionElement)) {
+    const actionElement = event.target.closest('form[method="delete"], button[data-turbo-method="delete"], a[data-turbo-method="delete"], [data-safety-confirm], [data-confirm]')
+
+    if (!actionElement) {
+      return // Not a dangerous action, let it proceed
+    }
+
+    // Only intercept truly dangerous actions
+    if (this.isTrulyDangerous(actionElement)) {
       event.preventDefault()
       event.stopPropagation()
+
+      const actionType = this.getActionType(actionElement)
+      const confirmMessage = this.getConfirmMessage(actionElement, actionType)
 
       if (this.impersonationModeValue) {
         this.showImpersonationModal(actionElement, actionType, confirmMessage)
@@ -74,16 +85,16 @@ export default class extends Controller {
     }
   }
 
-  // FIXED: Better logic to determine what's actually dangerous
-  isDangerousAction(element) {
+  // FIXED: Much more restrictive - only truly dangerous actions
+  isTrulyDangerous(element) {
     if (!element) return false
 
-    const isDangerousButton = element.matches('.btn-danger, .btn-warning, [data-safety-confirm]')
-    const isDangerousMethod = element.dataset.turboMethod === 'delete'
-    const isSubmitButton = element.matches('input[type="submit"], button[type="submit"]')
-    const isDangerousForm = element.matches('form[method="delete"], form[data-safety-confirm]')
+    const hasDeleteMethod = element.dataset.turboMethod === 'delete' || element.method === 'delete'
+    const hasExplicitConfirm = element.dataset.confirm || element.dataset.safetyConfirm
+    const isDangerButton = element.matches('.btn-danger') && hasExplicitConfirm
+    const isDeleteForm = element.matches('form[method="delete"]')
 
-    return isDangerousButton || isDangerousMethod || (isSubmitButton && this.impersonationModeValue) || isDangerousForm
+    return hasDeleteMethod || isDangerButton || isDeleteForm
   }
 
   showImpersonationModal(element, actionType, confirmMessage) {
@@ -167,8 +178,6 @@ export default class extends Controller {
 
     if (method.toUpperCase() === 'DELETE' || className.includes('btn-danger')) {
       return 'Delete/Remove'
-    } else if (className.includes('btn-warning')) {
-      return 'Modify'
     } else if (element?.dataset?.safetyConfirm) {
       return element.dataset.safetyConfirm
     } else {
@@ -193,12 +202,12 @@ export default class extends Controller {
   }
 
   addImpersonationWarnings() {
-    // FIXED: Only add warnings to actually dangerous elements
+    // FIXED: Only add warnings to actually dangerous elements with explicit confirms
     const destructiveElements = this.element.querySelectorAll([
-      '.btn-danger',
-      '.btn-warning',
+      '.btn-danger[data-confirm]',
       'button[data-turbo-method="delete"]',
-      'a[data-turbo-method="delete"]'
+      'a[data-turbo-method="delete"]',
+      '[data-safety-confirm]'
     ].join(','))
 
     destructiveElements.forEach(element => {

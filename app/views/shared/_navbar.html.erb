@@ -2,13 +2,29 @@
 
 <nav class="navbar navbar-expand-lg mb-4 shadow-sm">
   <div class="container-fluid">
-    <!-- Logo only (since you said logo only) -->
+    <!-- Logo -->
     <a class="navbar-brand d-flex align-items-center" href="<%= root_path %>">
       <%= image_tag "logo.png",
           alt: "Heavy-Duty Logo",
           class: "navbar-logo",
           style: "height: 40px; width: auto;" %>
     </a>
+
+    <!-- Exit Impersonation Button (when active) -->
+    <% if user_signed_in? && user_context&.impersonation_mode? %>
+      <div class="d-flex align-items-center me-3">
+        <%= link_to stop_impersonation_path,
+                    method: :delete,
+                    class: "btn btn-sm btn-warning d-flex align-items-center",
+                    data: {
+                      turbo_method: :delete,
+                      confirm: "Exit client view and return to trainer dashboard?"
+                    } do %>
+          <i class="bi bi-box-arrow-left me-1"></i>
+          Exit Client View
+        <% end %>
+      </div>
+    <% end %>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
       <span class="navbar-toggler-icon"></span>
@@ -18,23 +34,23 @@
       <% if user_signed_in? %>
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <%= link_to("Dashboard", dashboard_path, class: "nav-link") %>
+            <%= link_to("#{user_context&.impersonation_mode? ? 'Their ' : ''}Dashboard", dashboard_path, class: "nav-link") %>
           </li>
           <li class="nav-item">
-            <%= link_to("My Split", split_plans_path, class: "nav-link") %>
+            <%= link_to("#{user_context&.impersonation_mode? ? 'Their ' : ''}Split", split_plans_path, class: "nav-link") %>
           </li>
           <li class="nav-item">
-            <%= link_to("Archive", training_archive_path, class: "nav-link") %>
+            <%= link_to("#{user_context&.impersonation_mode? ? 'Their ' : ''}Archive", training_archive_path, class: "nav-link") %>
           </li>
           <% if current_user.trainer? %>
             <li class="nav-item">
-              <%= link_to("My Clients", personal_trainer_path(current_user.personal_trainer), class: "nav-link") %>
+              <%= link_to("Clients", personal_trainer_path(current_user.personal_trainer), class: "nav-link") %>
             </li>
           <% end %>
         </ul>
 
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <!-- NEW: Session-based client switcher for trainers -->
+          <!-- Simple Client Switcher for Trainers -->
           <% if current_user.trainer? && user_context&.available_clients&.any? %>
             <li class="nav-item dropdown me-3">
               <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center"
@@ -53,38 +69,14 @@
                 <% end %>
               </button>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="clientSwitcherDropdown">
-                <!-- My Dashboard option -->
-                <li>
-                  <% if user_context.impersonation_mode? %>
-                    <%= link_to stop_impersonation_path,
-                                method: :delete,
-                                class: "dropdown-item d-flex align-items-center text-success",
-                                data: {
-                                  turbo_method: :delete,
-                                  impersonation_target: "switchLink"
-                                } do %>
-                      <i class="bi bi-house me-2"></i>
-                      <strong>My Dashboard</strong>
-                      <i class="bi bi-check text-success ms-auto"></i>
-                    <% end %>
-                  <% else %>
-                    <span class="dropdown-item d-flex align-items-center text-success">
-                      <i class="bi bi-house me-2"></i>
-                      <strong>My Dashboard</strong>
-                      <i class="bi bi-check text-success ms-auto"></i>
-                    </span>
-                  <% end %>
-                </li>
-
-                <li><hr class="dropdown-divider"></li>
-
-                <!-- Clients header -->
+                <!-- Current selection indicator -->
                 <li>
                   <h6 class="dropdown-header">
                     <i class="bi bi-people-fill me-1"></i>
                     My Clients (<%= user_context.available_clients.count %>)
                   </h6>
                 </li>
+                <li><hr class="dropdown-divider"></li>
 
                 <!-- Client list -->
                 <% user_context.available_clients.each do |client| %>
@@ -93,7 +85,10 @@
                       <!-- Current client (already selected) -->
                       <span class="dropdown-item d-flex align-items-center text-warning">
                         <i class="bi bi-person-check me-2"></i>
-                        <%= client.email %>
+                        <div>
+                          <strong><%= client.email %></strong>
+                          <small class="text-muted d-block">Currently viewing</small>
+                        </div>
                         <i class="bi bi-check text-warning ms-auto"></i>
                       </span>
                     <% else %>
@@ -103,10 +98,14 @@
                                   class: "dropdown-item d-flex align-items-center",
                                   data: {
                                     turbo_method: :post,
+                                    confirm: "Switch to #{client.email}'s dashboard?",
                                     impersonation_target: "switchLink"
                                   } do %>
                         <i class="bi bi-person me-2"></i>
-                        <%= client.email %>
+                        <div>
+                          <strong><%= client.email %></strong>
+                          <small class="text-muted d-block">Switch to client</small>
+                        </div>
                       <% end %>
                     <% end %>
                   </li>
@@ -115,24 +114,31 @@
             </li>
           <% end %>
 
-          <!-- User info and logout -->
+          <!-- User info -->
           <li class="nav-item d-flex align-items-center">
             <span class="nav-link disabled">
-              Signed in as
               <% if user_context&.impersonation_mode? %>
-                <strong class="text-warning">
-                  <%= user_context.acting_user.email %>
-                </strong>
-                <small class="text-muted d-block">
-                  (Trainer: <%= current_user.email %>)
-                </small>
+                <div class="text-center">
+                  <div class="text-warning fw-bold">
+                    Acting as: <%= user_context.acting_user.email %>
+                  </div>
+                  <small class="text-muted">
+                    Trainer: <%= current_user.email %>
+                  </small>
+                </div>
               <% else %>
-                <strong><%= current_user.email %></strong>
+                Signed in as <strong><%= current_user.email %></strong>
               <% end %>
             </span>
           </li>
+
+          <!-- Logout -->
           <li class="nav-item">
-            <%= button_to "Log Out", destroy_user_session_path, method: :delete, class: "btn btn-link nav-link border-0 p-0", style: "background: none; color: rgba(255,255,255,.55);" %>
+            <%= button_to "Log Out", destroy_user_session_path,
+                          method: :delete,
+                          class: "btn btn-link nav-link border-0 p-0",
+                          style: "background: none; color: rgba(255,255,255,.55);",
+                          data: { confirm: "Are you sure you want to log out?" } %>
           </li>
         </ul>
       <% else %>

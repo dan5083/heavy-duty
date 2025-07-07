@@ -11,7 +11,6 @@ class DashboardController < ApplicationController
     # NEW: Show client switcher for trainers
     if current_user.trainer?
       @clients = user_context.available_clients.includes(:split_plans)
-      @viewing_client = user_context.acting_user unless user_context.acting_user == current_user
     end
 
     # Use acting_user instead of viewing_user

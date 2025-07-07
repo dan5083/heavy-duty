@@ -3,7 +3,7 @@
     <!-- Trainer client switcher -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="mb-0" data-typography-animator-target="typewriter">
-        <%= @viewing_client ? "#{@viewing_client.email}'s Dashboard" : "Training Dashboard" %>
+        <%= user_context.impersonation_mode? ? "#{user_context.acting_user.email}'s Dashboard" : "Training Dashboard" %>
       </h1>
 
       <!-- REMOVED: Old dropdown - now handled by navbar and context indicator -->

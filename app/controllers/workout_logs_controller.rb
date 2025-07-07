@@ -2,7 +2,7 @@
 
 class WorkoutLogsController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_can_act_on_behalf!  # NEW
+  before_action :ensure_can_act_on_behalf!
   before_action :set_workout
 
   def index
@@ -14,20 +14,44 @@ class WorkoutLogsController < ApplicationController
   end
 
   def create
-    Rails.logger.info "DEBUG: beat_benchmark param = #{params[:beat_benchmark].inspect}"
+    Rails.logger.info "🏋️ Starting workout log creation"
+    Rails.logger.info "🏋️ Params: #{params.except(:authenticity_token).to_json}"
+    Rails.logger.info "🏋️ Current user: #{current_user.email} (#{current_user.id})"
+    Rails.logger.info "🏋️ Acting user: #{user_context.acting_user.email} (#{user_context.acting_user.id})"
+    Rails.logger.info "🏋️ Impersonation mode: #{user_context.impersonation_mode?}"
+    Rails.logger.info "🏋️ beat_benchmark param: #{params[:beat_benchmark].inspect}"
 
     # Use acting_user instead of viewing_user
     @log = @workout.workout_logs.build(user: user_context.acting_user)
+    Rails.logger.info "🏋️ Created workout log for user: #{@log.user.email} (#{@log.user.id})"
 
     # Parse the exercise sets from params
-    exercise_sets_data = JSON.parse(params[:exercise_sets] || '[]')
+    begin
+      exercise_sets_data = JSON.parse(params[:exercise_sets] || '[]')
+      Rails.logger.info "🏋️ Parsed exercise sets: #{exercise_sets_data.length} sets"
+      Rails.logger.info "🏋️ Exercise sets data: #{exercise_sets_data.to_json}"
+    rescue JSON::ParserError => e
+      Rails.logger.error "❌ Failed to parse exercise sets JSON: #{e.message}"
+      Rails.logger.error "❌ Raw exercise_sets param: #{params[:exercise_sets].inspect}"
+      redirect_to dashboard_path, alert: "Failed to save workout data - invalid exercise data."
+      return
+    end
+
     beat_benchmark = params[:beat_benchmark] == 'yes'
+    Rails.logger.info "🏋️ Beat benchmark: #{beat_benchmark}"
 
     ActiveRecord::Base.transaction do
+      Rails.logger.info "🏋️ Starting database transaction"
+
+      # Save the workout log first
       if @log.save
+        Rails.logger.info "✅ Workout log saved with ID: #{@log.id}"
+
         # Create exercise sets
-        exercise_sets_data.each do |set_data|
-          @log.exercise_sets.create!(
+        exercise_sets_data.each_with_index do |set_data, index|
+          Rails.logger.info "🏋️ Creating exercise set #{index + 1}: #{set_data.inspect}"
+
+          exercise_set = @log.exercise_sets.build(
             exercise_name: set_data['exercise_name'],
             set_number: set_data['set_number'],
             set_type: set_data['set_type'] || 'working',
@@ -36,7 +60,16 @@ class WorkoutLogsController < ApplicationController
             weight_unit: set_data['weight_unit'] || 'kg',
             notes: set_data['notes']
           )
+
+          if exercise_set.save
+            Rails.logger.info "✅ Exercise set #{index + 1} saved with ID: #{exercise_set.id}"
+          else
+            Rails.logger.error "❌ Failed to save exercise set #{index + 1}: #{exercise_set.errors.full_messages.join(', ')}"
+            raise ActiveRecord::RecordInvalid, exercise_set
+          end
         end
+
+        Rails.logger.info "✅ All exercise sets created successfully"
 
         # Log the workout creation
         log_audit_action(
@@ -45,39 +78,60 @@ class WorkoutLogsController < ApplicationController
           metadata: {
             exercise_count: exercise_sets_data.length,
             beat_benchmark: beat_benchmark,
-            muscle_group: @workout.muscle_group
+            muscle_group: @workout.muscle_group,
+            workout_id: @workout.id,
+            acting_user_id: user_context.acting_user.id
           }
         )
 
         # Handle benchmark choice
         if beat_benchmark
-          @log.update!(is_benchmark: true)
+          Rails.logger.info "🏆 Setting as benchmark"
 
-          # Log benchmark update
-          log_audit_action(
-            action: 'update_benchmark',
-            resource: @log,
-            metadata: { muscle_group: @workout.muscle_group }
-          )
+          # Check if there are existing benchmarks for this workout
+          existing_benchmarks = @workout.workout_logs.where(is_benchmark: true)
+          Rails.logger.info "🏆 Existing benchmarks for this workout: #{existing_benchmarks.count}"
 
-          # REMOVED: client_id parameter from redirect
-          redirect_to dashboard_path, notice: "Workout saved and benchmark updated! 🎉"
+          if @log.update!(is_benchmark: true)
+            Rails.logger.info "✅ Benchmark status updated successfully"
+
+            # Log benchmark update
+            log_audit_action(
+              action: 'update_benchmark',
+              resource: @log,
+              metadata: {
+                muscle_group: @workout.muscle_group,
+                previous_benchmark_count: existing_benchmarks.count
+              }
+            )
+
+            Rails.logger.info "🎉 Redirecting to dashboard with benchmark success message"
+            redirect_to dashboard_path, notice: "Workout saved and benchmark updated! 🎉"
+          else
+            Rails.logger.error "❌ Failed to update benchmark status: #{@log.errors.full_messages.join(', ')}"
+            raise ActiveRecord::RecordInvalid, @log
+          end
         else
-          # REMOVED: client_id parameter from redirect
+          Rails.logger.info "📝 Not setting as benchmark - regular workout save"
           redirect_to dashboard_path, notice: "Workout saved."
         end
       else
+        Rails.logger.error "❌ Failed to save workout log: #{@log.errors.full_messages.join(', ')}"
+        Rails.logger.error "❌ Workout log attributes: #{@log.attributes.inspect}"
         render :new, status: :unprocessable_entity
       end
     end
   rescue JSON::ParserError => e
-    Rails.logger.error "Failed to parse exercise sets: #{e.message}"
-    # REMOVED: client_id parameter from redirect
+    Rails.logger.error "❌ JSON parsing error in workout creation: #{e.message}"
     redirect_to dashboard_path, alert: "Failed to save workout data."
   rescue ActiveRecord::RecordInvalid => e
-    Rails.logger.error "Failed to save exercise sets: #{e.message}"
-    # REMOVED: client_id parameter from redirect
+    Rails.logger.error "❌ Database validation error in workout creation: #{e.message}"
+    Rails.logger.error "❌ Full backtrace: #{e.backtrace.first(5).join('\n')}"
     redirect_to dashboard_path, alert: "Failed to save workout: #{e.message}"
+  rescue StandardError => e
+    Rails.logger.error "❌ Unexpected error in workout creation: #{e.class.name}: #{e.message}"
+    Rails.logger.error "❌ Full backtrace: #{e.backtrace.first(10).join('\n')}"
+    redirect_to dashboard_path, alert: "An unexpected error occurred while saving your workout."
   end
 
   def render_set_inputs
@@ -94,5 +148,9 @@ class WorkoutLogsController < ApplicationController
 
   def set_workout
     @workout = Workout.find(params[:workout_id])
+    Rails.logger.info "🎯 Set workout: #{@workout.name} (ID: #{@workout.id}) for muscle group: #{@workout.muscle_group}"
+  rescue ActiveRecord::RecordNotFound => e
+    Rails.logger.error "❌ Workout not found: #{params[:workout_id]}"
+    redirect_to dashboard_path, alert: "Workout not found."
   end
 end
