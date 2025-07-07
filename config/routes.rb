@@ -41,9 +41,13 @@ Rails.application.routes.draw do
     end
   end
 
-  # Dashboard and archive
-  # REMOVED: No more client_id parameters needed
+  # === UPDATED: Dashboard routes with view mode support ===
   get "dashboard", to: "dashboard#index", as: :dashboard
+  get "dashboard/:view", to: "dashboard#index",
+      constraints: { view: /recovery|benchmark/ },
+      as: :dashboard_view
+
+  # Archive routes (unchanged)
   get "archive", to: "training_archive#index", as: :training_archive
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

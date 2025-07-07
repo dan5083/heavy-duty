@@ -1,29 +1,100 @@
-<% now = Time.current %>
-<% ready_on = data[:ready_on].to_time %>
-<% time_diff = ready_on - now %>
+<%
+  # Set default view mode if not provided
+  view_mode ||= 'recovery'
 
-<% if data[:days_left] <= 0 %>
-  <% label = "Good to Go" %>
-  <% since = data[:ready_on].strftime("%b %d") %>
-  <% note = "Has been ready for #{pluralize(data[:days_ready], 'day')} (since #{since})" %>
-  <% card_class = "border-success" %>
-  <% status_class = "text-success" %>
-<% else %>
-  <% days = (time_diff / 1.day).floor %>
-  <% hours = ((time_diff % 1.day) / 1.hour).floor %>
-  <% minutes = ((time_diff % 1.hour) / 1.minute).floor %>
+  # Determine what data to show based on view mode
+  if view_mode == 'benchmark'
+    # Benchmark view logic
+    benchmark_status = benchmark_status_for(muscle, { muscle => data })
+    has_benchmark = data[:has_benchmark]
+    days_since = data[:days_since_benchmark]
+    last_date = data[:last_benchmark_date]
 
-  <% countdown_html = raw("
-    <span class='countdown-number'>#{days}</span><span class='countdown-unit'>D</span>
-    <span class='countdown-number'>#{hours}</span><span class='countdown-unit'>H</span>
-    <span class='countdown-number'>#{minutes}</span><span class='countdown-unit'>M</span>
-  ") %>
+    if has_benchmark
+      case days_since
+      when 0..7
+        label = "Fresh Benchmark"
+        note = "Set #{data[:benchmark_age_label]}"
+        card_class = "border-success"
+        status_class = "text-success"
+        progress = benchmark_progress_percentage(days_since)
+        progress_color = "bg-success"
+      when 8..14
+        label = "Good Benchmark"
+        note = "Set #{data[:benchmark_age_label]}"
+        card_class = "border-primary"
+        status_class = "text-primary"
+        progress = benchmark_progress_percentage(days_since)
+        progress_color = "bg-primary"
+      when 15..21
+        label = "⏳ Aging Benchmark"
+        note = "Set #{data[:benchmark_age_label]} • Consider updating"
+        card_class = "border-warning"
+        status_class = "text-warning"
+        progress = benchmark_progress_percentage(days_since)
+        progress_color = "bg-warning"
+      else
+        label = "🔄 Stale Benchmark"
+        note = "Set #{data[:benchmark_age_label]} • Needs update!"
+        card_class = "border-danger"
+        status_class = "text-danger"
+        progress = benchmark_progress_percentage(days_since)
+        progress_color = "bg-danger"
+      end
+    else
+      label = "❌ No Benchmark"
+      note = "Never benchmarked • Set your first!"
+      card_class = "border-danger"
+      status_class = "text-danger"
+      progress = 0
+      progress_color = "bg-danger"
+    end
 
-  <% note = raw("Will be ready in #{countdown_html} (on #{ready_on.strftime('%b %d')})") %>
-  <% label = "⏳ Recovering" %>
-  <% card_class = days <= 2 ? "border-warning" : "border-secondary" %>
-  <% status_class = days <= 2 ? "text-warning" : "text-muted" %>
-<% end %>
+    button_text = has_benchmark ? "Beat Benchmark" : "Set First Benchmark"
+    button_class = has_benchmark ? "btn-primary" : "btn-warning"
+
+  else
+    # Recovery view logic (existing)
+    now = Time.current
+    ready_on = data[:ready_on].to_time
+    time_diff = ready_on - now
+
+    if data[:days_left] <= 0
+      label = "Good to Go"
+      since = data[:ready_on].strftime("%b %d")
+      note = "Has been ready for #{pluralize(data[:days_ready], 'day')} (since #{since})"
+      card_class = "border-success"
+      status_class = "text-success"
+      progress = 100
+      progress_color = "bg-success"
+      button_text = "Start Workout"
+      button_class = "btn-success"
+    else
+      days = (time_diff / 1.day).floor
+      hours = ((time_diff % 1.day) / 1.hour).floor
+      minutes = ((time_diff % 1.hour) / 1.minute).floor
+
+      countdown_html = raw("
+        <span class='countdown-number'>#{days}</span><span class='countdown-unit'>D</span>
+        <span class='countdown-number'>#{hours}</span><span class='countdown-unit'>H</span>
+        <span class='countdown-number'>#{minutes}</span><span class='countdown-unit'>M</span>
+      ")
+
+      note = raw("Will be ready in #{countdown_html} (on #{ready_on.strftime('%b %d')})")
+      label = "⏳ Recovering"
+      card_class = days <= 2 ? "border-warning" : "border-secondary"
+      status_class = days <= 2 ? "text-warning" : "text-muted"
+
+      muscle_recovery_days = AppConstants::TRAINING_CYCLE[muscle] || 7
+      days_recovered = [muscle_recovery_days - data[:days_left], 0].max
+      progress = (days_recovered.to_f / muscle_recovery_days * 100).round
+      progress_color = days <= 2 ? "bg-warning" : "bg-primary"
+
+      button_text = "Train Anyway"
+      button_class = "btn-outline-light"
+    end
+  end
+%>
 
 <div class="card <%= card_class %> h-100">
   <div class="card-body">
@@ -34,58 +105,94 @@
       <p class="small text-muted mb-0"><%= note %></p>
     </div>
 
-    <% if data[:days_left] <= 0 %>
-      <!-- Ready State: Show progress bar at 100% -->
-      <div class="recovery-progress mb-3">
-        <div class="progress" style="height: 8px; border-radius: 12px;">
-          <div class="progress-bar bg-success"
-               role="progressbar"
-               style="width: 100%; border-radius: 12px;"
-               aria-valuenow="100"
-               aria-valuemin="0"
-               aria-valuemax="100">
-          </div>
+    <!-- Progress Bar -->
+    <div class="recovery-progress mb-3">
+      <div class="progress" style="height: 8px; border-radius: 12px;">
+        <div class="progress-bar <%= progress_color %>"
+             role="progressbar"
+             style="width: <%= progress %>%; border-radius: 12px;"
+             aria-valuenow="<%= progress %>"
+             aria-valuemin="0"
+             aria-valuemax="100">
         </div>
-        <small class="text-success mt-1 d-block">
-          <i class="bi bi-check-circle-fill me-1"></i>
-          Fully recovered
-        </small>
       </div>
-    <% else %>
-      <!-- Recovering State: Show progress based on recovery time -->
-      <% muscle_recovery_days = AppConstants::TRAINING_CYCLE[muscle] || 7 %>
-      <% days_recovered = [muscle_recovery_days - data[:days_left], 0].max %>
-      <% progress_percentage = (days_recovered.to_f / muscle_recovery_days * 100).round %>
+      <small class="<%= status_class %> mt-1 d-block">
+        <% if view_mode == 'benchmark' %>
+          <% if has_benchmark %>
+            <i class="bi bi-trophy-fill me-1"></i>
+            <%= progress %>% fresh
+          <% else %>
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            No benchmark set
+          <% end %>
+        <% else %>
+          <% if data[:days_left] <= 0 %>
+            <i class="bi bi-check-circle-fill me-1"></i>
+            Fully recovered
+          <% else %>
+            <i class="bi bi-clock me-1"></i>
+            <%= progress %>% recovered
+          <% end %>
+        <% end %>
+      </small>
+    </div>
 
-      <div class="recovery-progress mb-3">
-        <div class="progress" style="height: 8px; border-radius: 12px;">
-          <div class="progress-bar <%= days <= 2 ? 'bg-warning' : 'bg-primary' %>"
-               role="progressbar"
-               style="width: <%= progress_percentage %>%; border-radius: 12px;"
-               aria-valuenow="<%= progress_percentage %>"
-               aria-valuemin="0"
-               aria-valuemax="100">
-          </div>
-        </div>
-        <small class="<%= days <= 2 ? 'text-warning' : 'text-primary' %> mt-1 d-block">
-          <i class="bi bi-clock me-1"></i>
-          <%= progress_percentage %>% recovered
+    <!-- Action Button -->
+    <% if log_path.present? %>
+      <%= link_to log_path, class: "btn #{button_class} btn-sm w-100 d-flex align-items-center justify-content-center" do %>
+        <% if view_mode == 'benchmark' %>
+          <% if has_benchmark %>
+            <i class="bi bi-trophy me-2"></i>
+            <%= button_text %>
+          <% else %>
+            <i class="bi bi-plus-circle me-2"></i>
+            <%= button_text %>
+          <% end %>
+        <% else %>
+          <% if data[:days_left] <= 0 %>
+            <i class="bi bi-play-fill me-2"></i>
+            <%= button_text %>
+          <% else %>
+            <i class="bi bi-lightning me-2"></i>
+            <%= button_text %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <!-- Additional Benchmark Info -->
+    <% if view_mode == 'benchmark' && has_benchmark %>
+      <div class="mt-2 pt-2 border-top border-secondary">
+        <small class="text-muted d-flex justify-content-between">
+          <span>
+            <i class="bi bi-calendar3 me-1"></i>
+            <%= last_date&.strftime("%b %d") %>
+          </span>
+          <span>
+            <i class="bi bi-clock-history me-1"></i>
+            <%= pluralize(days_since, 'day') %> ago
+          </span>
         </small>
       </div>
     <% end %>
 
-    <% if log_path.present? %>
-      <% if data[:days_left] <= 0 %>
-        <%= link_to log_path, class: "btn btn-success btn-sm w-100 d-flex align-items-center justify-content-center" do %>
-          <i class="bi bi-play-fill me-2"></i>
-          Start Workout
-        <% end %>
-      <% else %>
-        <%= link_to log_path, class: "btn btn-outline-light btn-sm w-100 d-flex align-items-center justify-content-center" do %>
-          <i class="bi bi-lightning me-2"></i>
-          Train Anyway
-        <% end %>
-      <% end %>
+    <!-- Recovery info for benchmark view -->
+    <% if view_mode == 'benchmark' %>
+      <div class="mt-2 pt-2 border-top border-secondary">
+        <%
+          # Get recovery data for this muscle
+          recovery_tracker = RecoveryTracker.new(user_context.acting_user)
+          recovery_days_left = recovery_tracker.countdown_days_for(muscle)
+        %>
+        <small class="text-muted">
+          <i class="bi bi-heart-pulse me-1"></i>
+          <% if recovery_days_left <= 0 %>
+            <span class="text-success">Muscle ready to train</span>
+          <% else %>
+            Recovery: <%= pluralize(recovery_days_left, 'day') %> left
+          <% end %>
+        </small>
+      </div>
     <% end %>
   </div>
 </div>

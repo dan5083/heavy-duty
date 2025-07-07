@@ -15,34 +15,125 @@
     </h1>
   <% end %>
 
-  <% if @next_ready %>
-    <div class="alert alert-next-up d-flex align-items-center mb-4">
-      <div class="flex-grow-1">
-        <h4>NEXT UP: <%= @next_ready[:label] %></h4>
-        <p class="mb-0">Ready for <strong><%= @next_ready[:days_ready] %> days</strong> • Train this muscle next!</p>
-      </div>
+  <!-- NEW: View Mode Toggle -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="text-muted mb-1"><%= @view_title %></h4>
+      <p class="text-muted small mb-0"><%= @view_subtitle %></p>
     </div>
+
+    <%= view_mode_toggle_links(@view_mode) %>
+  </div>
+
+  <!-- NEW: Priority Alert (adapts to view mode) -->
+  <% if @next_ready %>
+    <% if @view_mode == 'benchmark' %>
+      <!-- Benchmark Priority Alert -->
+      <div class="alert alert-benchmark-priority d-flex align-items-center mb-4">
+        <div class="flex-grow-1">
+          <% if @next_ready[:needs_benchmark] %>
+            <h4>⚠️ MISSING BENCHMARK: <%= @next_ready[:label] %></h4>
+            <p class="mb-0">This muscle group has <strong>never been benchmarked</strong> • Set your first benchmark!</p>
+          <% else %>
+            <h4>🔄 STALE BENCHMARK: <%= @next_ready[:label] %></h4>
+            <p class="mb-0">Last benchmarked <strong><%= pluralize(@next_ready[:days_since], 'day') %> ago</strong> • Time to beat your record!</p>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <!-- Recovery Priority Alert (existing) -->
+      <div class="alert alert-next-up d-flex align-items-center mb-4">
+        <div class="flex-grow-1">
+          <h4>NEXT UP: <%= @next_ready[:label] %></h4>
+          <p class="mb-0">Ready for <strong><%= @next_ready[:days_ready] %> days</strong> • Train this muscle next!</p>
+        </div>
+      </div>
+    <% end %>
   <% end %>
 
+  <!-- No Data State -->
   <% if @readiness_data.none? { |m, data| data.present? } %>
     <div class="alert alert-warning slide-up-delay-1"
          data-typography-animator-target="slideUp">
-      <strong>No recovery data available yet.</strong><br>
-      Start logging workouts to unlock recovery tracking.
+      <% if @view_mode == 'benchmark' %>
+        <strong>No benchmark data available yet.</strong><br>
+        Start setting benchmarks to track your progress over time.
+      <% else %>
+        <strong>No recovery data available yet.</strong><br>
+        Start logging workouts to unlock recovery tracking.
+      <% end %>
     </div>
   <% end %>
 
+  <!-- Muscle Cards Grid -->
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3"
        data-typography-animator-target="fadeIn"
        data-typography-animator-delay-value="800">
     <% @readiness_data.each_with_index do |(muscle, data), index| %>
-      <% log_path = log_path_for_muscle(muscle, @workouts_by_muscle) %>
+      <% log_path = log_path_for_muscle(muscle, @workouts_by_muscle, @view_mode) %>
       <% next unless log_path.present? %>
 
       <div class="col slide-up-delay-<%= [index % 3 + 1, 3].min %>"
            data-typography-animator-target="slideUp">
-        <%= render partial: "muscle_countdown", locals: { muscle: muscle, data: data, log_path: log_path } %>
+        <%= render partial: "muscle_countdown",
+                   locals: {
+                     muscle: muscle,
+                     data: data,
+                     log_path: log_path,
+                     view_mode: @view_mode
+                   } %>
       </div>
     <% end %>
   </div>
+
+  <!-- NEW: View Mode Help Text -->
+  <div class="mt-5 pt-4 border-top">
+    <div class="text-center text-muted">
+      <small>
+        <% if @view_mode == 'benchmark' %>
+          <i class="bi bi-info-circle me-1"></i>
+          <strong>Benchmark View:</strong> Track when you last set personal records for each muscle group.
+          Fresh benchmarks (green) are recent, while stale benchmarks (red) need updating.
+        <% else %>
+          <i class="bi bi-info-circle me-1"></i>
+          <strong>Recovery View:</strong> Track muscle recovery status based on your last workout.
+          Green muscles are ready to train, while others are still recovering.
+        <% end %>
+      </small>
+    </div>
+  </div>
 </div>
+
+<!-- NEW: Custom CSS for benchmark alerts -->
+<style>
+  .alert-benchmark-priority {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+    border: 1px solid #ffc107;
+    color: #856404;
+  }
+
+  .alert-next-up {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(32, 201, 151, 0.1) 100%);
+    border: 1px solid #28a745;
+    color: #155724;
+  }
+
+  .btn-group .btn {
+    min-width: 120px;
+  }
+
+  @media (max-width: 768px) {
+    .d-flex.justify-content-between {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .btn-group {
+      width: 100%;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+    }
+  }
+</style>
