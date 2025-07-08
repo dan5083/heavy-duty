@@ -12,13 +12,17 @@ Rails.application.configure do
   # Full error reports are disabled.
   config.consider_all_requests_local = false
 
-  # MailGun config
+  # Email configuration - Mailgun
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: 'heavy-duty.herokuapp.com', protocol: 'https' }
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.default_url_options = {
+    host: 'heavy-duty-1bf635cff355.herokuapp.com',
+    protocol: 'https'
+  }
   config.action_mailer.smtp_settings = {
     address: ENV['MAILGUN_SMTP_SERVER'],
-    port: ENV['MAILGUN_SMTP_PORT'],
+    port: ENV['MAILGUN_SMTP_PORT'].to_i,
     domain: ENV['MAILGUN_DOMAIN'],
     user_name: ENV['MAILGUN_SMTP_LOGIN'],
     password: ENV['MAILGUN_SMTP_PASSWORD'],
