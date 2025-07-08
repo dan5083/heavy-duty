@@ -12,8 +12,8 @@ class ClientAssignmentsController < ApplicationController
     if user.save
       @personal_trainer.client_assignments.create!(user: user)
 
-      # TODO: Configure SMTP on Heroku before enabling
-      # ClientMailer.welcome(user, temp_password, @personal_trainer).deliver_now
+    # Email configured - sending now
+    ClientMailer.welcome(user, temp_password, @personal_trainer).deliver_now
 
       redirect_to personal_trainer_path(@personal_trainer),
                   notice: "Client #{email} created! Temp password: #{temp_password}"
@@ -40,5 +40,3 @@ class ClientAssignmentsController < ApplicationController
     end
   end
 end
-# Force update
-
