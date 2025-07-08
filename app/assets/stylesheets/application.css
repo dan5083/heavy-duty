@@ -9,7 +9,7 @@
    loading-screen IMPORT
    =============================================== */
 
-@import "animations/loading-screen";
+@import "animations/loading-screen.css";
 
 /* Disable Turbo's loading indicators */
 .turbo-progress-bar {
