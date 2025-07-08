@@ -200,13 +200,13 @@
         // Aggressive timing for mobile PWA
         let loadingDuration = 3000;
         if (isPWA && isMobile) {
-          loadingDuration = 9000; // Even longer for mobile PWA to see full slow animation
+          loadingDuration = 7500; // Extra time for title to be seen
         } else if (isPWA) {
-          loadingDuration = 6000; // Longer for desktop PWA
+          loadingDuration = 7000; // Extra time for desktop PWA
         } else if (isMobile) {
-          loadingDuration = 5500; // Longer for mobile browser
+          loadingDuration = 6500; // Extra time for mobile browser
         } else {
-          loadingDuration = 5000; // Longer for desktop browser
+          loadingDuration = 6000; // Extra time for desktop
         }
 
         setTimeout(function() {
