@@ -185,29 +185,10 @@
     </div>
   </div>
 
- <script>
+  <script>
     // Only show loading screen on initial page load, not on Turbo navigation
     if (performance.navigation.type === 0) { // 0 = navigate (first load)
       document.addEventListener('DOMContentLoaded', function() {
-        // Debug what SVGs are actually loading
-        const figures = document.querySelectorAll('.loading-figure img');
-        const title = document.querySelector('.loading-title img');
-
-        console.log('=== LOADING SCREEN DEBUG ===');
-        console.log('Total figures found:', figures.length);
-
-        figures.forEach((img, index) => {
-          console.log(`Figure ${index}:`, img.src, 'loaded:', img.complete);
-          img.onload = () => console.log(`✅ Figure ${index} loaded:`, img.src);
-          img.onerror = () => console.log(`❌ Figure ${index} failed:`, img.src);
-        });
-
-        if (title) {
-          console.log('Title:', title.src, 'loaded:', title.complete);
-          title.onload = () => console.log('✅ Title loaded:', title.src);
-          title.onerror = () => console.log('❌ Title failed:', title.src);
-        }
-
         // Multiple PWA detection methods
         const isPWA = navigator.standalone ||
                       window.matchMedia('(display-mode: standalone)').matches ||
@@ -219,14 +200,14 @@
         // Aggressive timing for mobile PWA
         let loadingDuration = 3000;
         if (isPWA && isMobile) {
-          loadingDuration = 8000; // Much longer for mobile PWA
+          loadingDuration = 9000; // Even longer for mobile PWA to see full slow animation
         } else if (isPWA) {
-          loadingDuration = 4500; // Medium for desktop PWA
+          loadingDuration = 6000; // Longer for desktop PWA
         } else if (isMobile) {
-          loadingDuration = 4000; // Medium for mobile browser
+          loadingDuration = 5500; // Longer for mobile browser
+        } else {
+          loadingDuration = 5000; // Longer for desktop browser
         }
-
-        console.log('Loading duration:', loadingDuration, 'isPWA:', isPWA, 'isMobile:', isMobile);
 
         setTimeout(function() {
           const overlay = document.getElementById('loadingOverlay');
