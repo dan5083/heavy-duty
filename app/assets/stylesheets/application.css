@@ -11,6 +11,16 @@
 
 @import "animations/loading-screen";
 
+/* Disable Turbo's loading indicators */
+.turbo-progress-bar {
+  display: none !important;
+}
+
+/* Disable Turbo's default loading states */
+[data-turbo-temporary] {
+  display: none !important;
+}
+
 /* ===============================================
    CSS CUSTOM PROPERTIES - DARK THEME FOUNDATION
    =============================================== */

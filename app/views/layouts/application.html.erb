@@ -181,15 +181,22 @@
   </div>
 
   <script>
-    // Hide loading screen after animation completes
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function() {
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) {
-          overlay.classList.add('completed');
-        }
-      }, 3500); // Total animation time + fade out
-    });
+    // Only show loading screen on initial page load, not on Turbo navigation
+    if (performance.navigation.type === 0) { // 0 = navigate (first load)
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          const overlay = document.getElementById('loadingOverlay');
+          if (overlay) {
+            overlay.classList.add('completed');
+            setTimeout(() => overlay.remove(), 500);
+          }
+        }, 3000); // Adjust timing as needed
+      });
+    } else {
+      // Hide loading screen immediately on subsequent navigations
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) overlay.style.display = 'none';
+    }
   </script>
 
     <!-- ✅ Navbar -->
