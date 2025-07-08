@@ -12,6 +12,17 @@ const urlsToCache = [
   '/icon-512x512.png'
 ];
 
+// Cache exceptions - don't cache loading screen assets
+const CACHE_EXCEPTIONS = [
+  '/assets/animations/loading-screen',
+  '/assets/logo-animation/',
+  'loading-screen',
+  'green-man.svg',
+  'amber-man.svg',
+  'red-man.svg',
+  'anatomical-title.svg'
+];
+
 // Install event - cache core assets
 self.addEventListener('install', function(event) {
   console.log('[ServiceWorker] Install');
@@ -52,6 +63,15 @@ self.addEventListener('activate', function(event) {
 self.addEventListener('fetch', function(event) {
   // Skip non-HTTP requests
   if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
+  const url = new URL(event.request.url);
+
+  // Don't cache loading screen assets - always fetch fresh
+  if (CACHE_EXCEPTIONS.some(exception => url.pathname.includes(exception))) {
+    console.log('[ServiceWorker] Bypassing cache for loading asset:', url.pathname);
+    event.respondWith(fetch(event.request));
     return;
   }
 

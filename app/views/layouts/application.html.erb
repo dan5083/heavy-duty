@@ -183,9 +183,25 @@
     // Only show loading screen on initial page load, not on Turbo navigation
     if (performance.navigation.type === 0) { // 0 = navigate (first load)
       document.addEventListener('DOMContentLoaded', function() {
-        // Check if running as PWA or in browser
-        const isPWA = navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-        const loadingDuration = isPWA ? 4000 : 3000; // Longer for PWA to account for faster device behavior
+        // Multiple PWA detection methods
+        const isPWA = navigator.standalone ||
+                      window.matchMedia('(display-mode: standalone)').matches ||
+                      window.matchMedia('(display-mode: fullscreen)').matches ||
+                      document.referrer.includes('android-app://');
+
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        // Aggressive timing for mobile PWA
+        let loadingDuration = 3000;
+        if (isPWA && isMobile) {
+          loadingDuration = 6000; // Much longer for mobile PWA
+        } else if (isPWA) {
+          loadingDuration = 4500; // Medium for desktop PWA
+        } else if (isMobile) {
+          loadingDuration = 4000; // Medium for mobile browser
+        }
+
+        console.log('Loading duration:', loadingDuration, 'isPWA:', isPWA, 'isMobile:', isMobile);
 
         setTimeout(function() {
           const overlay = document.getElementById('loadingOverlay');
