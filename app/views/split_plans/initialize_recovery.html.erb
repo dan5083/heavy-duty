@@ -1,16 +1,22 @@
 <h1 class="mb-4">When did you last train these muscles?</h1>
-<p class="text-muted mb-4">Help us track your recovery by entering the last time you trained each muscle group. This ensures accurate recovery recommendations.</p>
+<p class="text-muted mb-4">
+  Enter the last date you trained each muscle group. This ensures accurate recovery tracking from day one.
+  <strong>All dates are required.</strong>
+</p>
 
 <%= form_with url: submit_recovery_split_plan_path(@split_plan), method: :post, local: true do %>
   <% @muscles.each do |muscle| %>
     <div class="mb-3">
-      <label><%= muscle.to_s.humanize %></label>
-      <%= date_field_tag "recovery_dates[#{muscle}]", nil, class: "form-control", placeholder: "dd/mm/yyyy" %>
+      <label class="form-label"><%= AppConstants::LABELS[muscle] %> *</label>
+      <%= date_field_tag "recovery_dates[#{muscle}]", nil,
+                         class: "form-control",
+                         required: true,
+                         max: Date.today %>
     </div>
   <% end %>
 
   <div class="mt-4">
-    <%= submit_tag "Submit Recovery Data", class: "btn btn-primary" %>
-    <%= submit_tag "Skip", name: "skip", class: "btn btn-outline-secondary ms-2" %>
+    <%= submit_tag "Initialize Recovery Tracking", class: "btn btn-primary" %>
+    <!-- REMOVED: Skip button -->
   </div>
 <% end %>

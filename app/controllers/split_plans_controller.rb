@@ -102,12 +102,16 @@ class SplitPlansController < ApplicationController
 
   def submit_recovery
     @split_plan = SplitPlan.find(params[:id])
+    recovery_dates = params[:recovery_dates] || {}
 
-    if params[:skip].present?  # Instead of == 'true' or == '1'
-      muscles = @split_plan.split_days.pluck(:muscle_group).uniq.map(&:to_sym)
-      recovery_dates = muscles.to_h { |muscle| [muscle.to_s, 3.weeks.ago.to_date] }
-    else
-      recovery_dates = params[:recovery_dates] || {}
+    # Validate that all muscles have dates
+    muscles = @split_plan.split_days.pluck(:muscle_group).uniq.map(&:to_sym)
+    missing_dates = muscles.select { |muscle| recovery_dates[muscle.to_s].blank? }
+
+    if missing_dates.any?
+      muscle_labels = missing_dates.map { |muscle| AppConstants::LABELS[muscle] }
+      flash[:alert] = "Please enter dates for: #{muscle_labels.join(', ')}"
+      return render :initialize_recovery
     end
 
     ActiveRecord::Base.transaction do
@@ -120,25 +124,19 @@ class SplitPlansController < ApplicationController
           muscle_group: muscle_group
         )
 
-        # Create workout log and exercise sets in one transaction
-        workout_log = WorkoutLog.new(
-          user: user_context.acting_user,  # Use acting_user instead of viewing_user
+        # Create simple workout log for recovery tracking only
+        WorkoutLog.create!(
+          user: user_context.acting_user,
           workout: workout,
           created_at: date.to_date
+          # REMOVED: is_benchmark: true
+          # REMOVED: generate_initial_exercise_sets call
+          # No exercise_sets created - this is purely for recovery date tracking
         )
-
-        # Create initial benchmark exercise sets BEFORE saving the workout_log
-        generate_initial_exercise_sets(workout_log, muscle_group.to_sym)
-
-        # Now save the workout_log with exercise_sets already present
-        workout_log.save!
-
-        # Mark this workout log as the benchmark
-        workout_log.update!(is_benchmark: true)
       end
     end
 
-    redirect_to dashboard_path, notice: "Recovery initialized successfully."
+    redirect_to dashboard_path, notice: "Recovery tracking initialized. Log real workouts to set benchmarks!"
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error "Failed to initialize recovery: #{e.message}"
     redirect_to initialize_recovery_split_plan_path(@split_plan),
@@ -157,25 +155,5 @@ class SplitPlansController < ApplicationController
     params.require(:split_plan).permit(:name, :split_length)
   end
 
-  # Generate initial benchmark with consistent defaults using ExerciseSet
-  def generate_initial_exercise_sets(workout_log, muscle_group)
-    exercises = AppConstants::WORKOUTS[muscle_group] || []
-    return if exercises.empty?
-
-    # Pick 2-4 exercises for the initial benchmark
-    selected_exercises = exercises.sample(rand(2..4))
-
-    selected_exercises.each_with_index do |exercise_name, index|
-      # Build exercise sets (don't create yet, just build)
-      workout_log.exercise_sets.build(
-        exercise_name: exercise_name,
-        set_number: 1,
-        set_type: 'working',
-        reps: 1,
-        weight_kg: 1.0,
-        weight_unit: 'kg',
-        notes: 'solid effort'
-      )
-    end
-  end
+  # REMOVED: generate_initial_exercise_sets method entirely
 end
