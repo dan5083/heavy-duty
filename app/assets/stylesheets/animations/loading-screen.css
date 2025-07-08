@@ -1,5 +1,4 @@
 /* app/assets/stylesheets/animations/loading-screen.css */
-
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -105,18 +104,75 @@
   display: none;
 }
 
-/* Responsive adjustments */
+/* FIXED: Mobile and PWA responsive adjustments */
 @media (max-width: 768px) {
+  /* Keep the same absolute positioning system but ensure proper sizing */
   .loading-figures {
-    gap: 1rem;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
   }
 
   .loading-figure {
-    width: 80px;
-    height: 120px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .loading-title svg {
-    max-width: 250px;
+  .loading-figure img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+
+  .loading-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-title img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+}
+
+/* PWA specific fixes */
+@media screen and (display-mode: standalone) {
+  .loading-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden;
+  }
+
+  .loading-figures {
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+
+  .loading-figure {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .loading-title {
+    width: 100% !important;
+    height: 100% !important;
   }
 }
