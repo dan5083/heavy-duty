@@ -40,3 +40,4 @@ class ClientAssignmentsController < ApplicationController
     end
   end
 end
+# Force update
