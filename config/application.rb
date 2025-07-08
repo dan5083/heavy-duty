@@ -33,24 +33,25 @@ module HeavyDuty
                          httponly: true,
                          same_site: :lax,
                          expire_after: 24.hours
-  end
-  # Email configuration for production
-  if Rails.env.production?
-    config.action_mailer.delivery_method = :smtp
-    config.action_mailer.raise_delivery_errors = true
-    config.action_mailer.perform_deliveries = true
-    config.action_mailer.default_url_options = {
-      host: 'heavy-duty-1bf635cff355.herokuapp.com',
-      protocol: 'https'
-    }
-    config.action_mailer.smtp_settings = {
-      address: ENV['MAILGUN_SMTP_SERVER'],
-      port: ENV['MAILGUN_SMTP_PORT'].to_i,
-      domain: ENV['MAILGUN_DOMAIN'],
-      user_name: ENV['MAILGUN_SMTP_LOGIN'],
-      password: ENV['MAILGUN_SMTP_PASSWORD'],
-      authentication: 'plain',
-      enable_starttls_auto: true
-    }
+
+    # Email configuration for production
+    if Rails.env.production?
+      config.action_mailer.delivery_method = :smtp
+      config.action_mailer.raise_delivery_errors = true
+      config.action_mailer.perform_deliveries = true
+      config.action_mailer.default_url_options = {
+        host: 'heavy-duty-1bf635cff355.herokuapp.com',
+        protocol: 'https'
+      }
+      config.action_mailer.smtp_settings = {
+        address: ENV['MAILGUN_SMTP_SERVER'],
+        port: ENV['MAILGUN_SMTP_PORT'].to_i,
+        domain: ENV['MAILGUN_DOMAIN'],
+        user_name: ENV['MAILGUN_SMTP_LOGIN'],
+        password: ENV['MAILGUN_SMTP_PASSWORD'],
+        authentication: 'plain',
+        enable_starttls_auto: true
+      }
+    end
   end
 end
