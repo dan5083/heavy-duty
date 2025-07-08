@@ -10,6 +10,12 @@
 
     <%= yield :head %>
 
+    <!-- Preload loading screen SVGs for faster loading -->
+    <%= preload_link_tag asset_path("logo-animation/green-man.svg"), as: :image %>
+    <%= preload_link_tag asset_path("logo-animation/amber-man.svg"), as: :image %>
+    <%= preload_link_tag asset_path("logo-animation/red-man.svg"), as: :image %>
+    <%= preload_link_tag asset_path("logo-animation/anatomical-title.svg"), as: :image %>
+
     <!-- iOS PWA Enhanced Support -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="anatomical.">
@@ -213,7 +219,7 @@
         // Aggressive timing for mobile PWA
         let loadingDuration = 3000;
         if (isPWA && isMobile) {
-          loadingDuration = 6000; // Much longer for mobile PWA
+          loadingDuration = 8000; // Much longer for mobile PWA
         } else if (isPWA) {
           loadingDuration = 4500; // Medium for desktop PWA
         } else if (isMobile) {
