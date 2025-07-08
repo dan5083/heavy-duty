@@ -10,18 +10,19 @@
       .credentials { background: #fff; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
       .button { display: inline-block; background: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
       .footer { color: #6c757d; font-size: 14px; text-align: center; margin-top: 30px; }
+      .brand { font-style: italic; font-weight: bold; }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h1>Welcome to Heavy Duty</h1>
+        <h1>Welcome to <span class="brand">anatomical.</span></h1>
       </div>
 
       <div class="content">
         <h2>Hi <%= @user.email %>!</h2>
 
-        <p>Your personal trainer <strong><%= @trainer.name %></strong> has added you to Heavy Duty, our workout tracking and recovery management platform.</p>
+        <p>Your personal trainer <strong><%= @trainer.name %></strong> has added you to <span class="brand">anatomical.</span>, our workout tracking and recovery management platform.</p>
 
         <div class="credentials">
           <h3>Your Login Credentials</h3>
@@ -31,7 +32,7 @@
 
         <p>Please log in and change your password as soon as possible for security.</p>
 
-        <a href="<%= @login_url %>" class="button">Log In to Heavy Duty</a>
+        <a href="<%= @login_url %>" class="button">Log In to <span class="brand">anatomical.</span></a>
 
         <h3>What's Next?</h3>
         <ul>
@@ -45,7 +46,7 @@
       </div>
 
       <div class="footer">
-        <p>Heavy Duty - Professional Workout Tracking</p>
+        <p><span class="brand">anatomical.</span> - Professional Workout Tracking</p>
       </div>
     </div>
   </body>

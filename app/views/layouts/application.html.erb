@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Heavy Duty" %></title>
+    <title><%= content_for(:title) || "anatomical." %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -12,7 +12,7 @@
 
     <!-- iOS PWA Enhanced Support -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Heavy Duty">
+    <meta name="apple-mobile-web-app-title" content="anatomical.">
 
     <!-- Enhanced PWA meta -->
     <meta name="theme-color" content="#dc3545">
@@ -41,6 +41,7 @@
 
     <%= stylesheet_link_tag "application",
         "animations/typography",
+        "animations/loading-screen",
         "themes/dark-theme",
         "components/buttons",
         "components/badge-editor",
@@ -109,7 +110,7 @@
             <div style="display: flex; align-items: center; gap: 1rem;">
               <img src="/icon.png" style="width: 48px; height: 48px; border-radius: 8px;">
               <div style="flex: 1;">
-                <h4 style="margin: 0; font-size: 1rem; font-weight: 600; color: var(--text-primary);">Add Heavy Duty to Home Screen</h4>
+                <h4 style="margin: 0; font-size: 1rem; font-weight: 600; color: var(--text-primary);">Add anatomical. to Home Screen</h4>
                 <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: var(--text-secondary);">
                   Get the full app experience
                 </p>
@@ -160,6 +161,37 @@
   </head>
 
   <body>
+
+      <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-figures">
+      <div class="loading-figure green">
+        <%= image_tag "logo-animation/green-man.svg", alt: "Green figure", class: "w-100 h-100" %>
+      </div>
+      <div class="loading-figure amber">
+        <%= image_tag "logo-animation/amber-man.svg", alt: "Amber figure", class: "w-100 h-100" %>
+      </div>
+      <div class="loading-figure red">
+        <%= image_tag "logo-animation/red-man.svg", alt: "Red figure", class: "w-100 h-100" %>
+      </div>
+    </div>
+
+    <div class="loading-title">
+      <%= image_tag "logo-animation/anatomical-title.svg", alt: "anatomical.", class: "w-100 h-100" %>
+    </div>
+  </div>
+
+  <script>
+    // Hide loading screen after animation completes
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.classList.add('completed');
+        }
+      }, 3500); // Total animation time + fade out
+    });
+  </script>
+
     <!-- ✅ Navbar -->
     <%= render "shared/navbar" %>
 
@@ -191,4 +223,5 @@
     <!-- ✅ Chart.js for workout trends, recovery forecasts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   </body>
+
 </html>

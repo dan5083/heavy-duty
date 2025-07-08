@@ -1,5 +1,5 @@
 class ClientMailer < ApplicationMailer
-  default from: 'noreply@heavyduty.app'
+  default from: 'noreply@anatomical.app'
 
   def welcome(user, temporary_password, personal_trainer)
     @user = user
@@ -9,7 +9,7 @@ class ClientMailer < ApplicationMailer
 
     mail(
       to: @user.email,
-      subject: "Welcome to Heavy Duty - Your trainer #{@trainer.name} has added you"
+      subject: "Welcome to anatomical. - Your trainer #{@trainer.name} has added you"
     )
   end
 end
