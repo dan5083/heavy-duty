@@ -131,6 +131,11 @@
             </span>
           </li>
 
+          <!-- Change Password -->
+          <li class="nav-item">
+            <%= link_to "Change Password", edit_user_registration_path, class: "nav-link" %>
+          </li>
+
           <!-- Logout -->
           <li class="nav-item">
             <%= button_to "Log Out", destroy_user_session_path,
@@ -143,7 +148,7 @@
       <% else %>
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <%= link_to "Sign In", new_user_session_path, class: "nav-link" %>
+            <%= link_to "Log In", new_user_session_path, class: "nav-link" %>
           </li>
           <li class="nav-item">
             <%= link_to "Sign Up", new_user_registration_path, class: "nav-link" %>

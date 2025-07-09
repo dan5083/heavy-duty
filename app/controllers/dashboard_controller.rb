@@ -16,7 +16,12 @@ class DashboardController < ApplicationController
     # Use acting_user instead of viewing_user
     latest_plan = user_context.acting_user.split_plans.last
     unless latest_plan
-      return redirect_to new_split_plan_path, alert: "Please create a split plan first."
+      # Only show alert if they came from trying to create a split plan
+      if params[:from_split_creation] == 'failed'
+        return redirect_to new_split_plan_path, alert: "Please create a split plan first."
+      else
+        return redirect_to new_split_plan_path
+      end
     end
 
     @workouts_by_muscle = latest_plan

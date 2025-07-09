@@ -4,19 +4,18 @@ class ClientAssignmentsController < ApplicationController
 
   def create
     @personal_trainer = current_user.personal_trainer
+    name = params[:name]
     email = params[:email]
 
-    user = User.new(email: email)
+    user = User.new(name: name, email: email)
     temp_password = user.generate_temporary_password!
 
     if user.save
       @personal_trainer.client_assignments.create!(user: user)
-
-    # Email configured - sending now
-    ClientMailer.welcome(user, temp_password, @personal_trainer).deliver_now
+      ClientMailer.welcome(user, temp_password, @personal_trainer).deliver_now
 
       redirect_to personal_trainer_path(@personal_trainer),
-                  notice: "Client #{email} created! Temp password: #{temp_password}"
+                  notice: "Client #{name} created! An invitation and temporary password has been sent to #{email}"
     else
       redirect_to personal_trainer_path(@personal_trainer),
                   alert: "Failed to create client: #{user.errors.full_messages.join(', ')}"
@@ -25,11 +24,11 @@ class ClientAssignmentsController < ApplicationController
 
   def destroy
     @assignment = current_user.personal_trainer.client_assignments.find(params[:id])
-    client_email = @assignment.user.email
+    client_name = @assignment.user.name
     @assignment.destroy
 
     redirect_to personal_trainer_path(current_user.personal_trainer),
-                notice: "#{client_email} removed."
+                notice: "#{client_name} removed."
   end
 
   private

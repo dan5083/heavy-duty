@@ -1,8 +1,4 @@
 <div class="signin-container">
-  <div class="brand-section">
-    <h1 class="brand-title">anatomical.</h1>
-  </div>
-
   <div class="signin-header">
     <h2>Edit <%= resource_name.to_s.humanize %></h2>
     <p>Update your account settings</p>
@@ -12,7 +8,12 @@
     <%= f.error_notification %>
 
     <div class="auth-form-group">
-      <%= f.input :email, required: true, autofocus: true,
+      <%= f.input :name, required: true, autofocus: true,
+                  wrapper_html: { class: "auth-form-group" } %>
+    </div>
+
+    <div class="auth-form-group">
+      <%= f.input :email, required: true,
                   wrapper_html: { class: "auth-form-group" } %>
     </div>
 
