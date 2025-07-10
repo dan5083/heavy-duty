@@ -40,7 +40,7 @@ module HeavyDuty
       config.action_mailer.raise_delivery_errors = true
       config.action_mailer.perform_deliveries = true
       config.action_mailer.default_url_options = {
-        host: 'anatomical.online',  # Changed from Heroku URL
+        host: 'www.anatomical.online',
         protocol: 'https'
       }
       config.action_mailer.smtp_settings = {
