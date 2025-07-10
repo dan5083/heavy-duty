@@ -168,61 +168,68 @@
 
   <body>
 
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-figures">
-      <div class="loading-figure green">
-        <%= image_tag "logo-animation/green-man.svg", alt: "Green figure", class: "w-100 h-100" %>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-figures">
+          <div class="loading-figure green">
+            <%= image_tag "logo-animation/green-man.svg", alt: "Green figure", class: "w-100 h-100" %>
+          </div>
+          <div class="loading-figure amber">
+            <%= image_tag "logo-animation/amber-man.svg", alt: "Amber figure", class: "w-100 h-100" %>
+          </div>
+          <div class="loading-figure red">
+            <%= image_tag "logo-animation/red-man.svg", alt: "Red figure", class: "w-100 h-100" %>
+          </div>
+        </div>
+        <div class="loading-title">
+          <%= image_tag "logo-animation/anatomical-title.svg", alt: "anatomical.", class: "w-100 h-100" %>
+        </div>
       </div>
-      <div class="loading-figure amber">
-        <%= image_tag "logo-animation/amber-man.svg", alt: "Amber figure", class: "w-100 h-100" %>
-      </div>
-      <div class="loading-figure red">
-        <%= image_tag "logo-animation/red-man.svg", alt: "Red figure", class: "w-100 h-100" %>
-      </div>
-    </div>
-    <div class="loading-title">
-      <%= image_tag "logo-animation/anatomical-title.svg", alt: "anatomical.", class: "w-100 h-100" %>
-    </div>
-  </div>
 
-  <script>
-    // Only show loading screen on initial page load, not on Turbo navigation
-    if (performance.navigation.type === 0) { // 0 = navigate (first load)
-      document.addEventListener('DOMContentLoaded', function() {
-        // Multiple PWA detection methods
-        const isPWA = navigator.standalone ||
-                      window.matchMedia('(display-mode: standalone)').matches ||
-                      window.matchMedia('(display-mode: fullscreen)').matches ||
-                      document.referrer.includes('android-app://');
+      <script>
+        // Only show loading screen once per session
+        document.addEventListener('DOMContentLoaded', function() {
+          // Check if we've already shown the loading screen this session
+          const hasShownLoading = sessionStorage.getItem('loading-screen-shown');
 
-        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          // Only show on first load of the session
+          if (!hasShownLoading) {
+            // Mark that we've shown the loading screen
+            sessionStorage.setItem('loading-screen-shown', 'true');
 
-        // Aggressive timing for mobile PWA
-        let loadingDuration = 3000;
-        if (isPWA && isMobile) {
-          loadingDuration = 7500; // Extra time for title to be seen
-        } else if (isPWA) {
-          loadingDuration = 7000; // Extra time for desktop PWA
-        } else if (isMobile) {
-          loadingDuration = 6500; // Extra time for mobile browser
-        } else {
-          loadingDuration = 6000; // Extra time for desktop
-        }
+            // Multiple PWA detection methods
+            const isPWA = navigator.standalone ||
+                          window.matchMedia('(display-mode: standalone)').matches ||
+                          window.matchMedia('(display-mode: fullscreen)').matches ||
+                          document.referrer.includes('android-app://');
 
-        setTimeout(function() {
-          const overlay = document.getElementById('loadingOverlay');
-          if (overlay) {
-            overlay.classList.add('completed');
-            setTimeout(() => overlay.remove(), 500);
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            // Simplified timing - shorter duration so title has time to appear
+            let loadingDuration = 4500; // Reduced from 6000-7500
+            if (isPWA && isMobile) {
+              loadingDuration = 5000;
+            } else if (isPWA) {
+              loadingDuration = 4800;
+            } else if (isMobile) {
+              loadingDuration = 4700;
+            }
+
+            setTimeout(function() {
+              const overlay = document.getElementById('loadingOverlay');
+              if (overlay) {
+                overlay.classList.add('completed');
+                setTimeout(() => overlay.remove(), 500);
+              }
+            }, loadingDuration);
+          } else {
+            // Hide loading screen immediately on subsequent page loads
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+              overlay.style.display = 'none';
+            }
           }
-        }, loadingDuration);
-      });
-    } else {
-      // Hide loading screen immediately on subsequent navigations
-      const overlay = document.getElementById('loadingOverlay');
-      if (overlay) overlay.style.display = 'none';
-    }
-  </script>
+        });
+      </script>
 
     <!-- ✅ Navbar -->
     <%= render "shared/navbar" %>
