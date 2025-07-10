@@ -103,8 +103,50 @@ export default class extends Controller {
       <div class="set-line" data-set-index="${setIndex}">
         <span class="set-number">${setIndex + 1}:</span>
         ${badgesHtml}
+        <button class="btn btn-xs btn-outline-danger ms-2"
+                data-action="click->log-builder#removeSet"
+                title="Remove set"
+                type="button">
+          <i class="bi bi-x"></i>
+        </button>
       </div>
     `
+  }
+
+  removeSet(event) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    const setLine = event.target.closest('.set-line[data-set-index]')
+    const exerciseBlock = setLine.closest('.exercise-block')
+    const exerciseId = exerciseBlock.dataset.exerciseId
+    const setIndex = parseInt(setLine.dataset.setIndex)
+
+    if (confirm('Remove this set?')) {
+      this.updateWorkoutData()
+
+      const exercises = Object.keys(this.benchmarkData)
+      const exerciseName = exercises[exerciseId]
+
+      if (exerciseName && this.benchmarkData[exerciseName]) {
+        this.benchmarkData[exerciseName].splice(setIndex, 1)
+
+        this.benchmarkData[exerciseName].forEach((set, index) => {
+          set.set_number = index + 1
+        })
+
+        if (this.benchmarkData[exerciseName].length === 0) {
+          delete this.benchmarkData[exerciseName]
+        }
+      }
+
+      this.renderWorkoutBadges()
+      this.updateHiddenField()
+
+      if (Object.keys(this.benchmarkData).length === 0) {
+        this.showEmptyState()
+      }
+    }
   }
 
   renderBadge(badge, exerciseIndex, setIndex, badgeIndex) {
