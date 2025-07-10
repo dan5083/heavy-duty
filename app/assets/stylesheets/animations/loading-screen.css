@@ -1,4 +1,4 @@
-/* Updated timing for better title visibility */
+/* Simplified loading screen animation */
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: fadeOut 0.5s ease-out 4s forwards; /* Adjusted timing */
+  animation: fadeOut 0.5s ease-out 4s forwards;
 }
 
 .loading-figures {
@@ -40,17 +40,17 @@
   object-position: center;
 }
 
-/* Faster sequence for better title visibility */
+/* Clean sequential animation - one at a time */
 .loading-figure.red {
-  animation: breatheIn 0.8s ease-in-out 0.3s forwards; /* Faster */
+  animation: quickFadeIn 0.8s ease-in-out 0.2s forwards;
 }
 
 .loading-figure.amber {
-  animation: breatheIn 0.8s ease-in-out 0.9s forwards; /* Faster */
+  animation: quickFadeIn 0.8s ease-in-out 1.0s forwards;
 }
 
 .loading-figure.green {
-  animation: breatheIn 0.8s ease-in-out 1.5s forwards; /* Faster */
+  animation: quickFadeIn 0.8s ease-in-out 1.8s forwards;
 }
 
 .loading-title {
@@ -60,7 +60,7 @@
   width: 100%;
   height: 100%;
   opacity: 0;
-  animation: breatheIn 1.5s ease-in-out 2.2s forwards; /* Earlier start, longer duration */
+  animation: titleFadeIn 1.2s ease-in-out 2.6s forwards;
 }
 
 .loading-title img {
@@ -69,23 +69,26 @@
   object-fit: contain;
 }
 
-/* Rest of your existing CSS stays the same... */
-@keyframes breatheIn {
+/* Simplified animations */
+@keyframes quickFadeIn {
   0% {
     opacity: 0;
-    filter: brightness(0.3) saturate(0.5);
-  }
-  30% {
-    opacity: 0.7;
-    filter: brightness(1.8) saturate(1.5);
-  }
-  70% {
-    opacity: 0.9;
-    filter: brightness(1.3) saturate(1.2);
+    transform: scale(0.95);
   }
   100% {
     opacity: 1;
-    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes titleFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -102,4 +105,76 @@
 
 .loading-overlay.completed {
   display: none;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .loading-figures {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .loading-figure {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-figure img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+
+  .loading-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-title img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+}
+
+/* PWA specific fixes */
+@media screen and (display-mode: standalone) {
+  .loading-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden;
+  }
+
+  .loading-figures {
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+
+  .loading-figure {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .loading-title {
+    width: 100% !important;
+    height: 100% !important;
+  }
 }
