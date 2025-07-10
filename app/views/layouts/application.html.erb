@@ -186,50 +186,72 @@
       </div>
 
       <script>
-        // Only show loading screen once per session
-        document.addEventListener('DOMContentLoaded', function() {
-          // Check if we've already shown the loading screen this session
-          const hasShownLoading = sessionStorage.getItem('loading-screen-shown');
+          // More robust session tracking - check multiple conditions
+          document.addEventListener('DOMContentLoaded', function() {
+            // Multiple ways to detect if this is the first load
+            const isFirstLoad = !window.loadingShown &&
+                              !sessionStorage.getItem('loading-screen-shown') &&
+                              !document.body.classList.contains('loading-complete') &&
+                              performance.navigation.type === 0;
 
-          // Only show on first load of the session
-          if (!hasShownLoading) {
-            // Mark that we've shown the loading screen
-            sessionStorage.setItem('loading-screen-shown', 'true');
+            // Set global flag immediately
+            window.loadingShown = true;
 
-            // Multiple PWA detection methods
-            const isPWA = navigator.standalone ||
-                          window.matchMedia('(display-mode: standalone)').matches ||
-                          window.matchMedia('(display-mode: fullscreen)').matches ||
-                          document.referrer.includes('android-app://');
+            if (isFirstLoad) {
+              // Mark in multiple ways
+              sessionStorage.setItem('loading-screen-shown', 'true');
+              document.body.classList.add('loading-started');
 
-            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+              // Multiple PWA detection methods
+              const isPWA = navigator.standalone ||
+                            window.matchMedia('(display-mode: standalone)').matches ||
+                            window.matchMedia('(display-mode: fullscreen)').matches ||
+                            document.referrer.includes('android-app://');
 
-            // Simplified timing - shorter duration so title has time to appear
-            let loadingDuration = 4500; // Reduced from 6000-7500
-            if (isPWA && isMobile) {
-              loadingDuration = 5000;
-            } else if (isPWA) {
-              loadingDuration = 4800;
-            } else if (isMobile) {
-              loadingDuration = 4700;
-            }
+              const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-            setTimeout(function() {
+              let loadingDuration = 4500;
+              if (isPWA && isMobile) {
+                loadingDuration = 5000;
+              } else if (isPWA) {
+                loadingDuration = 4800;
+              } else if (isMobile) {
+                loadingDuration = 4700;
+              }
+
+              setTimeout(function() {
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                  overlay.classList.add('completed');
+                  document.body.classList.add('loading-complete');
+                  setTimeout(() => overlay.remove(), 500);
+                }
+              }, loadingDuration);
+            } else {
+              // Hide immediately on subsequent loads
               const overlay = document.getElementById('loadingOverlay');
               if (overlay) {
-                overlay.classList.add('completed');
-                setTimeout(() => overlay.remove(), 500);
+                overlay.style.display = 'none';
               }
-            }, loadingDuration);
-          } else {
-            // Hide loading screen immediately on subsequent page loads
+            }
+          });
+
+          // Also listen for Turbo events to prevent showing on navigation
+          document.addEventListener('turbo:visit', function() {
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
               overlay.style.display = 'none';
             }
-          }
-        });
-      </script>
+          });
+
+          document.addEventListener('turbo:load', function() {
+            window.loadingShown = true; // Ensure flag is set
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay && sessionStorage.getItem('loading-screen-shown')) {
+              overlay.style.display = 'none';
+            }
+          });
+        </script>
 
     <!-- ✅ Navbar -->
     <%= render "shared/navbar" %>
