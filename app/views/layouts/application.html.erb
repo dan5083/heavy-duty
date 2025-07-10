@@ -185,73 +185,57 @@
         </div>
       </div>
 
-      <script>
-          // More robust session tracking - check multiple conditions
-          document.addEventListener('DOMContentLoaded', function() {
-            // Multiple ways to detect if this is the first load
-            const isFirstLoad = !window.loadingShown &&
-                              !sessionStorage.getItem('loading-screen-shown') &&
-                              !document.body.classList.contains('loading-complete') &&
-                              performance.navigation.type === 0;
+<script>
+    // Simple and reliable session check
+    document.addEventListener('DOMContentLoaded', function() {
+      const hasShownLoading = sessionStorage.getItem('loading-screen-shown');
 
-            // Set global flag immediately
-            window.loadingShown = true;
+      if (!hasShownLoading) {
+        // Mark that we've shown it
+        sessionStorage.setItem('loading-screen-shown', 'true');
 
-            if (isFirstLoad) {
-              // Mark in multiple ways
-              sessionStorage.setItem('loading-screen-shown', 'true');
-              document.body.classList.add('loading-started');
+        // Show the animation
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          // Multiple PWA detection methods
+          const isPWA = navigator.standalone ||
+                        window.matchMedia('(display-mode: standalone)').matches ||
+                        window.matchMedia('(display-mode: fullscreen)').matches ||
+                        document.referrer.includes('android-app://');
 
-              // Multiple PWA detection methods
-              const isPWA = navigator.standalone ||
-                            window.matchMedia('(display-mode: standalone)').matches ||
-                            window.matchMedia('(display-mode: fullscreen)').matches ||
-                            document.referrer.includes('android-app://');
+          const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-              const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          let loadingDuration = 4500;
+          if (isPWA && isMobile) {
+            loadingDuration = 5000;
+          } else if (isPWA) {
+            loadingDuration = 4800;
+          } else if (isMobile) {
+            loadingDuration = 4700;
+          }
 
-              let loadingDuration = 4500;
-              if (isPWA && isMobile) {
-                loadingDuration = 5000;
-              } else if (isPWA) {
-                loadingDuration = 4800;
-              } else if (isMobile) {
-                loadingDuration = 4700;
-              }
+          setTimeout(function() {
+            overlay.classList.add('completed');
+            setTimeout(() => overlay.remove(), 500);
+          }, loadingDuration);
+        }
+      } else {
+        // Hide immediately if we've already shown it this session
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.style.display = 'none';
+        }
+      }
+    });
 
-              setTimeout(function() {
-                const overlay = document.getElementById('loadingOverlay');
-                if (overlay) {
-                  overlay.classList.add('completed');
-                  document.body.classList.add('loading-complete');
-                  setTimeout(() => overlay.remove(), 500);
-                }
-              }, loadingDuration);
-            } else {
-              // Hide immediately on subsequent loads
-              const overlay = document.getElementById('loadingOverlay');
-              if (overlay) {
-                overlay.style.display = 'none';
-              }
-            }
-          });
-
-          // Also listen for Turbo events to prevent showing on navigation
-          document.addEventListener('turbo:visit', function() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-              overlay.style.display = 'none';
-            }
-          });
-
-          document.addEventListener('turbo:load', function() {
-            window.loadingShown = true; // Ensure flag is set
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay && sessionStorage.getItem('loading-screen-shown')) {
-              overlay.style.display = 'none';
-            }
-          });
-        </script>
+    // Hide on Turbo navigation (Rails specific)
+    document.addEventListener('turbo:visit', function() {
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay && sessionStorage.getItem('loading-screen-shown')) {
+        overlay.style.display = 'none';
+      }
+    });
+  </script>
 
     <!-- ✅ Navbar -->
     <%= render "shared/navbar" %>
