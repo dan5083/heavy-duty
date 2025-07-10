@@ -168,74 +168,57 @@
 
   <body>
 
+<!-- Only show loading overlay on first session visit -->
+  <% unless session[:loading_shown] %>
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-figures">
-          <div class="loading-figure green">
-            <%= image_tag "logo-animation/green-man.svg", alt: "Green figure", class: "w-100 h-100" %>
-          </div>
-          <div class="loading-figure amber">
-            <%= image_tag "logo-animation/amber-man.svg", alt: "Amber figure", class: "w-100 h-100" %>
-          </div>
-          <div class="loading-figure red">
-            <%= image_tag "logo-animation/red-man.svg", alt: "Red figure", class: "w-100 h-100" %>
-          </div>
+      <div class="loading-figures">
+        <div class="loading-figure green">
+          <%= image_tag "logo-animation/green-man.svg", alt: "Green figure", class: "w-100 h-100" %>
         </div>
-        <div class="loading-title">
-          <%= image_tag "logo-animation/anatomical-title.svg", alt: "anatomical.", class: "w-100 h-100" %>
+        <div class="loading-figure amber">
+          <%= image_tag "logo-animation/amber-man.svg", alt: "Amber figure", class: "w-100 h-100" %>
+        </div>
+        <div class="loading-figure red">
+          <%= image_tag "logo-animation/red-man.svg", alt: "Red figure", class: "w-100 h-100" %>
         </div>
       </div>
+      <div class="loading-title">
+        <%= image_tag "logo-animation/anatomical-title.svg", alt: "anatomical.", class: "w-100 h-100" %>
+      </div>
+    </div>
 
-<script>
-    // Simple and reliable session check
-    document.addEventListener('DOMContentLoaded', function() {
-      const hasShownLoading = sessionStorage.getItem('loading-screen-shown');
+    <script>
+      // Mark session and run animation
+      document.addEventListener('DOMContentLoaded', function() {
+        // Multiple PWA detection methods
+        const isPWA = navigator.standalone ||
+                      window.matchMedia('(display-mode: standalone)').matches ||
+                      window.matchMedia('(display-mode: fullscreen)').matches ||
+                      document.referrer.includes('android-app://');
 
-      if (!hasShownLoading) {
-        // Mark that we've shown it
-        sessionStorage.setItem('loading-screen-shown', 'true');
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-        // Show the animation
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) {
-          // Multiple PWA detection methods
-          const isPWA = navigator.standalone ||
-                        window.matchMedia('(display-mode: standalone)').matches ||
-                        window.matchMedia('(display-mode: fullscreen)').matches ||
-                        document.referrer.includes('android-app://');
+        let loadingDuration = 4500;
+        if (isPWA && isMobile) {
+          loadingDuration = 5000;
+        } else if (isPWA) {
+          loadingDuration = 4800;
+        } else if (isMobile) {
+          loadingDuration = 4700;
+        }
 
-          const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-          let loadingDuration = 4500;
-          if (isPWA && isMobile) {
-            loadingDuration = 5000;
-          } else if (isPWA) {
-            loadingDuration = 4800;
-          } else if (isMobile) {
-            loadingDuration = 4700;
-          }
-
-          setTimeout(function() {
+        setTimeout(function() {
+          const overlay = document.getElementById('loadingOverlay');
+          if (overlay) {
             overlay.classList.add('completed');
             setTimeout(() => overlay.remove(), 500);
-          }, loadingDuration);
-        }
-      } else {
-        // Hide immediately if we've already shown it this session
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) {
-          overlay.style.display = 'none';
-        }
-      }
-    });
+          }
+        }, loadingDuration);
+      });
+    </script>
 
-    // Hide on Turbo navigation (Rails specific)
-    document.addEventListener('turbo:visit', function() {
-      const overlay = document.getElementById('loadingOverlay');
-      if (overlay && sessionStorage.getItem('loading-screen-shown')) {
-        overlay.style.display = 'none';
-      }
-    });
-  </script>
+    <% session[:loading_shown] = true %>
+  <% end %>
 
     <!-- ✅ Navbar -->
     <%= render "shared/navbar" %>
