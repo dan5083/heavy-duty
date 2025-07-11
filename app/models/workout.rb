@@ -1,5 +1,5 @@
 class Workout < ApplicationRecord
-  has_many :workout_logs
+  has_many :workout_logs, dependent: :destroy
   has_one :benchmark_log, -> { where(is_benchmark: true) }, class_name: 'WorkoutLog'
   belongs_to :split_day
 

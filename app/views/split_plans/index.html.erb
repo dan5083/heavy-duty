@@ -15,15 +15,15 @@
           </div>
           <div>
             <%= link_to "View", split_plan_path(plan), class: "btn btn-sm btn-outline-primary" %>
-            <!-- ENHANCED: Add safety confirmation for delete -->
-            <%= link_to "Delete", split_plan_path(plan),
-                        method: :delete,
-                        class: "btn btn-sm btn-danger ms-2",
-                        data: {
-                          turbo_method: :delete,
-                          confirm: "Delete split plan '#{plan.name}'? This cannot be undone.",
-                          safety_confirm: "Delete Split Plan"
-                        } %>
+            <!-- FIXED: Use button_to instead of link_to for reliable DELETE requests -->
+            <%= button_to "Delete", split_plan_path(plan),
+                          method: :delete,
+                          class: "btn btn-sm btn-danger ms-2",
+                          form_class: "d-inline",
+                          data: {
+                            confirm: "Delete split plan '#{plan.name}'? This cannot be undone.",
+                            safety_confirm: "Delete Split Plan"
+                          } %>
           </div>
         </div>
       <% end %>

@@ -13,6 +13,12 @@ class SplitPlansController < ApplicationController
     @label_data = AppConstants::LABELS
   end
 
+  def show
+    @split_plan = SplitPlan.find(params[:id])
+    # Redirect to index since you don't want a show page
+    redirect_to split_plans_path
+  end
+
   # Custom split builder page
   def build_custom
     @split_plan = SplitPlan.new
