@@ -10,9 +10,6 @@
 
     <%= yield :head %>
 
-    <!-- Preload main logo for loading screen -->
-    <%= preload_link_tag asset_path("logo.svg"), as: :image %>
-
     <!-- iOS PWA Enhanced Support -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="anatomical.">
@@ -29,22 +26,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
 
     <!-- Favicon and Touch Icons -->
-    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon-192x192.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
 
     <!-- iOS Icons for different devices -->
-    <link rel="apple-touch-icon" href="/icon.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icon-180x180.png">
+    <link rel="apple-touch-icon" href="/ios/180.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/ios/76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/ios/120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/ios/152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/ios/180.png">
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
 
     <%= stylesheet_link_tag "application",
         "animations/typography",
-        "animations/loading-screen",
         "themes/dark-theme",
         "components/buttons",
         "components/badge-editor",
@@ -111,7 +107,7 @@
             animation: slideUp 0.3s ease-out;
           ">
             <div style="display: flex; align-items: center; gap: 1rem;">
-              <img src="/icon.png" style="width: 48px; height: 48px; border-radius: 8px;">
+              <img src="/ios/180.png" style="width: 48px; height: 48px; border-radius: 8px;">
               <div style="flex: 1;">
                 <h4 style="margin: 0; font-size: 1rem; font-weight: 600; color: var(--text-primary);">Add anatomical. to Home Screen</h4>
                 <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: var(--text-secondary);">
@@ -164,106 +160,6 @@
   </head>
 
   <body>
-
-<!-- Simple loading overlay with logo.svg -->
-  <div class="loading-overlay" id="loadingOverlay" style="opacity: 1;">
-    <div class="loading-content">
-      <%= image_tag "logo.svg", alt: "anatomical.", class: "loading-logo" %>
-    </div>
-  </div>
-
-  <script>
-    // IMMEDIATE DEBUG - runs right away, no waiting
-    const isPWA_immediate =
-      // iOS detection
-      navigator.standalone ||
-      // Android/Chrome detection - multiple methods
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.matchMedia('(display-mode: fullscreen)').matches ||
-      window.matchMedia('(display-mode: minimal-ui)').matches ||
-      // Check if launched from home screen (Android specific)
-      (window.location.search.includes('utm_source=homescreen')) ||
-      // Check document referrer for Android app launch
-      document.referrer.includes('android-app://') ||
-      // Check if window.outerHeight is close to screen.height (PWA removes browser UI)
-      (window.outerHeight >= screen.height * 0.95) ||
-      // Check user agent for WebAPK (Android PWA wrapper)
-      navigator.userAgent.includes('wv');
-
-    const hasShownLoading_immediate = localStorage.getItem('anatomical-loading-shown');
-    const shouldShowAnimation_immediate = !isPWA_immediate && !hasShownLoading_immediate;
-
-    // Show debug info on screen immediately
-    const debugDiv = document.createElement('div');
-    debugDiv.style.cssText = `
-      position: fixed; top: 10px; left: 10px; right: 10px;
-      background: red; color: white; padding: 15px;
-      font-size: 14px; z-index: 99999; font-family: monospace;
-      border: 2px solid white;
-    `;
-    debugDiv.innerHTML = `
-      IMPROVED DEBUG:<br>
-      isPWA: ${isPWA_immediate}<br>
-      navigator.standalone: ${navigator.standalone}<br>
-      display-mode standalone: ${window.matchMedia('(display-mode: standalone)').matches}<br>
-      display-mode fullscreen: ${window.matchMedia('(display-mode: fullscreen)').matches}<br>
-      outerHeight: ${window.outerHeight}, screenHeight: ${screen.height}<br>
-      height ratio: ${(window.outerHeight / screen.height).toFixed(2)}<br>
-      userAgent contains wv: ${navigator.userAgent.includes('wv')}<br>
-      hasShownLoading: ${hasShownLoading_immediate}<br>
-      shouldShowAnimation: ${shouldShowAnimation_immediate}
-    `;
-    document.body.appendChild(debugDiv);
-
-    // Keep it longer - 15 seconds
-    setTimeout(() => debugDiv.remove(), 15000);
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const overlay = document.getElementById('loadingOverlay');
-      const hasShownLoading = localStorage.getItem('anatomical-loading-shown');
-
-      // Detect if this is PWA mode
-      const isPWA = navigator.standalone ||
-                    window.matchMedia('(display-mode: standalone)').matches ||
-                    window.matchMedia('(display-mode: fullscreen)').matches ||
-                    document.referrer.includes('android-app://');
-
-      // For PWA, use separate flag to allow first-time PWA experience
-      const pwaFlag = isPWA ? localStorage.getItem('anatomical-pwa-loading-shown') : null;
-
-      // Show animation if never shown, but SKIP entirely in PWA mode
-      const shouldShowAnimation = !isPWA && !hasShownLoading;
-
-      if (shouldShowAnimation && overlay) {
-        // Mark as shown
-        localStorage.setItem('anatomical-loading-shown', 'true');
-
-        // Overlay is already visible, just fade it out after delay
-        setTimeout(function() {
-          if (overlay) {
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.remove(), 500);
-          }
-        }, 2000); // Simple 2 second duration
-      } else {
-        // Hide immediately if already shown OR if in PWA mode
-        if (overlay) {
-          overlay.style.opacity = '0';
-          setTimeout(() => overlay.remove(), 100);
-        }
-      }
-    });
-
-    // Hide on Turbo navigation
-    document.addEventListener('turbo:visit', function() {
-      const overlay = document.getElementById('loadingOverlay');
-      if (overlay && localStorage.getItem('anatomical-loading-shown')) {
-        overlay.style.display = 'none';
-      }
-    });
-  </script>
-
-
     <!-- ✅ Navbar -->
     <%= render "shared/navbar" %>
 
