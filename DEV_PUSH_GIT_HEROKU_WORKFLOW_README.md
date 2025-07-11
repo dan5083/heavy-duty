@@ -28,6 +28,8 @@ for f in app/views/[s-t]*/*.html.erb; do echo "=== $f ==="; cat "$f"; echo; done
 # u–z
 for f in app/views/[u-z]*/*.html.erb; do echo "=== $f ==="; cat "$f"; echo; done
 
+# See schema and app_constants
+echo "=== db/schema.rb ===" && cat db/schema.rb && echo -e "\n\n=== lib/app_constants.rb ===" && cat lib/app_constants.rb
 
 # See the helpers
 for file in app/helpers/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
