@@ -10,7 +10,13 @@ export default class extends Controller {
     "hiddenDetails",
     "submitButton",
     "benchmarkModal",
-    "benchmarkChoice"
+    "benchmarkChoice",
+    "contextSection",
+    "contextToggleButton",
+    "contextBody",
+    "contextTextarea",
+    "contextSubmitButton",
+    "hiddenContext"
   ]
 
   connect() {
@@ -18,16 +24,21 @@ export default class extends Controller {
 
     // Get benchmark data from ExerciseSet structure
     this.benchmarkData = window.benchmarkData || {}
+    this.benchmarkContext = window.benchmarkContext || null
     this.availableExercises = window.availableExercises || []
     this.cardioExercises = window.cardioExercises || []
 
     console.log("Benchmark data:", this.benchmarkData)
+    console.log("Benchmark context:", this.benchmarkContext)
     console.log("Available exercises:", this.availableExercises)
     console.log("Cardio exercises:", this.cardioExercises)
 
     this.initializeBadgeInterface()
     this.element.addEventListener('badge-editor:badge-changed', this.handleBadgeChange.bind(this))
     this.element.addEventListener('badge-editor:add-badge', this.handleAddBadge.bind(this))
+
+    // 🆕 NEW: Initialize context functionality
+    this.initializeContextSection()
 
     this.updateHiddenField()
   }
@@ -42,6 +53,142 @@ export default class extends Controller {
       console.log("Benchmark data found - rendering workout badges")
       this.renderWorkoutBadges()
       this.hideEmptyState()
+    }
+  }
+
+  // 🆕 NEW: Initialize context section functionality
+  initializeContextSection() {
+    if (this.hasContextTextareaTarget) {
+      // Add input event listener for character counting and real-time updates
+      this.contextTextareaTarget.addEventListener('input', () => {
+        this.updateContextData()
+      })
+
+      // 🆕 NEW: Load benchmark context if available
+      if (this.benchmarkContext) {
+        console.log("Loading benchmark context:", this.benchmarkContext)
+        this.contextTextareaTarget.value = this.benchmarkContext
+
+        // Show as badge instead of open textarea
+        this.showContextBadge(this.benchmarkContext)
+
+        // Update hidden field with loaded context
+        this.updateContextData()
+      }
+    }
+  }
+
+  // 🆕 NEW: Toggle context section visibility
+  toggleContextSection(event) {
+    event.preventDefault()
+
+    if (this.contextBodyTarget.style.display === 'none') {
+      // Show context section
+      this.contextBodyTarget.style.display = 'block'
+      this.contextToggleButtonTarget.innerHTML = '<i class="bi bi-x me-2"></i>Cancel'
+      this.contextToggleButtonTarget.classList.remove('btn-outline-secondary')
+      this.contextToggleButtonTarget.classList.add('btn-outline-danger')
+
+      // Focus the textarea
+      setTimeout(() => {
+        this.contextTextareaTarget.focus()
+      }, 100)
+    } else {
+      // Hide context section
+      this.hideContextSection()
+    }
+  }
+
+  // 🆕 NEW: Submit context (like IG comment)
+  submitContext(event) {
+    event.preventDefault()
+
+    const contextValue = this.contextTextareaTarget.value.trim()
+
+    if (contextValue) {
+      // Save context and transform to badge-like display
+      this.updateContextData()
+      this.showContextBadge(contextValue)
+      this.hideContextInput()
+    } else {
+      // Just close if empty
+      this.hideContextSection()
+    }
+  }
+
+  // 🆕 NEW: Show context as a badge-like element
+  showContextBadge(contextText) {
+    const badgeHtml = `
+      <div class="context-badge-display" data-log-builder-target="contextBadge">
+        <div class="context-badge">
+          <i class="bi bi-chat-square-text"></i>
+          <span class="context-preview">${contextText}</span>
+          <button class="context-edit-btn"
+                  data-action="click->log-builder#editContext"
+                  title="Edit context">
+            <i class="bi bi-pencil"></i>
+          </button>
+        </div>
+      </div>
+    `
+
+    // Hide the toggle button and show the badge
+    this.contextToggleButtonTarget.style.display = 'none'
+    this.contextToggleButtonTarget.insertAdjacentHTML('afterend', badgeHtml)
+  }
+
+  // 🆕 NEW: Edit existing context
+  editContext(event) {
+    event.preventDefault()
+
+    // Remove the badge and show the input again
+    const badge = this.element.querySelector('[data-log-builder-target="contextBadge"]')
+    if (badge) {
+      badge.remove()
+    }
+
+    // Show the toggle button and open the context section
+    this.contextToggleButtonTarget.style.display = 'inline-block'
+    this.contextBodyTarget.style.display = 'block'
+    this.contextToggleButtonTarget.innerHTML = '<i class="bi bi-x me-2"></i>Cancel'
+    this.contextToggleButtonTarget.classList.remove('btn-outline-secondary')
+    this.contextToggleButtonTarget.classList.add('btn-outline-danger')
+
+    // Focus the textarea
+    setTimeout(() => {
+      this.contextTextareaTarget.focus()
+    }, 100)
+  }
+
+  // 🆕 NEW: Hide just the input section (keep badge if exists)
+  hideContextInput() {
+    this.contextBodyTarget.style.display = 'none'
+    this.contextToggleButtonTarget.style.display = 'none'
+  }
+
+  // 🆕 NEW: Utility to truncate text
+  truncateText(text, limit) {
+    if (text.length <= limit) return text
+    return text.substring(0, limit) + '...'
+  }
+
+  // 🆕 NEW: Hide context section helper
+  hideContextSection() {
+    this.contextBodyTarget.style.display = 'none'
+    this.contextToggleButtonTarget.innerHTML = '<i class="bi bi-chat-square-text me-2"></i>Add Context'
+    this.contextToggleButtonTarget.classList.remove('btn-outline-danger')
+    this.contextToggleButtonTarget.classList.add('btn-outline-secondary')
+
+    // Update the hidden field when hiding
+    this.updateContextData()
+  }
+
+  // 🆕 NEW: Update context data in hidden field
+  updateContextData() {
+    if (this.hasHiddenContextTarget && this.hasContextTextareaTarget) {
+      const contextValue = this.contextTextareaTarget.value.trim()
+      this.hiddenContextTarget.value = contextValue
+      console.log("Updated exercise context:", contextValue)
     }
   }
 
@@ -488,6 +635,8 @@ export default class extends Controller {
     console.log("Showing benchmark choice modal...")
 
     this.updateWorkoutData()
+    // 🆕 NEW: Also update context data before showing modal
+    this.updateContextData()
 
     this.benchmarkModalTarget.style.display = 'flex'
     this.benchmarkModalTarget.style.cssText = `
@@ -535,6 +684,9 @@ export default class extends Controller {
   submitFormWithChoice() {
     const benchmarkField = document.querySelector('[data-log-builder-target="benchmarkChoice"]')
     console.log("Submitting form with benchmark choice:", benchmarkField?.value)
+
+    // 🆕 NEW: Ensure context is updated before submission
+    this.updateContextData()
 
     const allBadges = this.exerciseListTarget.querySelectorAll('.workout-badge')
     allBadges.forEach(badge => {

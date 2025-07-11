@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_07_191508) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_11_190152) do
   create_table "audit_logs", force: :cascade do |t|
     t.integer "performer_id", null: false
     t.integer "subject_id", null: false
@@ -111,6 +111,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_07_191508) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_benchmark", default: false
+    t.text "exercise_context"
     t.index ["user_id"], name: "index_workout_logs_on_user_id"
     t.index ["workout_id", "is_benchmark"], name: "index_workout_logs_on_workout_id_and_is_benchmark"
     t.index ["workout_id"], name: "index_workout_logs_on_workout_id"

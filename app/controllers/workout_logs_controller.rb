@@ -20,10 +20,16 @@ class WorkoutLogsController < ApplicationController
     Rails.logger.info "🏋️ Acting user: #{user_context.acting_user.email} (#{user_context.acting_user.id})"
     Rails.logger.info "🏋️ Impersonation mode: #{user_context.impersonation_mode?}"
     Rails.logger.info "🏋️ beat_benchmark param: #{params[:beat_benchmark].inspect}"
+    Rails.logger.info "🏋️ exercise_context param: #{params[:exercise_context].inspect}"
 
     # Use acting_user instead of viewing_user
     @log = @workout.workout_logs.build(user: user_context.acting_user)
+
+    # 🆕 NEW: Set exercise context if provided
+    @log.exercise_context = params[:exercise_context] if params[:exercise_context].present?
+
     Rails.logger.info "🏋️ Created workout log for user: #{@log.user.email} (#{@log.user.id})"
+    Rails.logger.info "🏋️ Exercise context: #{@log.exercise_context.inspect}"
 
     # Parse the exercise sets from params
     begin
@@ -61,6 +67,15 @@ class WorkoutLogsController < ApplicationController
             notes: set_data['notes']
           )
 
+          # 🆕 NEW: Handle cardio fields if present
+          if set_data['duration_seconds'].present?
+            exercise_set.duration_seconds = set_data['duration_seconds']
+          end
+
+          if set_data['energy_calories'].present?
+            exercise_set.energy_calories = set_data['energy_calories']
+          end
+
           if exercise_set.save
             Rails.logger.info "✅ Exercise set #{index + 1} saved with ID: #{exercise_set.id}"
           else
@@ -80,7 +95,8 @@ class WorkoutLogsController < ApplicationController
             beat_benchmark: beat_benchmark,
             muscle_group: @workout.muscle_group,
             workout_id: @workout.id,
-            acting_user_id: user_context.acting_user.id
+            acting_user_id: user_context.acting_user.id,
+            has_exercise_context: @log.has_context? # 🆕 NEW: Track context usage
           }
         )
 
@@ -101,7 +117,8 @@ class WorkoutLogsController < ApplicationController
               resource: @log,
               metadata: {
                 muscle_group: @workout.muscle_group,
-                previous_benchmark_count: existing_benchmarks.count
+                previous_benchmark_count: existing_benchmarks.count,
+                has_exercise_context: @log.has_context? # 🆕 NEW: Track context in benchmarks
               }
             )
 
@@ -113,7 +130,13 @@ class WorkoutLogsController < ApplicationController
           end
         else
           Rails.logger.info "📝 Not setting as benchmark - regular workout save"
-          redirect_to dashboard_path, notice: "Workout saved."
+
+          # 🆕 NEW: Different success message if context was added
+          success_message = @log.has_context? ?
+            "Workout saved with context notes." :
+            "Workout saved."
+
+          redirect_to dashboard_path, notice: success_message
         end
       else
         Rails.logger.error "❌ Failed to save workout log: #{@log.errors.full_messages.join(', ')}"
@@ -152,5 +175,10 @@ class WorkoutLogsController < ApplicationController
   rescue ActiveRecord::RecordNotFound => e
     Rails.logger.error "❌ Workout not found: #{params[:workout_id]}"
     redirect_to dashboard_path, alert: "Workout not found."
+  end
+
+  # 🆕 NEW: Updated strong parameters to include exercise_context
+  def workout_log_params
+    params.require(:workout_log).permit(:exercise_context, :is_benchmark)
   end
 end

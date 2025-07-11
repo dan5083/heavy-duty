@@ -3,7 +3,19 @@ module WorkoutsHelper
     return content_tag(:em, "No exercises recorded") if workout_log.exercise_sets.empty?
 
     content_tag(:div) do
-      workout_log.exercises_hash.map do |exercise_name, sets|
+      # 🆕 NEW: Show exercise context if present
+      context_html = if workout_log.has_context?
+        content_tag(:div, class: "exercise-context-display mb-3 p-2 bg-light rounded") do
+          content_tag(:small, class: "text-muted") do
+            content_tag(:strong, "Context: ") + workout_log.context_for_display
+          end
+        end
+      else
+        "".html_safe
+      end
+
+      # Existing exercise details
+      exercises_html = workout_log.exercises_hash.map do |exercise_name, sets|
         content_tag(:div, class: "mb-2") do
           content_tag(:strong, exercise_name) +
           content_tag(:ul) do
@@ -11,6 +23,8 @@ module WorkoutsHelper
           end
         end
       end.join.html_safe
+
+      context_html + exercises_html
     end
   end
 
@@ -19,6 +33,28 @@ module WorkoutsHelper
     return content_tag(:em, "No benchmark set") unless benchmark_log
 
     render_log_details(benchmark_log)
+  end
+
+  # 🆕 NEW: Render context summary for compact displays (like cards)
+  def render_context_summary(workout_log, limit: 50)
+    return nil unless workout_log.has_context?
+
+    content_tag(:div, class: "context-summary text-muted small mt-1") do
+      content_tag(:i, "", class: "bi bi-chat-square-text me-1") +
+      content_tag(:span, workout_log.context_summary(limit: limit))
+    end
+  end
+
+  # 🆕 NEW: Render full context display for detailed views
+  def render_context_detail(workout_log)
+    return nil unless workout_log.has_context?
+
+    content_tag(:div, class: "context-detail border-start border-3 border-info ps-3 mb-3") do
+      content_tag(:h6, class: "text-muted mb-1") do
+        content_tag(:i, "", class: "bi bi-chat-square-text me-2") + "Exercise Context"
+      end +
+      content_tag(:p, workout_log.context_for_display, class: "mb-0 text-muted")
+    end
   end
 
   # 🆕 Parse set description into structured badges
@@ -75,6 +111,69 @@ module WorkoutsHelper
       { type: 'weight', content: 'at 1 kg' },
       { type: 'reflection', content: 'solid effort' }
     ]
+  end
+
+  # 🆕 NEW: Check if workout log has meaningful content for display
+  def workout_log_has_content?(workout_log)
+    workout_log.exercise_sets.any? || workout_log.has_context?
+  end
+
+  # 🆕 NEW: Generate workout summary including context
+  def workout_summary(workout_log)
+    summary_parts = []
+
+    # Exercise count
+    if workout_log.exercise_sets.any?
+      exercise_count = workout_log.exercises_hash.keys.count
+      set_count = workout_log.exercise_sets.count
+      summary_parts << "#{pluralize(exercise_count, 'exercise')}, #{pluralize(set_count, 'set')}"
+    end
+
+    # Context indicator
+    if workout_log.has_context?
+      summary_parts << "with context notes"
+    end
+
+    # Benchmark indicator
+    if workout_log.is_benchmark?
+      summary_parts << "(benchmark)"
+    end
+
+    summary_parts.any? ? summary_parts.join(" ") : "No details recorded"
+  end
+
+  # 🆕 NEW: Render workout log with proper context and exercise display
+  def render_complete_workout_log(workout_log)
+    return content_tag(:em, "Empty workout log") unless workout_log_has_content?(workout_log)
+
+    content_tag(:div, class: "workout-log-display") do
+      html = "".html_safe
+
+      # Context section (if present)
+      if workout_log.has_context?
+        html += render_context_detail(workout_log)
+      end
+
+      # Exercise sets (if present)
+      if workout_log.exercise_sets.any?
+        html += content_tag(:div, class: "exercises-section") do
+          workout_log.exercises_hash.map do |exercise_name, sets|
+            content_tag(:div, class: "exercise-group mb-3") do
+              content_tag(:h6, exercise_name, class: "exercise-name text-primary mb-2") +
+              content_tag(:div, class: "sets-list") do
+                sets.map.with_index do |exercise_set, index|
+                  content_tag(:div, class: "set-item small text-muted mb-1") do
+                    "Set #{index + 1}: #{exercise_set.description}"
+                  end
+                end.join.html_safe
+              end
+            end
+          end.join.html_safe
+        end
+      end
+
+      html
+    end
   end
 
   private

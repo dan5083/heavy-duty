@@ -50,6 +50,36 @@
 
     </div>
 
+    <!-- 🆕 NEW: Exercise Context Section -->
+    <div class="exercise-context-section mt-4" data-log-builder-target="contextSection">
+      <div class="text-center">
+        <button class="btn btn-outline-secondary btn-sm"
+                data-action="click->log-builder#toggleContextSection"
+                data-log-builder-target="contextToggleButton">
+          <i class="bi bi-chat-square-text me-2"></i>
+          Add Context
+        </button>
+      </div>
+
+      <div class="mt-3"
+           data-log-builder-target="contextBody"
+           style="display: none;">
+        <div class="context-input-wrapper">
+          <textarea class="form-control"
+                    data-log-builder-target="contextTextarea"
+                    placeholder="Equipment notes, form changes, etc..."
+                    rows="3"
+                    maxlength="1000"></textarea>
+          <button class="context-submit-btn"
+                  data-action="click->log-builder#submitContext"
+                  data-log-builder-target="contextSubmitButton"
+                  title="Save context">
+            <i class="bi bi-arrow-up"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Help Text -->
     <div class="p-3 border-top bg-light" data-typography-animator-target="fadeIn">
       <div class="text-muted small">
@@ -75,6 +105,7 @@
 
       <%= hidden_field_tag "exercise_sets", "", data: { log_builder_target: "hiddenDetails" } %>
       <%= hidden_field_tag "beat_benchmark", "", data: { log_builder_target: "benchmarkChoice" } %>
+      <%= hidden_field_tag "exercise_context", "", data: { log_builder_target: "hiddenContext" } %>
 
       <div class="text-center">
         <%= f.submit "Finish Workout",
@@ -125,7 +156,9 @@
 <script>
   // Convert benchmark ExerciseSets to JavaScript format
   <% benchmark_data = {} %>
+  <% benchmark_context = nil %>
   <% if @workout.benchmark_log %>
+    <% benchmark_context = @workout.benchmark_log.exercise_context %>
     <% @workout.benchmark_log.exercises_hash.each do |exercise_name, sets| %>
       <% benchmark_data[exercise_name] = sets.map do |exercise_set| %>
         <% {
@@ -143,6 +176,10 @@
   <% end %>
 
   window.benchmarkData = <%= raw(benchmark_data.to_json) %>;
+  window.benchmarkContext = <%= raw(benchmark_context.to_json) %>;
+
+  // Debug logging
+  console.log("Benchmark context from server:", <%= raw(benchmark_context.to_json) %>);
   window.availableExercises = <%= raw(AppConstants::WORKOUTS[@workout.muscle_group.to_sym].to_json) %>;
   window.cardioExercises = <%= raw(AppConstants::WORKOUTS[:cardio].to_json) %>;
 

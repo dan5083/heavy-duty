@@ -7,6 +7,9 @@ class WorkoutLog < ApplicationRecord
   validate :only_one_benchmark_per_workout
   validate :has_exercise_sets_after_save, on: :update
 
+  # 🆕 NEW: Validation for exercise context
+  validates :exercise_context, length: { maximum: 1000, message: "context is too long (maximum 1000 characters)" }
+
   # Move the callback to run BEFORE validation
   before_validation :clear_other_benchmarks, if: :is_benchmark?
 
@@ -87,6 +90,28 @@ class WorkoutLog < ApplicationRecord
   def muscle_label
     return nil unless muscle_group
     AppConstants::LABELS[muscle_group.to_sym] || muscle_group.humanize
+  end
+
+  # 🆕 NEW: Exercise context helper methods
+  def has_context?
+    exercise_context.present?
+  end
+
+  def context_summary(limit: 50)
+    return nil unless has_context?
+
+    if exercise_context.length <= limit
+      exercise_context
+    else
+      "#{exercise_context.truncate(limit)}..."
+    end
+  end
+
+  def context_for_display
+    return nil unless has_context?
+
+    # Clean up context for display - remove extra whitespace, etc.
+    exercise_context.strip.gsub(/\s+/, ' ')
   end
 
   # === CLASS METHODS FOR BENCHMARK ANALYTICS ===

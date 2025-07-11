@@ -41,6 +41,20 @@
             </span>
           </div>
           <div class="card-body">
+            <!-- Exercise Context Display -->
+            <% if log.has_context? %>
+              <div class="context-display mb-3 p-2 bg-light rounded">
+                <div class="d-flex align-items-start">
+                  <i class="bi bi-chat-square-text text-muted me-2 mt-1 flex-shrink-0"></i>
+                  <div class="flex-grow-1">
+                    <small class="text-muted fw-bold d-block">Context:</small>
+                    <small class="text-muted"><%= log.context_for_display %></small>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+
+            <!-- Exercise Sets Display -->
             <% if log.exercise_sets.any? %>
               <% log.exercises_hash.each do |exercise_name, sets| %>
                 <div class="mb-3">
@@ -64,6 +78,16 @@
               <% end %>
             <% else %>
               <div class="text-muted small">No exercises recorded</div>
+            <% end %>
+
+            <!-- Workout Summary at Bottom -->
+            <% if log.has_context? || log.exercise_sets.any? %>
+              <div class="mt-3 pt-2 border-top">
+                <small class="text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  <%= workout_summary(log) %>
+                </small>
+              </div>
             <% end %>
           </div>
         </div>
