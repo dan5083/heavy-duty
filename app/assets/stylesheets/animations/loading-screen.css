@@ -31,10 +31,10 @@
 /* Mobile optimization */
 @media (max-width: 768px) {
   .loading-logo {
-    width: 120px;
-    height: 120px;
-    max-width: 120px;
-    max-height: 120px;
+    width: 300px;
+    height: 300px;
+    max-width: 300px;
+    max-height: 300px;
   }
 }
 

@@ -186,15 +186,12 @@
       // For PWA, use separate flag to allow first-time PWA experience
       const pwaFlag = isPWA ? localStorage.getItem('anatomical-pwa-loading-shown') : null;
 
-      // Show animation if never shown, or if PWA and never shown in PWA context
-      const shouldShowAnimation = !hasShownLoading || (isPWA && !pwaFlag);
+      // Show animation if never shown, but SKIP entirely in PWA mode
+      const shouldShowAnimation = !isPWA && !hasShownLoading;
 
       if (shouldShowAnimation && overlay) {
         // Mark as shown
         localStorage.setItem('anatomical-loading-shown', 'true');
-        if (isPWA) {
-          localStorage.setItem('anatomical-pwa-loading-shown', 'true');
-        }
 
         // Overlay is already visible, just fade it out after delay
         setTimeout(function() {
@@ -204,7 +201,7 @@
           }
         }, 2000); // Simple 2 second duration
       } else {
-        // Hide immediately if already shown
+        // Hide immediately if already shown OR if in PWA mode
         if (overlay) {
           overlay.style.opacity = '0';
           setTimeout(() => overlay.remove(), 100);
