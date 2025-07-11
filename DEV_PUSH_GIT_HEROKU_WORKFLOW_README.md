@@ -43,14 +43,14 @@ for f in app/javascript/controllers/**/[j-q]*_controller.js; do echo "=== $f ===
 # JS Controllers [r–z]:
 for f in app/javascript/controllers/**/[r-z]*_controller.js; do echo "=== $f ==="; cat "$f"; echo; done
 
-# For all CSS files in stylesheets/pages
-for file in app/assets/stylesheets/pages/*.css; do echo "=== $file ==="; cat "$file"; echo; done
-# For all CSS files in stylesheets/Themes
-for file in app/assets/stylesheets/themes/*.css; do echo "=== $file ==="; cat "$file"; echo; done
-# For all CSS files in stylesheets/Components A–C
-for file in app/assets/stylesheets/components/[a-c]*.css; do echo "=== $file ==="; cat "$file"; echo; done
-# For all CSS files in stylesheets/Components D–Z
-for file in app/assets/stylesheets/components/[d-z]*.css; do echo "=== $file ==="; cat "$file"; echo; done
+# For all CSS files in stylesheets/Components A
+for file in app/assets/stylesheets/components/[a]*.css; do echo "=== $file ==="; cat "$file"; echo; done
+# For all CSS files in stylesheets/Components B
+for file in app/assets/stylesheets/components/[b]*.css; do echo "=== $file ==="; cat "$file"; echo; done
+# For all CSS files in stylesheets/Components C
+for file in app/assets/stylesheets/components/[c]*.css; do echo "=== $file ==="; cat "$file"; echo; done
+# For all CSS files in stylesheets/Components E–Z
+for file in app/assets/stylesheets/components/[e-z]*.css; do echo "=== $file ==="; cat "$file"; echo; done
 
 
 

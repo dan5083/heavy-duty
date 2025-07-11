@@ -10,11 +10,8 @@
 
     <%= yield :head %>
 
-    <!-- Preload loading screen SVGs for faster loading -->
-    <%= preload_link_tag asset_path("logo-animation/green-man.svg"), as: :image %>
-    <%= preload_link_tag asset_path("logo-animation/amber-man.svg"), as: :image %>
-    <%= preload_link_tag asset_path("logo-animation/red-man.svg"), as: :image %>
-    <%= preload_link_tag asset_path("logo-animation/anatomical-title.svg"), as: :image %>
+    <!-- Preload main logo for loading screen -->
+    <%= preload_link_tag asset_path("logo.svg"), as: :image %>
 
     <!-- iOS PWA Enhanced Support -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -168,26 +165,14 @@
 
   <body>
 
-<!-- Always render loading overlay, but control with JavaScript -->
-  <div class="loading-overlay" id="loadingOverlay" style="opacity: 0;">
-    <div class="loading-figures">
-      <div class="loading-figure green">
-        <%= image_tag "logo-animation/green-man.svg", alt: "Green figure", class: "w-100 h-100" %>
-      </div>
-      <div class="loading-figure amber">
-        <%= image_tag "logo-animation/amber-man.svg", alt: "Amber figure", class: "w-100 h-100" %>
-      </div>
-      <div class="loading-figure red">
-        <%= image_tag "logo-animation/red-man.svg", alt: "Red figure", class: "w-100 h-100" %>
-      </div>
-    </div>
-    <div class="loading-title">
-      <%= image_tag "logo-animation/anatomical-title.svg", alt: "anatomical.", class: "w-100 h-100" %>
+<!-- Simple loading overlay with logo.svg -->
+  <div class="loading-overlay" id="loadingOverlay" style="opacity: 1;">
+    <div class="loading-content">
+      <%= image_tag "logo.svg", alt: "anatomical.", class: "loading-logo" %>
     </div>
   </div>
 
   <script>
-    // Check localStorage for cross-context compatibility (PWA + browser)
     document.addEventListener('DOMContentLoaded', function() {
       const overlay = document.getElementById('loadingOverlay');
       const hasShownLoading = localStorage.getItem('anatomical-loading-shown');
@@ -211,30 +196,18 @@
           localStorage.setItem('anatomical-pwa-loading-shown', 'true');
         }
 
-        // Show the overlay
-        overlay.style.opacity = '1';
-
-        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-        let loadingDuration = 4500;
-        if (isPWA && isMobile) {
-          loadingDuration = 5000;
-        } else if (isPWA) {
-          loadingDuration = 4800;
-        } else if (isMobile) {
-          loadingDuration = 4700;
-        }
-
+        // Overlay is already visible, just fade it out after delay
         setTimeout(function() {
           if (overlay) {
-            overlay.classList.add('completed');
+            overlay.style.opacity = '0';
             setTimeout(() => overlay.remove(), 500);
           }
-        }, loadingDuration);
+        }, 2000); // Simple 2 second duration
       } else {
         // Hide immediately if already shown
         if (overlay) {
-          overlay.style.display = 'none';
+          overlay.style.opacity = '0';
+          setTimeout(() => overlay.remove(), 100);
         }
       }
     });
