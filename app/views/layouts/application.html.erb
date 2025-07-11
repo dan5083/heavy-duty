@@ -174,10 +174,21 @@
 
   <script>
     // IMMEDIATE DEBUG - runs right away, no waiting
-    const isPWA_immediate = navigator.standalone ||
-                           window.matchMedia('(display-mode: standalone)').matches ||
-                           window.matchMedia('(display-mode: fullscreen)').matches ||
-                           document.referrer.includes('android-app://');
+    const isPWA_immediate =
+      // iOS detection
+      navigator.standalone ||
+      // Android/Chrome detection - multiple methods
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      window.matchMedia('(display-mode: minimal-ui)').matches ||
+      // Check if launched from home screen (Android specific)
+      (window.location.search.includes('utm_source=homescreen')) ||
+      // Check document referrer for Android app launch
+      document.referrer.includes('android-app://') ||
+      // Check if window.outerHeight is close to screen.height (PWA removes browser UI)
+      (window.outerHeight >= screen.height * 0.95) ||
+      // Check user agent for WebAPK (Android PWA wrapper)
+      navigator.userAgent.includes('wv');
 
     const hasShownLoading_immediate = localStorage.getItem('anatomical-loading-shown');
     const shouldShowAnimation_immediate = !isPWA_immediate && !hasShownLoading_immediate;
@@ -191,13 +202,16 @@
       border: 2px solid white;
     `;
     debugDiv.innerHTML = `
-      IMMEDIATE DEBUG:<br>
+      IMPROVED DEBUG:<br>
       isPWA: ${isPWA_immediate}<br>
       navigator.standalone: ${navigator.standalone}<br>
       display-mode standalone: ${window.matchMedia('(display-mode: standalone)').matches}<br>
+      display-mode fullscreen: ${window.matchMedia('(display-mode: fullscreen)').matches}<br>
+      outerHeight: ${window.outerHeight}, screenHeight: ${screen.height}<br>
+      height ratio: ${(window.outerHeight / screen.height).toFixed(2)}<br>
+      userAgent contains wv: ${navigator.userAgent.includes('wv')}<br>
       hasShownLoading: ${hasShownLoading_immediate}<br>
-      shouldShowAnimation: ${shouldShowAnimation_immediate}<br>
-      Loading overlay exists: ${document.getElementById('loadingOverlay') ? 'YES' : 'NO'}
+      shouldShowAnimation: ${shouldShowAnimation_immediate}
     `;
     document.body.appendChild(debugDiv);
 
