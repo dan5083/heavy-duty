@@ -183,6 +183,12 @@
                     window.matchMedia('(display-mode: fullscreen)').matches ||
                     document.referrer.includes('android-app://');
 
+      // DEBUG: Log PWA detection
+      console.log('DEBUG - isPWA:', isPWA);
+      console.log('DEBUG - navigator.standalone:', navigator.standalone);
+      console.log('DEBUG - display-mode standalone:', window.matchMedia('(display-mode: standalone)').matches);
+      console.log('DEBUG - hasShownLoading:', hasShownLoading);
+
       // For PWA, use separate flag to allow first-time PWA experience
       const pwaFlag = isPWA ? localStorage.getItem('anatomical-pwa-loading-shown') : null;
 
