@@ -87,7 +87,7 @@ git push origin main
 git push heroku main
 
 # 8️⃣ TEST LIVE APP
-# Visit https://heavy-duty-1bf635cff355.herokuapp.com/
+# Visit https://www.anatomical.online/
 # Make sure your feature works in production
 
 # 9️⃣ CLEANUP - DELETE BRANCH
