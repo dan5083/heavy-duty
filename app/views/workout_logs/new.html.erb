@@ -106,6 +106,7 @@
       <%= hidden_field_tag "exercise_sets", "", data: { log_builder_target: "hiddenDetails" } %>
       <%= hidden_field_tag "beat_benchmark", "", data: { log_builder_target: "benchmarkChoice" } %>
       <%= hidden_field_tag "exercise_context", "", data: { log_builder_target: "hiddenContext" } %>
+      <%= hidden_field_tag "workout_datetime", "", data: { log_builder_target: "hiddenDatetime" } %>
 
       <div class="text-center">
         <%= f.submit "Finish Workout",
@@ -123,7 +124,67 @@
         <p class="text-muted">Did you beat your benchmark today?</p>
       </div>
 
-      <div class="d-grid gap-3">
+      <!-- Workout Timing Section -->
+      <div class="workout-timing-section mt-3 pt-3 border-top">
+        <div class="form-check">
+          <input type="checkbox"
+                 class="form-check-input"
+                 id="current-time-checkbox"
+                 checked
+                 data-action="change->log-builder#toggleTimingSection">
+          <label class="form-check-label" for="current-time-checkbox">
+            This workout happened now
+          </label>
+        </div>
+
+        <small class="text-muted mt-1 d-block">
+          <i class="bi bi-info-circle me-1"></i>
+          Accurate timing ensures proper recovery tracking
+        </small>
+
+        <div class="custom-timing-section mt-3"
+             data-log-builder-target="customTimingSection"
+             style="display: none;">
+
+          <!-- Quick presets -->
+          <div class="mb-3">
+            <small class="text-muted">Common times:</small>
+            <div class="btn-group d-block mt-1" role="group">
+              <button type="button" class="btn btn-sm btn-outline-secondary me-1"
+                      data-action="click->log-builder#setTimeAgo"
+                      data-hours="1">1 hour ago</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary me-1"
+                      data-action="click->log-builder#setTimeAgo"
+                      data-hours="2">2 hours ago</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary"
+                      data-action="click->log-builder#setTimeAgo"
+                      data-hours="24">Yesterday</button>
+            </div>
+          </div>
+
+          <!-- Manual date/time inputs -->
+          <div class="row">
+            <div class="col-md-6">
+              <%= date_field_tag "custom_workout_date",
+                                Date.current,
+                                class: "form-control",
+                                max: Date.current,
+                                data: { log_builder_target: "customDate" } %>
+              <small class="form-text text-muted">Workout date</small>
+            </div>
+            <div class="col-md-6">
+              <%= time_field_tag "custom_workout_time",
+                                Time.current.strftime("%H:%M"),
+                                class: "form-control",
+                                data: { log_builder_target: "customTime" } %>
+              <small class="form-text text-muted">Workout time</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Benchmark Choice Buttons -->
+      <div class="d-grid gap-3 mt-4">
         <button class="btn btn-success btn-lg"
                 data-action="click->log-builder#chooseBenchmarkUpdate"
                 data-choice="yes">

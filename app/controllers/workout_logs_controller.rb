@@ -21,6 +21,7 @@ class WorkoutLogsController < ApplicationController
     Rails.logger.info "🏋️ Impersonation mode: #{user_context.impersonation_mode?}"
     Rails.logger.info "🏋️ beat_benchmark param: #{params[:beat_benchmark].inspect}"
     Rails.logger.info "🏋️ exercise_context param: #{params[:exercise_context].inspect}"
+    Rails.logger.info "🏋️ workout_datetime param: #{params[:workout_datetime].inspect}"
 
     # Use acting_user instead of viewing_user
     @log = @workout.workout_logs.build(user: user_context.acting_user)
@@ -28,8 +29,21 @@ class WorkoutLogsController < ApplicationController
     # 🆕 NEW: Set exercise context if provided
     @log.exercise_context = params[:exercise_context] if params[:exercise_context].present?
 
+    # 🆕 NEW: Handle custom workout timing
+    workout_datetime = determine_workout_datetime
+    if workout_datetime.nil? && params[:workout_datetime].present?
+      # There was an error with the custom datetime
+      redirect_to new_split_plan_split_day_workout_workout_log_path(@workout.split_day.split_plan, @workout.split_day, @workout),
+                  alert: flash[:alert] || "Invalid workout date/time. Please try again."
+      return
+    end
+
+    # Set custom datetime if provided (nil means use current time)
+    @log.created_at = workout_datetime if workout_datetime
+
     Rails.logger.info "🏋️ Created workout log for user: #{@log.user.email} (#{@log.user.id})"
     Rails.logger.info "🏋️ Exercise context: #{@log.exercise_context.inspect}"
+    Rails.logger.info "🏋️ Workout datetime: #{workout_datetime || 'current time'}"
 
     # Parse the exercise sets from params
     begin
@@ -52,6 +66,7 @@ class WorkoutLogsController < ApplicationController
       # Save the workout log first
       if @log.save
         Rails.logger.info "✅ Workout log saved with ID: #{@log.id}"
+        Rails.logger.info "✅ Workout log created_at: #{@log.created_at}"
 
         # Create exercise sets
         exercise_sets_data.each_with_index do |set_data, index|
@@ -96,7 +111,9 @@ class WorkoutLogsController < ApplicationController
             muscle_group: @workout.muscle_group,
             workout_id: @workout.id,
             acting_user_id: user_context.acting_user.id,
-            has_exercise_context: @log.has_context? # 🆕 NEW: Track context usage
+            has_exercise_context: @log.has_context?, # 🆕 NEW: Track context usage
+            custom_datetime: workout_datetime.present?, # 🆕 NEW: Track custom timing usage
+            workout_datetime: @log.created_at.iso8601 # 🆕 NEW: Log the actual workout time
           }
         )
 
@@ -118,12 +135,21 @@ class WorkoutLogsController < ApplicationController
               metadata: {
                 muscle_group: @workout.muscle_group,
                 previous_benchmark_count: existing_benchmarks.count,
-                has_exercise_context: @log.has_context? # 🆕 NEW: Track context in benchmarks
+                has_exercise_context: @log.has_context?, # 🆕 NEW: Track context in benchmarks
+                custom_datetime: workout_datetime.present?, # 🆕 NEW: Track custom timing in benchmarks
+                workout_datetime: @log.created_at.iso8601 # 🆕 NEW: Log benchmark datetime
               }
             )
 
+            # 🆕 NEW: Different success message based on timing
+            success_message = if workout_datetime
+              "Workout saved and benchmark updated! 🎉 (Logged for #{@log.created_at.strftime('%b %d at %I:%M %p')})"
+            else
+              "Workout saved and benchmark updated! 🎉"
+            end
+
             Rails.logger.info "🎉 Redirecting to dashboard with benchmark success message"
-            redirect_to dashboard_path, notice: "Workout saved and benchmark updated! 🎉"
+            redirect_to dashboard_path, notice: success_message
           else
             Rails.logger.error "❌ Failed to update benchmark status: #{@log.errors.full_messages.join(', ')}"
             raise ActiveRecord::RecordInvalid, @log
@@ -131,10 +157,16 @@ class WorkoutLogsController < ApplicationController
         else
           Rails.logger.info "📝 Not setting as benchmark - regular workout save"
 
-          # 🆕 NEW: Different success message if context was added
-          success_message = @log.has_context? ?
-            "Workout saved with context notes." :
-            "Workout saved."
+          # 🆕 NEW: Success message considers context and timing
+          success_parts = []
+          success_parts << "Workout saved"
+          success_parts << "with context notes" if @log.has_context?
+
+          if workout_datetime
+            success_parts << "(logged for #{@log.created_at.strftime('%b %d at %I:%M %p')})"
+          end
+
+          success_message = success_parts.join(" ") + "."
 
           redirect_to dashboard_path, notice: success_message
         end
@@ -177,7 +209,42 @@ class WorkoutLogsController < ApplicationController
     redirect_to dashboard_path, alert: "Workout not found."
   end
 
-  # 🆕 NEW: Updated strong parameters to include exercise_context
+  # 🆕 NEW: Determine workout datetime from params
+  def determine_workout_datetime
+    # If no custom datetime provided, use current time (return nil for ActiveRecord default)
+    return nil unless params[:workout_datetime].present?
+
+    begin
+      custom_datetime = DateTime.parse(params[:workout_datetime])
+
+      # Validate it's not in the future
+      if custom_datetime > Time.current
+        flash[:alert] = "Workout time cannot be in the future."
+        Rails.logger.warn "🕐 Attempted future workout time: #{custom_datetime}"
+        return nil
+      end
+
+      # Validate it's not too far in the past (e.g., 1 year)
+      if custom_datetime < 1.year.ago
+        flash[:alert] = "Workout time cannot be more than 1 year ago."
+        Rails.logger.warn "🕐 Attempted workout time too far in past: #{custom_datetime}"
+        return nil
+      end
+
+      # Convert to current timezone for consistency
+      converted_datetime = custom_datetime.in_time_zone(Time.zone)
+
+      Rails.logger.info "🕐 Using custom workout time: #{converted_datetime} (original: #{custom_datetime})"
+      return converted_datetime
+
+    rescue ArgumentError => e
+      Rails.logger.error "🕐 Invalid datetime format: #{params[:workout_datetime]} - #{e.message}"
+      flash[:alert] = "Invalid date/time format. Please check your input."
+      return nil
+    end
+  end
+
+  # 🆕 NEW: Updated strong parameters to include exercise_context and workout_datetime
   def workout_log_params
     params.require(:workout_log).permit(:exercise_context, :is_benchmark)
   end

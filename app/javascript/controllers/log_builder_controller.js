@@ -16,7 +16,11 @@ export default class extends Controller {
     "contextBody",
     "contextTextarea",
     "contextSubmitButton",
-    "hiddenContext"
+    "hiddenContext",
+    "customTimingSection",
+    "customDate",
+    "customTime",
+    "hiddenDatetime"
   ]
 
   connect() {
@@ -39,6 +43,9 @@ export default class extends Controller {
 
     // 🆕 NEW: Initialize context functionality
     this.initializeContextSection()
+
+    // 🆕 NEW: Initialize timing functionality
+    this.initializeTimingSection()
 
     this.updateHiddenField()
   }
@@ -74,6 +81,61 @@ export default class extends Controller {
 
         // Update hidden field with loaded context
         this.updateContextData()
+      }
+    }
+  }
+
+  // 🆕 NEW: Initialize timing section functionality
+  initializeTimingSection() {
+    if (this.hasCustomDateTarget) {
+      this.customDateTarget.addEventListener('change', this.updateCustomDatetime.bind(this))
+    }
+    if (this.hasCustomTimeTarget) {
+      this.customTimeTarget.addEventListener('change', this.updateCustomDatetime.bind(this))
+    }
+  }
+
+  // 🆕 NEW: Toggle timing section visibility
+  toggleTimingSection(event) {
+    const isCurrentTime = event.target.checked
+
+    if (isCurrentTime) {
+      this.customTimingSectionTarget.style.display = 'none'
+      this.hiddenDatetimeTarget.value = '' // Empty means use current time
+      console.log("Using current time for workout")
+    } else {
+      this.customTimingSectionTarget.style.display = 'block'
+      this.updateCustomDatetime()
+      console.log("Using custom time for workout")
+    }
+  }
+
+  // 🆕 NEW: Set time ago using quick buttons
+  setTimeAgo(event) {
+    event.preventDefault()
+    const hours = parseInt(event.target.dataset.hours)
+    const targetTime = new Date(Date.now() - (hours * 60 * 60 * 1000))
+
+    // Update the date and time fields
+    this.customDateTarget.value = targetTime.toISOString().split('T')[0]
+    this.customTimeTarget.value = targetTime.toTimeString().slice(0, 5)
+
+    // Update the hidden field
+    this.updateCustomDatetime()
+
+    console.log(`Set workout time to ${hours} hours ago:`, targetTime)
+  }
+
+  // 🆕 NEW: Update custom datetime when fields change
+  updateCustomDatetime() {
+    if (this.hasCustomDateTarget && this.hasCustomTimeTarget) {
+      const date = this.customDateTarget.value
+      const time = this.customTimeTarget.value
+
+      if (date && time) {
+        const datetime = `${date}T${time}`
+        this.hiddenDatetimeTarget.value = datetime
+        console.log("Updated custom workout datetime:", datetime)
       }
     }
   }
@@ -685,7 +747,7 @@ export default class extends Controller {
     const benchmarkField = document.querySelector('[data-log-builder-target="benchmarkChoice"]')
     console.log("Submitting form with benchmark choice:", benchmarkField?.value)
 
-    // 🆕 NEW: Ensure context is updated before submission
+    // 🆕 NEW: Ensure context and timing are updated before submission
     this.updateContextData()
 
     const allBadges = this.exerciseListTarget.querySelectorAll('.workout-badge')
