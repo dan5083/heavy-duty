@@ -107,7 +107,7 @@ WORKOUTS = {
   ],
 
   chest_and_triceps: [
-    "Bench Press (Close-Grip)", "Bench Press (Decline)", "Bench Press (Incline)",
+    "Bench Press", "Bench Press (Close-Grip)", "Bench Press (Decline)", "Bench Press (Incline)",
     "Bench Press (Regular)", "Cable Crossover", "Cable Flyes", "Cable Overhead Extension",
     "California Press", "Chest Dips", "Dips (Tricep)", "Dumbbell Flyes",
     "Dumbbell Flyes (Incline)", "Extensions (Overhead Tricep)", "Extensions (Single-Arm Tricep)",
@@ -148,7 +148,7 @@ WORKOUTS = {
   ],
 
   chest: [
-    "Bench Press (Barbell)", "Bench Press (Decline)", "Bench Press (Dumbbell)",
+    "Bench Press", "Bench Press (Barbell)", "Bench Press (Decline)", "Bench Press (Dumbbell)",
     "Bench Press (Incline)", "Bench Press (Smith Machine)", "Cable Crossover",
     "Chest Dips", "Chest Fly Machine", "Chest Press Machine", "Chest Press Machine (Decline)",
     "Chest Press Machine (Hammer Strength)", "Chest Press Machine (Incline)", "Dips",
@@ -343,7 +343,7 @@ WORKOUTS = {
     "Jumping Jacks", "Jump Rope", "Jumps (Box)", "Jumps (Plyometric)",
     "Kickboxing",
     "Mountain Climbers",
-    "Rowing (Concept2)", "Rowing (Machine)", "Rowing (Water)", "Running (Interval)", "Running (Outdoor)", "Running (Track)", "Running (Trail)",
+    "Rowing (Concept2)", "Rowing (Machine)", "Rowing (Water)", "Running (Interval)", "Running (Outdoor)", "Running (Track)", "Running (Trail)", "Sled Pushes",
     "Soccer", "Stairs (Climber)", "Stairs (Master)", "Stairs (Mill)", "Swimming (Backstroke)", "Swimming (Breaststroke)", "Swimming (Butterfly)", "Swimming (Freestyle)",
     "Tabata", "Tennis", "Treadmill (Incline)", "Treadmill (Running)", "Treadmill (Sprints)", "Treadmill (Walking)",
     "Walking", "Walking (Incline)", "Walking (Power)", "Water Jogging"
