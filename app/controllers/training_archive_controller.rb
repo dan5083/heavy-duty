@@ -14,8 +14,9 @@ class TrainingArchiveController < ApplicationController
                                     .map(&:to_sym)
 
     # Filter LABELS to only include muscle groups the user has (exclude split plan labels)
+    # UPDATED: Use new all_muscle_groups method instead of WORKOUTS.key?
     @muscles = AppConstants::LABELS.select do |key, _label|
-      user_muscle_groups.include?(key) && AppConstants::WORKOUTS.key?(key)
+      user_muscle_groups.include?(key) && AppConstants.all_muscle_groups.include?(key)
     end
 
     @selected_muscle = params[:muscle]

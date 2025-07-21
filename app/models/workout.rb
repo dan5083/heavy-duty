@@ -205,8 +205,10 @@ class Workout < ApplicationRecord
 
   private
 
+  # UPDATED: Changed from referring to old WORKOUTS hash to return empty hash
+  # The frontend will handle populating exercises via AppConstants.exercises_for_muscle_group
   def default_template
-    # Return empty hash - will be handled by frontend
+    # Return empty hash - exercises will be populated by frontend using new EXERCISE_TAGS system
     {}
   end
 

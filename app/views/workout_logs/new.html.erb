@@ -241,8 +241,10 @@
 
   // Debug logging
   console.log("Benchmark context from server:", <%= raw(benchmark_context.to_json) %>);
-  window.availableExercises = <%= raw(AppConstants::WORKOUTS[@workout.muscle_group.to_sym].to_json) %>;
-  window.cardioExercises = <%= raw(AppConstants::WORKOUTS[:cardio].to_json) %>;
+
+  // UPDATED: Use new EXERCISE_TAGS system
+  window.availableExercises = <%= raw(AppConstants.exercises_for_muscle_group(@workout.muscle_group.to_sym).to_json) %>;
+  window.cardioExercises = <%= raw(AppConstants.cardio_exercises.to_json) %>;
 
   // Pass AppConstants clause library to JavaScript
   window.clauseLibrary = {

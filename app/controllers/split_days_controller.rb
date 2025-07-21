@@ -4,7 +4,7 @@ class SplitDaysController < ApplicationController
 
   def edit
     @split_day = SplitDay.find(params[:id])
-    @available_exercises = AppConstants::WORKOUTS[@split_day.muscle_group.to_sym]
+    @available_exercises = AppConstants.exercises_for_muscle_group(@split_day.muscle_group.to_sym)
     @selected = @split_day.workouts.pluck(:name)
   end
 
