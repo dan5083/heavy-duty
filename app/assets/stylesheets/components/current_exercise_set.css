@@ -1,0 +1,422 @@
+/* app/assets/stylesheets/components/current_exercise_set.css */
+
+/* ===============================================
+   CURRENT EXERCISE/SET INDICATOR SYSTEM
+   =============================================== */
+
+/* Current Exercise Block Highlighting - More Subtle */
+.exercise-block.current-exercise {
+  background: rgba(88, 166, 255, 0.05);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 0 8px rgba(88, 166, 255, 0.15);
+  transition: all var(--transition-normal);
+}
+
+.exercise-block.current-exercise::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: rgba(88, 166, 255, 0.1);
+  border-radius: 11px;
+  z-index: -1;
+  opacity: 0.3;
+  animation: current-exercise-pulse 3s ease-in-out infinite;
+}
+
+@keyframes current-exercise-pulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.01);
+  }
+}
+
+/* Current Exercise Header Enhancement - Improved Visibility */
+.exercise-block.current-exercise .exercise-header {
+  position: relative;
+  padding-left: 1.8rem;
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+  z-index: 10;
+}
+
+.exercise-block.current-exercise .exercise-header::before {
+  content: "▶";
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  animation: current-indicator-blink 1.5s ease-in-out infinite;
+}
+
+@keyframes current-indicator-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Current Set Line Highlighting - Smooth rounded corners */
+.set-line.current-set {
+  background: linear-gradient(90deg, rgba(88, 166, 255, 0.25) 0%, rgba(88, 166, 255, 0.05) 100%);
+  border-left: 4px solid var(--accent-primary);
+  padding: 0.5rem 0.75rem;
+  margin: 0.25rem -0.5rem;
+  border-radius: 8px; /* Full border radius instead of just right side */
+  position: relative;
+  animation: current-set-glow 2s ease-in-out infinite;
+  z-index: 5;
+}
+
+@keyframes current-set-glow {
+  0%, 100% {
+    box-shadow: inset 0 0 15px rgba(88, 166, 255, 0.3);
+  }
+  50% {
+    box-shadow: inset 0 0 25px rgba(88, 166, 255, 0.5);
+  }
+}
+
+/* Current Set Number Enhancement - NO white background badge */
+.set-line.current-set .set-number {
+  color: var(--accent-primary);
+  font-weight: var(--weight-bold);
+  text-shadow: 0 0 4px rgba(88, 166, 255, 0.4);
+  transform: scale(1.1);
+  position: relative;
+  z-index: 10;
+  /* Removed white background styling */
+  margin-right: 0.5rem;
+}
+
+.set-line.current-set .set-number::after {
+  content: "◀";
+  position: absolute;
+  right: -0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-primary);
+  font-size: 0.8em;
+  animation: current-arrow-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes current-arrow-bounce {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(-3px); }
+}
+
+/* Current Set Badge Enhancement - Improved Visibility */
+.set-line.current-set .workout-badge {
+  box-shadow: 0 0 8px rgba(88, 166, 255, 0.3);
+  transform: scale(1.02);
+  transition: all var(--transition-fast);
+  position: relative;
+  z-index: 10;
+}
+
+.set-line.current-set .workout-badge:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(88, 166, 255, 0.6);
+}
+
+/* Current Set Button Visibility - EXCLUDE delete buttons and set numbers */
+.set-line.current-set .add-badge-btn {
+  position: relative;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid var(--border-default) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Progress Indicator for Current Exercise */
+.exercise-block.current-exercise::after {
+  content: attr(data-progress);
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--accent-success);
+  color: #ffffff;
+  border-radius: var(--radius-full);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  font-family: var(--font-accent);
+  border: 2px solid var(--bg-primary);
+  z-index: 10;
+}
+
+/* Completed Exercise/Set States - Minimal visual changes */
+.exercise-block.completed-exercise {
+  /* Remove opacity reduction - keep completed exercises at full visibility */
+  background: var(--surface-primary);
+  border: 1px solid var(--border-muted);
+  position: relative;
+}
+
+.exercise-block.completed-exercise::before {
+  content: "✓";
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: var(--accent-success);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  background: var(--bg-primary);
+  border-radius: var(--radius-full);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--accent-success);
+}
+
+.set-line.completed-set {
+  /* Remove opacity reduction - keep completed sets at full visibility */
+  background: var(--surface-primary);
+  border-left: 3px solid var(--accent-success);
+  border-radius: 8px;
+  margin-left: -0.25rem;
+  padding-left: 0.5rem;
+}
+
+.set-line.completed-set .set-number {
+  color: var(--accent-success);
+  /* Remove line-through - keep text readable */
+}
+
+/* Upcoming Exercise/Set States - No visual dulling */
+.exercise-block.upcoming-exercise {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-muted);
+}
+
+/* Progress Bar for Overall Workout */
+.workout-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--surface-hover);
+  z-index: 1000;
+  transition: all var(--transition-normal);
+}
+
+.workout-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-success) 100%);
+  width: var(--progress-width, 0%);
+  transition: width var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.workout-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+  animation: progress-shine 2s ease-in-out infinite;
+}
+
+@keyframes progress-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Current Exercise/Set Counter */
+.current-position-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--accent-primary);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-accent);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  min-width: 120px;
+  text-align: center;
+  border: 2px solid var(--bg-primary);
+  animation: position-indicator-pulse 3s ease-in-out infinite;
+}
+
+@keyframes position-indicator-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: var(--shadow-lg);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(88, 166, 255, 0.5);
+  }
+}
+
+.current-position-indicator .exercise-name {
+  display: block;
+  font-size: var(--text-xs);
+  opacity: 0.9;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+
+.current-position-indicator .set-info {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+}
+
+/* Mobile Optimizations - Improved Spacing and Visibility */
+@media (max-width: 768px) {
+  .exercise-block.current-exercise {
+    border-width: 1px;
+    border-radius: 8px;
+  }
+
+  .exercise-block.current-exercise::before {
+    border-radius: 9px;
+  }
+
+  .exercise-block.current-exercise .exercise-header {
+    padding-left: 1.5rem;
+  }
+
+  .exercise-block.current-exercise .exercise-header::before {
+    font-size: var(--text-base);
+    left: 0.25rem;
+  }
+
+  .set-line.current-set {
+    margin: 0.25rem -0.25rem;
+    padding: 0.4rem 0.5rem;
+    border-left-width: 3px;
+    border-radius: 6px; /* Slightly smaller radius on mobile */
+  }
+
+  .set-line.current-set .set-number {
+    margin-right: 0.3rem;
+    font-size: var(--text-sm);
+  }
+
+  .set-line.current-set .set-number::after {
+    right: -0.6rem;
+    font-size: 0.7em;
+  }
+
+  .current-position-indicator {
+    bottom: 100px; /* Higher on mobile for better clearance */
+    right: 15px;
+    padding: 0.5rem 0.75rem;
+    min-width: 100px;
+    font-size: var(--text-xs);
+  }
+
+  .current-position-indicator .set-info {
+    font-size: var(--text-base);
+  }
+
+  .workout-progress {
+    height: 3px;
+  }
+}
+
+/* Extra Small Screens - Further Clearance Adjustments */
+@media (max-width: 480px) {
+  .exercise-block.current-exercise .exercise-header {
+    padding-left: 1.3rem;
+  }
+
+  .exercise-block.current-exercise .exercise-header::before {
+    left: 0.1rem;
+    font-size: var(--text-sm);
+  }
+
+  .set-line.current-set .set-number {
+    margin-right: 0.2rem;
+    font-size: 0.8rem;
+  }
+
+  .current-position-indicator {
+    bottom: 90px; /* Even higher on very small screens */
+    right: 10px;
+    padding: 0.4rem 0.6rem;
+    min-width: 80px;
+  }
+
+  .current-position-indicator .exercise-name {
+    font-size: 0.65rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .current-position-indicator .set-info {
+    font-size: var(--text-sm);
+  }
+}
+
+/* Accessibility & Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .exercise-block.current-exercise::before,
+  .exercise-block.current-exercise .exercise-header::before,
+  .set-line.current-set,
+  .set-line.current-set .set-number::after,
+  .workout-progress-bar::after,
+  .current-position-indicator {
+    animation: none !important;
+  }
+
+  .exercise-block.current-exercise,
+  .set-line.current-set,
+  .set-line.current-set .workout-badge {
+    transition: none !important;
+  }
+}
+
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+  .exercise-block.current-exercise {
+    border-width: 3px;
+    background: var(--bg-primary);
+  }
+
+  .set-line.current-set {
+    border-left-width: 6px;
+    background: var(--bg-primary);
+  }
+
+  .current-position-indicator {
+    border-width: 3px;
+    font-weight: var(--weight-bold);
+  }
+}
+
+/* Focus States for Keyboard Navigation */
+.exercise-block.current-exercise:focus-within {
+  outline: 3px solid var(--accent-info);
+  outline-offset: 2px;
+}
+
+.set-line.current-set:focus-within {
+  outline: 2px solid var(--accent-info);
+  outline-offset: 1px;
+  border-radius: var(--radius-sm);
+}

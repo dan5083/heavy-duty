@@ -1,7 +1,9 @@
 <!-- app/views/workout_logs/_badge_editor.html.erb -->
 
 <% exercises.each_with_index do |(exercise_name, sets), exercise_index| %>
-  <div class="exercise-block" data-exercise-id="<%= exercise_index %>">
+  <div class="exercise-block"
+       data-exercise-id="<%= exercise_index %>"
+       data-exercise-name="<%= exercise_name %>">
 
     <!-- Exercise Header -->
     <div class="exercise-header">
@@ -15,7 +17,11 @@
 
     <!-- Sets -->
     <% sets.each_with_index do |set_description, set_index| %>
-      <div class="set-line" data-set-index="<%= set_index %>">
+      <div class="set-line"
+           data-set-index="<%= set_index %>"
+           data-exercise-id="<%= exercise_index %>"
+           data-set-number="<%= set_index + 1 %>">
+
         <span class="set-number"><%= "#{set_index + 1}️⃣" %></span>
 
         <!-- Parse set description into badges -->
@@ -27,6 +33,7 @@
                 data-badge-editor-type-value="<%= badge[:type] %>"
                 data-badge-editor-content-value="<%= badge[:content] %>"
                 data-badge-editor-exercise-id-value="<%= exercise_index %>"
+                data-badge-index="<%= badge_index %>"
                 data-action="click->badge-editor#edit badge-editor:badge-changed->log-builder#updateWorkout">
             <%= badge[:content] %>
           </span>
@@ -38,6 +45,16 @@
                 data-exercise-id="<%= exercise_index %>"
                 data-set-index="<%= set_index %>">
           + Add
+        </button>
+
+        <!-- 🆕 NEW: Set Remove Button -->
+        <button class="btn btn-xs btn-outline-danger ms-2"
+                data-action="click->log-builder#removeSet"
+                data-exercise-id="<%= exercise_index %>"
+                data-set-index="<%= set_index %>"
+                title="Remove set"
+                type="button">
+          <i class="bi bi-x"></i>
         </button>
       </div>
     <% end %>

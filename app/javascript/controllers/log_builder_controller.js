@@ -48,6 +48,66 @@ export default class extends Controller {
     this.initializeTimingSection()
 
     this.updateHiddenField()
+
+    // 🆕 NEW: Dispatch initial workout state for current-exercise-set controller
+    this.dispatchWorkoutStateUpdate('workout-initialized')
+  }
+
+  // 🆕 NEW: Dispatch events for current-exercise-set controller
+  dispatchWorkoutStateUpdate(action, details = {}) {
+    const eventDetail = {
+      action: action,
+      totalExercises: this.getTotalExerciseCount(),
+      totalSets: this.getTotalSetCount(),
+      exerciseData: this.getExerciseStructure(),
+      ...details
+    }
+
+    console.log(`🔄 Dispatching ${action}:`, eventDetail)
+
+    // Dispatch to current-exercise-set controller
+    this.element.dispatchEvent(new CustomEvent('log-builder:workout-updated', {
+      detail: eventDetail,
+      bubbles: true
+    }))
+  }
+
+  // 🆕 NEW: Get total exercise count
+  getTotalExerciseCount() {
+    return this.exerciseListTarget.querySelectorAll('.exercise-block[data-exercise-id]').length
+  }
+
+  // 🆕 NEW: Get total set count across all exercises
+  getTotalSetCount() {
+    let totalSets = 0
+    const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block[data-exercise-id]')
+
+    exerciseBlocks.forEach(block => {
+      const setLines = block.querySelectorAll('.set-line[data-set-index]')
+      totalSets += setLines.length
+    })
+
+    return totalSets
+  }
+
+  // 🆕 NEW: Get structured exercise data for current-exercise-set controller
+  getExerciseStructure() {
+    const structure = []
+    const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block[data-exercise-id]')
+
+    exerciseBlocks.forEach((block, exerciseIndex) => {
+      const exerciseName = block.dataset.exerciseName || `Exercise ${exerciseIndex + 1}`
+      const setLines = block.querySelectorAll('.set-line[data-set-index]')
+
+      structure.push({
+        exerciseIndex: exerciseIndex,
+        exerciseName: exerciseName,
+        setCount: setLines.length,
+        element: block
+      })
+    })
+
+    return structure
   }
 
   initializeBadgeInterface() {
@@ -272,6 +332,9 @@ export default class extends Controller {
 
     html += this.renderAddExerciseButtons()
     this.exerciseListTarget.innerHTML = html
+
+    // 🆕 NEW: Dispatch exercise structure update
+    this.dispatchWorkoutStateUpdate('exercises-rendered')
   }
 
   renderExerciseBlock(exerciseName, sets, exerciseIndex) {
@@ -280,7 +343,7 @@ export default class extends Controller {
     }).join('')
 
     return `
-      <div class="exercise-block" data-exercise-id="${exerciseIndex}">
+      <div class="exercise-block" data-exercise-id="${exerciseIndex}" data-exercise-name="${exerciseName}">
         <div class="exercise-header d-flex justify-content-between align-items-center">
           <span>${exerciseName}</span>
           <button class="btn btn-xs btn-danger exercise-delete-btn"
@@ -309,11 +372,13 @@ export default class extends Controller {
     }).join('')
 
     return `
-      <div class="set-line" data-set-index="${setIndex}">
+      <div class="set-line" data-set-index="${setIndex}" data-exercise-id="${exerciseIndex}" data-set-number="${setIndex + 1}">
         <span class="set-number">${setIndex + 1}:</span>
         ${badgesHtml}
         <button class="btn btn-xs btn-outline-danger ms-2"
                 data-action="click->log-builder#removeSet"
+                data-exercise-id="${exerciseIndex}"
+                data-set-index="${setIndex}"
                 title="Remove set"
                 type="button">
           <i class="bi bi-x"></i>
@@ -352,6 +417,13 @@ export default class extends Controller {
       this.renderWorkoutBadges()
       this.updateHiddenField()
 
+      // 🆕 NEW: Dispatch set removal event
+      this.dispatchWorkoutStateUpdate('set-removed', {
+        exerciseId: exerciseId,
+        setIndex: setIndex,
+        exerciseName: exerciseName
+      })
+
       if (Object.keys(this.benchmarkData).length === 0) {
         this.showEmptyState()
       }
@@ -366,6 +438,7 @@ export default class extends Controller {
             data-badge-editor-type-value="${badge.type}"
             data-badge-editor-content-value="${badge.content}"
             data-badge-editor-exercise-id-value="${exerciseIndex}"
+            data-badge-index="${badgeIndex}"
             data-new-badge="true"
             data-action="click->badge-editor#edit">
         <span class="badge-text">${badge.content}</span>
@@ -601,6 +674,12 @@ export default class extends Controller {
     this.renderWorkoutBadges()
     this.updateHiddenField()
 
+    // 🆕 NEW: Dispatch exercise addition event
+    this.dispatchWorkoutStateUpdate('exercise-added', {
+      exerciseName: exerciseName,
+      isCardio: isCardio
+    })
+
     setTimeout(() => {
       const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
       const newExercise = exerciseBlocks[exerciseBlocks.length - 2]
@@ -650,6 +729,13 @@ export default class extends Controller {
       this.renderWorkoutBadges()
       this.updateHiddenField()
 
+      // 🆕 NEW: Dispatch set addition event
+      this.dispatchWorkoutStateUpdate('set-added', {
+        exerciseId: exerciseId,
+        exerciseName: exerciseName,
+        setNumber: newSetNumber
+      })
+
       setTimeout(() => {
         const exerciseBlock = this.exerciseListTarget.querySelector(`[data-exercise-id="${exerciseId}"]`)
         if (exerciseBlock) {
@@ -685,6 +771,12 @@ export default class extends Controller {
       delete this.benchmarkData[exerciseName]
       this.renderWorkoutBadges()
       this.updateHiddenField()
+
+      // 🆕 NEW: Dispatch exercise removal event
+      this.dispatchWorkoutStateUpdate('exercise-removed', {
+        exerciseId: exerciseId,
+        exerciseName: exerciseName
+      })
 
       if (Object.keys(this.benchmarkData).length === 0) {
         this.showEmptyState()
@@ -764,10 +856,24 @@ export default class extends Controller {
     console.log('Badge changed:', event.detail)
     this.updateWorkoutData()
     this.showSuccessFeedback('Updated!')
+
+    // 🆕 NEW: Dispatch badge change event for current-exercise-set controller
+    this.dispatchWorkoutStateUpdate('badge-changed', {
+      badgeType: event.detail.type,
+      newValue: event.detail.newValue,
+      oldValue: event.detail.oldValue
+    })
   }
 
   handleAddBadge(event) {
     console.log('Add badge:', event.detail)
+
+    // 🆕 NEW: Dispatch badge addition event
+    this.dispatchWorkoutStateUpdate('badge-added', {
+      badgeType: event.detail.type,
+      exerciseId: event.detail.exerciseId,
+      setIndex: event.detail.setIndex
+    })
   }
 
   showSuccessFeedback(message) {
@@ -839,6 +945,9 @@ export default class extends Controller {
 
     console.log("Rebuilt workout data:", this.benchmarkData)
     console.log("Exercise sets array:", exerciseSetsArray)
+
+    // 🆕 NEW: Dispatch workout data update
+    this.dispatchWorkoutStateUpdate('workout-data-updated')
   }
 
   updateHiddenField(exerciseSetsArray = null) {

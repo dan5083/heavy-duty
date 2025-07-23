@@ -242,6 +242,89 @@
   }
 }
 
+/* BULLETPROOF DELETE BUTTON STYLING - HIGHEST PRIORITY */
+/* Exercise Delete Button - Red solid styling */
+.exercise-header .btn-danger,
+.exercise-header .btn.btn-xs.btn-danger,
+.exercise-delete-btn {
+  background: #dc2626 !important;
+  border: 1px solid #dc2626 !important;
+  color: #ffffff !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.75rem !important;
+  margin-left: auto !important;
+}
+
+/* Set Delete Button - Same red solid styling, right-aligned */
+.set-line .btn-outline-danger,
+.set-line .btn.btn-xs.btn-outline-danger,
+.set-line .btn-danger,
+.set-line .btn.btn-xs.btn-danger {
+  background: #dc2626 !important;
+  border: 1px solid #dc2626 !important;
+  color: #ffffff !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.75rem !important;
+  margin-left: auto !important; /* Push to the right */
+  order: 999 !important; /* Ensure it stays at the end */
+}
+
+/* Hover states for all delete buttons */
+.exercise-header .btn-danger:hover,
+.exercise-header .btn.btn-xs.btn-danger:hover,
+.exercise-delete-btn:hover,
+.set-line .btn-outline-danger:hover,
+.set-line .btn.btn-xs.btn-outline-danger:hover,
+.set-line .btn-danger:hover,
+.set-line .btn.btn-xs.btn-danger:hover {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+  transform: scale(0.95) !important;
+}
+
+/* Focus states for all delete buttons */
+.exercise-header .btn-danger:focus,
+.exercise-header .btn.btn-xs.btn-danger:focus,
+.exercise-delete-btn:focus,
+.set-line .btn-outline-danger:focus,
+.set-line .btn.btn-xs.btn-outline-danger:focus,
+.set-line .btn-danger:focus,
+.set-line .btn.btn-xs.btn-danger:focus {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Icon styling for delete buttons */
+.exercise-header .btn-danger i,
+.exercise-header .btn.btn-xs.btn-danger i,
+.exercise-delete-btn i,
+.set-line .btn-outline-danger i,
+.set-line .btn.btn-xs.btn-outline-danger i,
+.set-line .btn-danger i,
+.set-line .btn.btn-xs.btn-danger i {
+  font-size: 0.75rem !important;
+  pointer-events: none !important;
+}
+
 /* Mobile Optimization - Minimal Spacing */
 @media (max-width: 768px) {
   .exercise-block {
@@ -289,6 +372,32 @@
     padding-bottom: 0.25rem;
     font-size: 0.9rem;
   }
+
+  /* Mobile delete button adjustments */
+  .exercise-header .btn-danger,
+  .exercise-header .btn.btn-xs.btn-danger,
+  .exercise-delete-btn,
+  .set-line .btn-outline-danger,
+  .set-line .btn.btn-xs.btn-outline-danger,
+  .set-line .btn-danger,
+  .set-line .btn.btn-xs.btn-danger {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    font-size: 0.7rem !important;
+    border-radius: 4px !important;
+  }
+
+  .exercise-header .btn-danger i,
+  .exercise-header .btn.btn-xs.btn-danger i,
+  .exercise-delete-btn i,
+  .set-line .btn-outline-danger i,
+  .set-line .btn.btn-xs.btn-outline-danger i,
+  .set-line .btn-danger i,
+  .set-line .btn.btn-xs.btn-danger i {
+    font-size: 0.7rem !important;
+  }
 }
 
 /* Extra Small Screens - Ultra Compact */
@@ -322,6 +431,31 @@
     gap: 0.025rem;
     margin: 0.15rem 0;
   }
+
+  /* Extra small delete button adjustments */
+  .exercise-header .btn-danger,
+  .exercise-header .btn.btn-xs.btn-danger,
+  .exercise-delete-btn,
+  .set-line .btn-outline-danger,
+  .set-line .btn.btn-xs.btn-outline-danger,
+  .set-line .btn-danger,
+  .set-line .btn.btn-xs.btn-danger {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    font-size: 0.65rem !important;
+  }
+
+  .exercise-header .btn-danger i,
+  .exercise-header .btn.btn-xs.btn-danger i,
+  .exercise-delete-btn i,
+  .set-line .btn-outline-danger i,
+  .set-line .btn.btn-xs.btn-outline-danger i,
+  .set-line .btn-danger i,
+  .set-line .btn.btn-xs.btn-danger i {
+    font-size: 0.65rem !important;
+  }
 }
 
 /* Focus States */
@@ -343,9 +477,18 @@
   .add-badge-btn:active {
     transform: none;
   }
-}
 
-/* Replace the forced mobile styles section at the bottom of your CSS with this: */
+  /* Remove scale transform on delete buttons for reduced motion */
+  .exercise-header .btn-danger:hover,
+  .exercise-header .btn.btn-xs.btn-danger:hover,
+  .exercise-delete-btn:hover,
+  .set-line .btn-outline-danger:hover,
+  .set-line .btn.btn-xs.btn-outline-danger:hover,
+  .set-line .btn-danger:hover,
+  .set-line .btn.btn-xs.btn-danger:hover {
+    transform: none !important;
+  }
+}
 
 /* Force mobile styles with higher specificity - REFINED VERSION */
 @media screen and (max-width: 768px) {
@@ -355,31 +498,31 @@
   }
 
   .badge-container .workout-badge {
-    padding: 0.2rem 0.35rem !important; /* More padding for better appearance */
-    font-size: 0.75rem !important; /* 5% larger than 0.7rem */
-    min-height: 26px !important; /* Slightly taller */
+    padding: 0.2rem 0.35rem !important;
+    font-size: 0.75rem !important;
+    min-height: 26px !important;
     margin: 0 !important;
-    border-radius: 4px !important; /* Slightly more rounded */
+    border-radius: 4px !important;
     white-space: nowrap !important;
-    line-height: 1.2 !important; /* Better line height */
+    line-height: 1.2 !important;
     display: inline-flex !important;
-    align-items: center !important; /* Ensure vertical alignment */
+    align-items: center !important;
   }
 
   .badge-container .set-number {
-    font-size: 0.75rem !important; /* Match badge font size */
+    font-size: 0.75rem !important;
     min-width: 0.8rem !important;
-    margin-right: 0.15rem !important; /* Slightly more space */
+    margin-right: 0.15rem !important;
     flex-shrink: 0 !important;
     display: inline-flex !important;
-    align-items: center !important; /* Match badge alignment */
-    line-height: 1.2 !important; /* Match badge line height */
+    align-items: center !important;
+    line-height: 1.2 !important;
   }
 
   .badge-container .add-badge-btn {
-    padding: 0.2rem 0.35rem !important; /* Match badge padding */
-    font-size: 0.75rem !important; /* Match badge font size */
-    min-height: 26px !important; /* Match badge height */
+    padding: 0.2rem 0.35rem !important;
+    font-size: 0.75rem !important;
+    min-height: 26px !important;
     margin: 0 !important;
     border-radius: 4px !important;
     display: inline-flex !important;
@@ -388,10 +531,10 @@
   }
 
   .badge-container .set-line {
-    gap: 0.1rem !important; /* Thicker gaps between badges */
-    margin: 0.25rem 0 !important; /* More space between sets */
+    gap: 0.1rem !important;
+    margin: 0.25rem 0 !important;
     display: flex !important;
-    align-items: center !important; /* Ensure everything aligns */
+    align-items: center !important;
     flex-wrap: wrap !important;
   }
 
@@ -405,17 +548,17 @@
 /* Even more specific for very small screens */
 @media screen and (max-width: 480px) {
   .badge-container .exercise-block {
-    padding: 0.3rem !important; /* Slightly more padding */
+    padding: 0.3rem !important;
   }
 
   .badge-container .workout-badge {
-    padding: 0.18rem 0.3rem !important; /* Proportionally smaller but still sightly */
-    font-size: 0.72rem !important; /* Slightly smaller for very small screens */
+    padding: 0.18rem 0.3rem !important;
+    font-size: 0.72rem !important;
     min-height: 25px !important;
   }
 
   .badge-container .set-number {
-    font-size: 0.72rem !important; /* Match badge font */
+    font-size: 0.72rem !important;
     margin-right: 0.12rem !important;
   }
 
@@ -426,124 +569,20 @@
   }
 
   .badge-container .set-line {
-    gap: 0.08rem !important; /* Slightly smaller gap for very small screens */
+    gap: 0.08rem !important;
     margin: 0.2rem 0 !important;
   }
 }
 
-/* Add this AFTER your rollback CSS - Correct selectors for delete buttons only */
-
-/* Replace your set delete button CSS with this updated version */
-
-@media screen and (max-width: 768px) {
-  /* Exercise Delete Button in header */
-  .exercise-header .btn.btn-xs.btn-danger,
-  .exercise-delete-btn {
-    width: 26px !important;
-    height: 26px !important;
-    min-width: 26px !important;
-    min-height: 26px !important;
-    padding: 0 !important;
-    border-radius: 4px !important;
-    background: var(--accent-warning) !important;
-    border-color: var(--accent-warning) !important;
-    color: #ffffff !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 0.75rem !important;
-  }
-
-  /* Set Delete Button - Match exercise delete exactly */
-  .set-line .btn.btn-xs.btn-outline-danger {
-    width: 26px !important;
-    height: 26px !important;
-    min-width: 26px !important;
-    min-height: 26px !important;
-    padding: 0 !important;
-    border-radius: 4px !important;
-    /* Same solid red background as exercise delete */
-    background: var(--accent-warning) !important;
-    border: 1px solid var(--accent-warning) !important;
-    color: #ffffff !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 0.75rem !important;
-    margin-left: auto !important; /* Align to the right */
-    /* Override any outline styles */
-    border-style: solid !important;
-  }
-
-  /* Make sure the icon is the trash icon, not X */
-  .set-line .btn.btn-xs.btn-outline-danger i {
-    font-family: "bootstrap-icons" !important;
-  }
-
-  /* If the HTML has bi-x, we need to change it to bi-trash via content */
-  .set-line .btn.btn-xs.btn-outline-danger i.bi-x::before {
-    content: "\f5de" !important; /* Bootstrap Icons trash icon Unicode */
-  }
-
-  /* Hover states - both buttons identical */
-  .exercise-header .btn.btn-xs.btn-danger:hover,
-  .exercise-header .btn.btn-xs.btn-danger:focus,
-  .exercise-header .btn.btn-xs.btn-danger:active,
-  .exercise-delete-btn:hover,
-  .exercise-delete-btn:focus,
-  .exercise-delete-btn:active,
-  .set-line .btn.btn-xs.btn-outline-danger:hover,
-  .set-line .btn.btn-xs.btn-outline-danger:focus,
-  .set-line .btn.btn-xs.btn-outline-danger:active {
-    background: #dc2626 !important;
-    border-color: #dc2626 !important;
-    color: #ffffff !important;
-    transform: scale(0.95) !important;
-  }
-
-  /* Icon sizes */
-  .exercise-header .btn.btn-xs.btn-danger i,
-  .exercise-delete-btn i,
-  .set-line .btn.btn-xs.btn-outline-danger i {
-    font-size: 0.75rem !important;
-    pointer-events: none !important;
-  }
-}
-
-/* Smaller screens */
-@media screen and (max-width: 480px) {
-  .exercise-header .btn.btn-xs.btn-danger,
-  .exercise-delete-btn,
-  .set-line .btn.btn-xs.btn-outline-danger {
-    width: 25px !important;
-    height: 25px !important;
-    min-width: 25px !important;
-    min-height: 25px !important;
-    font-size: 0.72rem !important;
-  }
-
-  .exercise-header .btn.btn-xs.btn-danger i,
-  .exercise-delete-btn i,
-  .set-line .btn.btn-xs.btn-outline-danger i {
-    font-size: 0.72rem !important;
-  }
-}
-
-/* Replace the exercise button section at the bottom of your CSS with this: */
-
-/* Replace the exercise button section at the bottom of your CSS with this: */
-
 /* Exercise Addition Buttons - Left aligned with spacing and consistent styling */
 @media screen and (max-width: 768px) {
-  /* Container for the add exercise buttons */
   .text-center.mt-4.mb-4,
   .text-center.mt-4 {
-    text-align: left !important; /* Left align instead of center */
+    text-align: left !important;
     margin-top: 1rem !important;
     margin-bottom: 1rem !important;
   }
 
-  /* Add Context section - left align */
   .exercise-context-section {
     text-align: left !important;
   }
@@ -552,37 +591,33 @@
     text-align: left !important;
   }
 
-  /* Make all add buttons consistent - override different outline styles */
   .btn.btn-outline-info,
   .btn.btn-outline-success,
   .btn.btn-outline-secondary {
-    margin-right: 0.75rem !important; /* Space between buttons */
-    margin-bottom: 0.5rem !important; /* Space if they wrap */
+    margin-right: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
     display: inline-block !important;
     width: auto !important;
     flex-shrink: 0 !important;
-    /* Consistent border styling */
     border-width: 1px !important;
     border-style: solid !important;
   }
 
-  /* Normalize the border colors to be more subtle and consistent */
   .btn.btn-outline-info {
-    border-color: rgba(121, 192, 255, 0.6) !important; /* Softer blue */
+    border-color: rgba(121, 192, 255, 0.6) !important;
     color: rgba(121, 192, 255, 0.9) !important;
   }
 
   .btn.btn-outline-success {
-    border-color: rgba(63, 185, 80, 0.6) !important; /* Softer green */
+    border-color: rgba(63, 185, 80, 0.6) !important;
     color: rgba(63, 185, 80, 0.9) !important;
   }
 
   .btn.btn-outline-secondary {
-    border-color: rgba(139, 148, 158, 0.6) !important; /* Softer gray */
+    border-color: rgba(139, 148, 158, 0.6) !important;
     color: rgba(139, 148, 158, 0.9) !important;
   }
 
-  /* Hover states - keep original functionality but consistent intensity */
   .btn.btn-outline-info:hover {
     background: rgba(121, 192, 255, 0.1) !important;
     border-color: rgba(121, 192, 255, 0.8) !important;
@@ -610,7 +645,6 @@
     margin-bottom: 0.5rem !important;
   }
 
-  /* Remove bottom margin from last button in each section */
   .btn.btn-outline-success:last-of-type,
   .btn.btn-outline-secondary:last-of-type {
     margin-bottom: 0 !important;
