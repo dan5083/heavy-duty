@@ -33,15 +33,6 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.exercise-delete-btn {
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
-}
-
-.exercise-delete-btn:hover {
-  opacity: 1;
-}
-
 .set-line {
   display: flex;
   align-items: center;
