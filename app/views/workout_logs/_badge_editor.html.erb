@@ -7,10 +7,12 @@
 
     <!-- Exercise Header -->
     <div class="exercise-header">
-       <%= exercise_name %>
-      <button class="btn btn-sm btn-outline-secondary ms-2"
+      <span><%= exercise_name %></span>
+      <button class="btn-delete"
               data-action="click->log-builder#deleteExercise"
-              data-exercise-id="<%= exercise_index %>">
+              data-exercise-id="<%= exercise_index %>"
+              title="Delete exercise"
+              type="button">
         <i class="bi bi-trash"></i>
       </button>
     </div>
@@ -47,14 +49,14 @@
           + Add
         </button>
 
-        <!-- 🆕 NEW: Set Remove Button -->
-        <button class="btn btn-xs btn-outline-danger ms-2"
+        <!-- Set Remove Button -->
+        <button class="btn-delete"
                 data-action="click->log-builder#removeSet"
                 data-exercise-id="<%= exercise_index %>"
                 data-set-index="<%= set_index %>"
                 title="Remove set"
                 type="button">
-          <i class="bi bi-x"></i>
+          <i class="bi bi-trash"></i>
         </button>
       </div>
     <% end %>

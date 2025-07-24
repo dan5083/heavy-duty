@@ -137,16 +137,17 @@
   color: var(--text-primary) !important;
 }
 
-/* Progress Indicator for Current Exercise */
+/* Progress Indicator for Current Exercise - CENTER ALIGNED */
 .exercise-block.current-exercise::after {
   content: attr(data-progress);
   position: absolute;
   top: -8px;
-  right: -8px;
+  left: 50%;
+  transform: translateX(-50%);
   background: var(--accent-success);
   color: #ffffff;
   border-radius: var(--radius-full);
-  width: 24px;
+  width: 36px;
   height: 24px;
   display: flex;
   align-items: center;
@@ -166,11 +167,13 @@
   position: relative;
 }
 
+/* Completed Exercise Green Tick - CENTER ALIGNED */
 .exercise-block.completed-exercise::before {
   content: "✓";
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
   color: var(--accent-success);
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
@@ -182,6 +185,7 @@
   align-items: center;
   justify-content: center;
   border: 2px solid var(--accent-success);
+  z-index: 10;
 }
 
 .set-line.completed-set {
@@ -306,6 +310,22 @@
     left: 0.25rem;
   }
 
+  /* Progress indicator mobile adjustments */
+  .exercise-block.current-exercise::after {
+    width: 32px;
+    height: 20px;
+    font-size: 0.65rem;
+    top: -6px;
+  }
+
+  /* Completed tick mobile adjustments */
+  .exercise-block.completed-exercise::before {
+    width: 24px;
+    height: 24px;
+    font-size: var(--text-base);
+    top: -6px;
+  }
+
   .set-line.current-set {
     margin: 0.25rem -0.25rem;
     padding: 0.4rem 0.5rem;
@@ -349,6 +369,22 @@
   .exercise-block.current-exercise .exercise-header::before {
     left: 0.1rem;
     font-size: var(--text-sm);
+  }
+
+  /* Progress indicator extra small adjustments */
+  .exercise-block.current-exercise::after {
+    width: 28px;
+    height: 18px;
+    font-size: 0.6rem;
+    top: -5px;
+  }
+
+  /* Completed tick extra small adjustments */
+  .exercise-block.completed-exercise::before {
+    width: 22px;
+    height: 22px;
+    font-size: var(--text-sm);
+    top: -5px;
   }
 
   .set-line.current-set .set-number {

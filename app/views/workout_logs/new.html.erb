@@ -22,7 +22,7 @@
   </div>
 
   <!-- Main Content: Badge Editor -->
-  <div class="px-3">
+  <div>
     <!-- Badge Container -->
     <div class="badge-container"
          data-log-builder-target="badgeContainer"
@@ -104,11 +104,12 @@
     <div class="d-flex justify-content-between align-items-center">
       <!-- 🆕 NEW: Current Position Indicator with Navigation Controls -->
       <div class="current-position-indicator-inline" data-current-exercise-set-target="positionIndicator">
-        <div class="d-flex align-items-center gap-2">
-          <button class="btn btn-sm btn-outline-secondary"
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
                   data-action="click->current-exercise-set#previousSet"
                   data-current-exercise-set-target="previousButton"
-                  title="Previous Set">
+                  title="Previous Set"
+                  style="width: 40px; height: 40px;">
             <i class="bi bi-chevron-left"></i>
           </button>
 
@@ -121,10 +122,11 @@
             </div>
           </div>
 
-          <button class="btn btn-sm btn-outline-secondary"
+          <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center me-3"
                   data-action="click->current-exercise-set#nextSet"
                   data-current-exercise-set-target="nextButton"
-                  title="Next Set">
+                  title="Next Set"
+                  style="width: 40px; height: 40px;">
             <i class="bi bi-chevron-right"></i>
           </button>
         </div>
