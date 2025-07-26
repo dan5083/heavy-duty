@@ -1,17 +1,21 @@
 class Workout < ApplicationRecord
   has_many :workout_logs, dependent: :destroy
-  has_one :benchmark_log, -> { where(is_benchmark: true) }, class_name: 'WorkoutLog'
+  has_one :benchmark_log, -> { where(is_benchmark: true, is_default_variation: true) }, class_name: 'WorkoutLog'
   belongs_to :split_day
 
-  # === EXISTING BENCHMARK METHODS ===
+  # === EXISTING BENCHMARK METHODS (updated for default variation) ===
 
   def benchmark_exercises
     return {} unless benchmark_log
     benchmark_log.exercises_hash
   end
 
-  def starter_template
-    benchmark_exercises.presence || default_template
+  def starter_template(variation = nil)
+    if variation.present?
+      benchmark_exercises_for_variation(variation).presence || default_template
+    else
+      benchmark_exercises.presence || default_template
+    end
   end
 
   def benchmark_summary
@@ -19,7 +23,42 @@ class Workout < ApplicationRecord
     benchmark_log.exercises_summary
   end
 
-  # === NEW BENCHMARK HELPER METHODS ===
+  # === NEW VARIATION-SPECIFIC BENCHMARK METHODS ===
+
+  # 🆕 NEW: Get benchmark log for specific variation
+  def benchmark_log_for_variation(variation)
+    workout_logs.benchmarks_only.where(benchmark_variation: variation).order(created_at: :desc).first
+  end
+
+  # 🆕 NEW: Get benchmark exercises for specific variation
+  def benchmark_exercises_for_variation(variation)
+    log = benchmark_log_for_variation(variation)
+    return {} unless log
+    log.exercises_hash
+  end
+
+  # 🆕 NEW: Get benchmark summary for specific variation
+  def benchmark_summary_for_variation(variation)
+    log = benchmark_log_for_variation(variation)
+    return {} unless log
+    log.exercises_summary
+  end
+
+  # 🆕 NEW: Check if variation has benchmark
+  def has_benchmark_for_variation?(variation)
+    benchmark_log_for_variation(variation).present?
+  end
+
+  # 🆕 NEW: Get all available variations for this workout
+  def available_variations
+    workout_logs.benchmarks_only
+               .where.not(benchmark_variation: nil)
+               .distinct
+               .pluck(:benchmark_variation)
+               .sort
+  end
+
+  # === EXISTING BENCHMARK HELPER METHODS (updated for default variation) ===
 
   def has_benchmark?
     benchmark_log.present?

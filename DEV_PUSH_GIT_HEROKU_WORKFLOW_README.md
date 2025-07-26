@@ -39,9 +39,12 @@ echo "=== config/routes.rb ==="; cat config/routes.rb; echo
 for file in app/logic/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 
 # Show all js controllers with filenames as headers:
-for file in app/javascript/controllers/**/[a-i]*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
-# JS Controllers [j–q]:
-for f in app/javascript/controllers/**/[j-q]*_controller.js; do echo "=== $f ==="; cat "$f"; echo; done
+# JS Controllers [a-b]:
+for file in app/javascript/controllers/**/[a-b]*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
+# JS Controllers [c-i]:
+for file in app/javascript/controllers/**/[c-i]*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
+# JS Controllers [j-k]:
+for f in app/javascript/controllers/**/[j-k]*_controller.js; do echo "=== $f ==="; cat "$f"; echo; done
 # JS Controllers [r–z]:
 for f in app/javascript/controllers/**/[r-z]*_controller.js; do echo "=== $f ==="; cat "$f"; echo; done
 

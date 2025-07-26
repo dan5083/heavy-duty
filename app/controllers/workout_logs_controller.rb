@@ -11,6 +11,34 @@ class WorkoutLogsController < ApplicationController
 
   def new
     @log = @workout.workout_logs.new
+
+    # 🚀 OPTIMIZED: Single query to get all variation data
+    all_benchmark_logs = @workout.workout_logs
+                                .where(is_benchmark: true, benchmark_variation: ['A', 'B', 'C'])
+                                .includes(:exercise_sets)
+                                .index_by(&:benchmark_variation)
+
+    # 🚀 OPTIMIZED: Build variation data from preloaded records
+    @all_variation_data = {}
+    @all_context_data = {}
+
+    %w[A B C].each do |variation|
+      benchmark_log = all_benchmark_logs[variation]
+
+      if benchmark_log
+        @all_variation_data[variation] = benchmark_log.exercises_hash  # Uses preloaded exercise_sets
+        @all_context_data[variation] = benchmark_log.exercise_context
+      else
+        @all_variation_data[variation] = {}
+        @all_context_data[variation] = nil
+      end
+    end
+
+    # Rest of your existing logic...
+    @available_variations = all_benchmark_logs.keys.sort
+    @current_variation = @available_variations.include?('A') ? 'A' : (@available_variations.first || 'A')
+    @benchmark_data = @all_variation_data[@current_variation] || {}
+    @benchmark_context = @all_context_data[@current_variation]
   end
 
   def create
@@ -20,6 +48,7 @@ class WorkoutLogsController < ApplicationController
     Rails.logger.info "🏋️ Acting user: #{user_context.acting_user.email} (#{user_context.acting_user.id})"
     Rails.logger.info "🏋️ Impersonation mode: #{user_context.impersonation_mode?}"
     Rails.logger.info "🏋️ beat_benchmark param: #{params[:beat_benchmark].inspect}"
+    Rails.logger.info "🏋️ benchmark_variation param: #{params[:benchmark_variation].inspect}"
     Rails.logger.info "🏋️ exercise_context param: #{params[:exercise_context].inspect}"
     Rails.logger.info "🏋️ workout_datetime param: #{params[:workout_datetime].inspect}"
 
@@ -45,7 +74,40 @@ class WorkoutLogsController < ApplicationController
     Rails.logger.info "🏋️ Exercise context: #{@log.exercise_context.inspect}"
     Rails.logger.info "🏋️ Workout datetime: #{workout_datetime || 'current time'}"
 
-    # Parse the exercise sets from params
+    # 🆕 NEW: Handle "just save" workflow
+    if params[:beat_benchmark] == 'just_save'
+      Rails.logger.info "💾 Just save workflow - creating minimal workout log for recovery tracking"
+
+      if @log.save
+        log_audit_action(
+          action: 'create_workout_log',
+          resource: @log,
+          metadata: {
+            workflow: 'just_save',
+            muscle_group: @workout.muscle_group,
+            workout_id: @workout.id,
+            acting_user_id: user_context.acting_user.id,
+            has_exercise_context: @log.has_context?,
+            custom_datetime: workout_datetime.present?,
+            workout_datetime: @log.created_at.iso8601
+          }
+        )
+
+        success_message = if workout_datetime
+          "Workout logged for recovery tracking! (#{@log.created_at.strftime('%b %d at %I:%M %p')})"
+        else
+          "Workout logged for recovery tracking!"
+        end
+
+        redirect_to dashboard_path, notice: success_message
+      else
+        Rails.logger.error "❌ Failed to save minimal workout log: #{@log.errors.full_messages.join(', ')}"
+        redirect_to dashboard_path, alert: "Failed to save workout: #{@log.errors.full_messages.join(', ')}"
+      end
+      return
+    end
+
+    # Parse the exercise sets from params for regular workout
     begin
       exercise_sets_data = JSON.parse(params[:exercise_sets] || '[]')
       Rails.logger.info "🏋️ Parsed exercise sets: #{exercise_sets_data.length} sets"
@@ -58,7 +120,10 @@ class WorkoutLogsController < ApplicationController
     end
 
     beat_benchmark = params[:beat_benchmark] == 'yes'
+    benchmark_variation = params[:benchmark_variation] if beat_benchmark
+    benchmark_variation = nil if benchmark_variation == "undefined" || benchmark_variation.blank?
     Rails.logger.info "🏋️ Beat benchmark: #{beat_benchmark}"
+    Rails.logger.info "🏋️ Benchmark variation: #{benchmark_variation}" if benchmark_variation
 
     ActiveRecord::Base.transaction do
       Rails.logger.info "🏋️ Starting database transaction"
@@ -108,22 +173,27 @@ class WorkoutLogsController < ApplicationController
           metadata: {
             exercise_count: exercise_sets_data.length,
             beat_benchmark: beat_benchmark,
+            benchmark_variation: benchmark_variation,
             muscle_group: @workout.muscle_group,
             workout_id: @workout.id,
             acting_user_id: user_context.acting_user.id,
-            has_exercise_context: @log.has_context?, # 🆕 NEW: Track context usage
-            custom_datetime: workout_datetime.present?, # 🆕 NEW: Track custom timing usage
-            workout_datetime: @log.created_at.iso8601 # 🆕 NEW: Log the actual workout time
+            has_exercise_context: @log.has_context?,
+            custom_datetime: workout_datetime.present?,
+            workout_datetime: @log.created_at.iso8601
           }
         )
 
         # Handle benchmark choice
         if beat_benchmark
-          Rails.logger.info "🏆 Setting as benchmark"
+          Rails.logger.info "🏆 Setting as benchmark variation: #{benchmark_variation}"
 
-          # Check if there are existing benchmarks for this workout
-          existing_benchmarks = @workout.workout_logs.where(is_benchmark: true)
-          Rails.logger.info "🏆 Existing benchmarks for this workout: #{existing_benchmarks.count}"
+          # 🆕 NEW: Set benchmark variation and default status
+          @log.benchmark_variation = benchmark_variation
+          @log.is_default_variation = (benchmark_variation == 'A') # A is always default
+
+          # Check if there are existing benchmarks for this workout and variation
+          existing_benchmarks = @workout.workout_logs.where(is_benchmark: true, benchmark_variation: benchmark_variation)
+          Rails.logger.info "🏆 Existing benchmarks for this workout/variation: #{existing_benchmarks.count}"
 
           if @log.update!(is_benchmark: true)
             Rails.logger.info "✅ Benchmark status updated successfully"
@@ -134,18 +204,20 @@ class WorkoutLogsController < ApplicationController
               resource: @log,
               metadata: {
                 muscle_group: @workout.muscle_group,
+                benchmark_variation: benchmark_variation,
+                is_default_variation: @log.is_default_variation,
                 previous_benchmark_count: existing_benchmarks.count,
-                has_exercise_context: @log.has_context?, # 🆕 NEW: Track context in benchmarks
-                custom_datetime: workout_datetime.present?, # 🆕 NEW: Track custom timing in benchmarks
-                workout_datetime: @log.created_at.iso8601 # 🆕 NEW: Log benchmark datetime
+                has_exercise_context: @log.has_context?,
+                custom_datetime: workout_datetime.present?,
+                workout_datetime: @log.created_at.iso8601
               }
             )
 
-            # 🆕 NEW: Different success message based on timing
+            # 🆕 NEW: Different success message based on timing and variation
             success_message = if workout_datetime
-              "Workout saved and benchmark updated! 🎉 (Logged for #{@log.created_at.strftime('%b %d at %I:%M %p')})"
+              "Workout saved and #{@log.variation_label} benchmark updated! 🎉 (Logged for #{@log.created_at.strftime('%b %d at %I:%M %p')})"
             else
-              "Workout saved and benchmark updated! 🎉"
+              "Workout saved and #{@log.variation_label} benchmark updated! 🎉"
             end
 
             Rails.logger.info "🎉 Redirecting to dashboard with benchmark success message"
@@ -244,8 +316,8 @@ class WorkoutLogsController < ApplicationController
     end
   end
 
-  # 🆕 NEW: Updated strong parameters to include exercise_context and workout_datetime
+  # 🆕 NEW: Updated strong parameters to include benchmark_variation
   def workout_log_params
-    params.require(:workout_log).permit(:exercise_context, :is_benchmark)
+    params.require(:workout_log).permit(:exercise_context, :is_benchmark, :benchmark_variation)
   end
 end

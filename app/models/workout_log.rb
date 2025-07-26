@@ -4,11 +4,14 @@ class WorkoutLog < ApplicationRecord
   has_many :exercise_sets, dependent: :destroy
 
   # Remove the exercise_sets presence validation - we'll validate after creation
-  validate :only_one_benchmark_per_workout
+  validate :only_one_benchmark_per_workout_per_variation
   validate :has_exercise_sets_after_save, on: :update
 
   # 🆕 NEW: Validation for exercise context
   validates :exercise_context, length: { maximum: 1000, message: "context is too long (maximum 1000 characters)" }
+
+  # 🆕 NEW: Validation for benchmark variation
+  validates :benchmark_variation, inclusion: { in: %w[A B C] }, allow_nil: true, allow_blank: true
 
   # Move the callback to run BEFORE validation
   before_validation :clear_other_benchmarks, if: :is_benchmark?
@@ -20,6 +23,12 @@ class WorkoutLog < ApplicationRecord
 
   # Get only non-benchmark workout logs
   scope :regular_workouts, -> { where(is_benchmark: false) }
+
+  # 🆕 NEW: Get default benchmark per muscle group
+  scope :default_benchmarks, -> { benchmarks_only.where(is_default_variation: true) }
+
+  # 🆕 NEW: Get benchmarks for specific variation
+  scope :variation_benchmarks, ->(variation) { benchmarks_only.where(benchmark_variation: variation) }
 
   # Get latest benchmark per muscle group for a user
   scope :latest_benchmark_per_muscle, -> {
@@ -53,6 +62,17 @@ class WorkoutLog < ApplicationRecord
 
   def benchmark?
     is_benchmark?
+  end
+
+  # 🆕 NEW: Get variation label
+  def variation_label
+    return nil unless benchmark_variation.present?
+    "Variation #{benchmark_variation}"
+  end
+
+  # 🆕 NEW: Check if this is the default variation
+  def default_variation?
+    is_default_variation?
   end
 
   def days_since_benchmark
@@ -153,15 +173,27 @@ class WorkoutLog < ApplicationRecord
 
   private
 
-  def only_one_benchmark_per_workout
-    if is_benchmark? && workout.workout_logs.where(is_benchmark: true).where.not(id: id).exists?
-      errors.add(:is_benchmark, "Only one benchmark allowed per workout")
+  # 🆕 UPDATED: Only one benchmark per workout per variation
+  def only_one_benchmark_per_workout_per_variation
+    return unless is_benchmark? && benchmark_variation.present?
+
+    existing = workout.workout_logs
+                     .where(is_benchmark: true, benchmark_variation: benchmark_variation)
+                     .where.not(id: id)
+
+    if existing.exists?
+      errors.add(:benchmark_variation, "Only one benchmark allowed per workout per variation")
     end
   end
 
-  # This now runs BEFORE validation, so it clears other benchmarks first
+  # 🆕 UPDATED: Clear other benchmarks for the same variation
   def clear_other_benchmarks
-    workout.workout_logs.where(is_benchmark: true).where.not(id: id).update_all(is_benchmark: false)
+    return unless benchmark_variation.present?
+
+    workout.workout_logs
+           .where(is_benchmark: true, benchmark_variation: benchmark_variation)
+           .where.not(id: id)
+           .update_all(is_benchmark: false, is_default_variation: false)
   end
 
   def has_exercise_sets_after_save

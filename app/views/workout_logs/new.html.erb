@@ -1,8 +1,13 @@
 <!-- app/views/workout_logs/new.html.erb -->
-<div data-controller="log-builder current-exercise-set typography-animator"
+<div data-controller="log-builder benchmark-variations current-exercise-set typography-animator"
      class="workout-logger"
      data-typography-animator-delay-value="200"
-     data-typography-animator-stagger-value="150">
+     data-typography-animator-stagger-value="150"
+     data-benchmark-variations-current-variation-value="A"
+     data-benchmark-variations-workout-id-value="<%= @workout.id %>"
+     data-benchmark-variations-available-variations-value="<%= @workout.available_variations.to_json %>"
+     data-benchmark-variations-benchmark-data-value="<%= @all_variation_data.to_json %>"
+     data-benchmark-variations-context-data-value="<%= @all_context_data.to_json %>">
 
   <!-- 🆕 NEW: Workout Progress Bar -->
   <div class="workout-progress" data-current-exercise-set-target="progressBar">
@@ -16,13 +21,39 @@
         Today's <%= AppConstants::LABELS[@workout.muscle_group.to_sym] %> Workout
       </h2>
       <p class="text-muted mb-0" data-typography-animator-target="fadeIn">
-        Tap badges to edit • Add exercises with <code>+</code>
+        Choose variation below • Tap badges to edit • Add exercises with <code>+</code>
       </p>
     </div>
   </div>
 
   <!-- Main Content: Badge Editor -->
   <div>
+    <!-- 🆕 SIMPLIFIED: Benchmark Variation Selector -->
+    <div class="variation-selector-section mb-4">
+      <div class="text-center">
+        <div class="btn-group" role="group">
+          <% %w[A B C].each do |variation| %>
+            <% has_data = @all_variation_data[variation].present? && @all_variation_data[variation].any? %>
+            <button type="button"
+                    class="btn <%= variation == 'A' ? 'btn-primary active' : 'btn-outline-secondary' %>"
+                    data-action="click->benchmark-variations#selectVariation"
+                    data-variation="<%= variation %>"
+                    data-benchmark-variations-target="variationButton"
+                    aria-pressed="<%= variation == 'A' ? 'true' : 'false' %>">
+              <span class="variation-text">Variation <%= variation %></span>
+              <small class="variation-indicator d-block">
+                <% if has_data %>
+                  <i class="bi bi-bookmark-fill"></i> Saved
+                <% else %>
+                  <i class="bi bi-plus-circle"></i> Empty
+                <% end %>
+              </small>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
     <!-- Badge Container -->
     <div class="badge-container"
          data-log-builder-target="badgeContainer"
@@ -35,7 +66,9 @@
       </div>
 
       <!-- Empty State with Exercise Selection Buttons -->
-      <div class="empty-exercise text-center" data-log-builder-target="emptyState">
+      <div class="empty-exercise text-center"
+           data-log-builder-target="emptyState"
+           data-benchmark-variations-target="emptyState">
         <!-- Exercise Type Selection Buttons -->
         <div class="d-flex flex-column gap-3 align-items-center">
           <button class="btn btn-success btn-lg"
@@ -85,18 +118,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Help Text -->
-    <div class="p-3 border-top bg-light" data-typography-animator-target="fadeIn">
-      <div class="text-muted small">
-        <strong>Quick Tips:</strong>
-        <span class="badge badge-status ms-2">Status</span>
-        <span class="badge badge-reps ms-1">Reps</span>
-        <span class="badge badge-weight ms-1">Weight</span>
-        <span class="badge badge-reflection ms-1">Notes</span>
-        • Tap any badge to change it
-      </div>
-    </div>
   </div>
 
   <!-- Fixed Bottom Section: Finish Workout -->
@@ -144,6 +165,7 @@
 
         <%= hidden_field_tag "exercise_sets", "", data: { log_builder_target: "hiddenDetails" } %>
         <%= hidden_field_tag "beat_benchmark", "", data: { log_builder_target: "benchmarkChoice" } %>
+        <%= hidden_field_tag "benchmark_variation", "A", data: { benchmark_variations_target: "hiddenVariation" } %>
         <%= hidden_field_tag "exercise_context", "", data: { log_builder_target: "hiddenContext" } %>
         <%= hidden_field_tag "workout_datetime", "", data: { log_builder_target: "hiddenDatetime" } %>
 
@@ -154,14 +176,12 @@
     </div>
   </div>
 
-
-
-  <!-- Benchmark Choice Modal -->
+  <!-- 🆕 UPDATED: Benchmark Choice Modal with Variation Integration -->
   <div class="benchmark-modal" data-log-builder-target="benchmarkModal" style="display: none;">
     <div class="benchmark-modal-content">
       <div class="text-center mb-4">
         <h3>Save this workout</h3>
-        <p class="text-muted">Did you beat your benchmark today?</p>
+        <p class="text-muted">How would you like to save this workout?</p>
       </div>
 
       <!-- Workout Timing Section -->
@@ -223,22 +243,31 @@
         </div>
       </div>
 
-      <!-- Benchmark Choice Buttons -->
+      <!-- 🆕 UPDATED: Benchmark Choice Buttons with Current Variation -->
       <div class="d-grid gap-3 mt-4">
-        <button class="btn btn-success btn-lg"
-                data-action="click->log-builder#chooseBenchmarkUpdate"
-                data-choice="yes">
+        <!-- Update Current Variation Button -->
+        <button class="btn btn-success btn-lg w-100"
+                data-action="click->benchmark-variations#updateCurrentVariation">
           <i class="bi bi-trophy-fill me-2"></i>
-          <strong>Yes! Update my benchmark</strong>
-          <br><small class="text-light">This becomes your new personal best</small>
+          <strong>Update <span data-benchmark-variations-target="currentVariationLabel">Variation A</span> Benchmark</strong>
+          <br><small class="text-light">Save this as your new personal best</small>
         </button>
 
+        <!-- Regular Save Button -->
         <button class="btn btn-outline-primary btn-lg"
                 data-action="click->log-builder#chooseBenchmarkUpdate"
                 data-choice="no">
           <i class="bi bi-bookmark-fill me-2"></i>
           <strong>Just save this workout</strong>
-          <br><small class="text-muted">Keep existing benchmark unchanged</small>
+          <br><small class="text-muted">Keep existing benchmarks unchanged</small>
+        </button>
+
+        <!-- 🆕 NEW: Just Save for Recovery Button -->
+        <button class="btn btn-outline-secondary btn-lg"
+                data-action="click->benchmark-variations#chooseJustSave">
+          <i class="bi bi-check-circle me-2"></i>
+          <strong>Mark as completed</strong>
+          <br><small class="text-muted">Just log for recovery tracking (no details)</small>
         </button>
       </div>
 
@@ -253,58 +282,55 @@
 
 </div>
 
-<!-- Pass exercise and benchmark data to JavaScript -->
-<script>
-  // Convert benchmark ExerciseSets to JavaScript format
-  <% benchmark_data = {} %>
-  <% benchmark_context = nil %>
-  <% if @workout.benchmark_log %>
-    <% benchmark_context = @workout.benchmark_log.exercise_context %>
-    <% @workout.benchmark_log.exercises_hash.each do |exercise_name, sets| %>
-      <% benchmark_data[exercise_name] = sets.map do |exercise_set| %>
-        <% {
-          set_number: exercise_set.set_number,
-          set_type: exercise_set.set_type,
-          reps: exercise_set.reps,
-          weight_kg: exercise_set.weight_kg,
-          weight_unit: exercise_set.weight_unit,
-          notes: exercise_set.notes,
-          duration_seconds: exercise_set.duration_seconds,
-          energy_calories: exercise_set.energy_calories
-        } %>
+  <!-- 🆕 OPTIMIZED: Pass variation data to JavaScript using preloaded data -->
+  <script>
+    // 🆕 NEW: Use preloaded controller data instead of individual method calls
+    window.allVariationData = <%= raw(@all_variation_data.transform_values do |exercises|
+      {
+        exercises: exercises,
+        context: nil  # Context will be added separately below
+      }
+    end.to_json) %>;
+
+    // 🆕 NEW: Add context data to the variation data
+    <% @all_context_data.each do |variation, context| %>
+      <% if context.present? %>
+        window.allVariationData['<%= variation %>'].context = <%= raw(context.to_json) %>;
       <% end %>
     <% end %>
-  <% end %>
 
-  window.benchmarkData = <%= raw(benchmark_data.to_json) %>;
-  window.benchmarkContext = <%= raw(benchmark_context.to_json) %>;
+    // Legacy support - default to Variation A for existing log-builder code
+    window.benchmarkData = <%= raw((@all_variation_data['A'] || {}).to_json) %>;
+    window.benchmarkContext = <%= raw((@all_context_data['A']).to_json) %>;
 
-  // Debug logging
-  console.log("Benchmark context from server:", <%= raw(benchmark_context.to_json) %>);
+    // Available exercises for this muscle group
+    window.availableExercises = <%= raw(AppConstants.exercises_for_muscle_group(@workout.muscle_group.to_sym).to_json) %>;
+    window.cardioExercises = <%= raw(AppConstants.cardio_exercises.to_json) %>;
 
-  // UPDATED: Use new EXERCISE_TAGS system
-  window.availableExercises = <%= raw(AppConstants.exercises_for_muscle_group(@workout.muscle_group.to_sym).to_json) %>;
-  window.cardioExercises = <%= raw(AppConstants.cardio_exercises.to_json) %>;
+    // Pass AppConstants clause library to JavaScript
+    window.clauseLibrary = {
+      status: {
+        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:status][:options].to_json) %>
+      },
+      reps: {
+        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reps][:options].to_json) %>
+      },
+      weight: {
+        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:weight][:options].to_json) %>
+      },
+      time: {
+        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:time][:options].to_json) %>
+      },
+      energy: {
+        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:energy][:options].to_json) %>
+      },
+      reflection: {
+        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reflection][:options].to_json) %>
+      }
+    };
 
-  // Pass AppConstants clause library to JavaScript
-  window.clauseLibrary = {
-    status: {
-      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:status][:options].to_json) %>
-    },
-    reps: {
-      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reps][:options].to_json) %>
-    },
-    weight: {
-      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:weight][:options].to_json) %>
-    },
-    time: {
-      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:time][:options].to_json) %>
-    },
-    energy: {
-      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:energy][:options].to_json) %>
-    },
-    reflection: {
-      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reflection][:options].to_json) %>
-    }
-  };
-</script>
+    // Debug logging
+    console.log("🔄 All variation data loaded:", window.allVariationData);
+    console.log("🔄 Default benchmark data (Variation A):", window.benchmarkData);
+    console.log("🔄 Available exercises:", window.availableExercises);
+  </script>

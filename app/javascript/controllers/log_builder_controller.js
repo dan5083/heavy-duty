@@ -20,7 +20,8 @@ export default class extends Controller {
     "customTimingSection",
     "customDate",
     "customTime",
-    "hiddenDatetime"
+    "hiddenDatetime",
+    "hiddenVariation"
   ]
 
   connect() {
@@ -51,6 +52,10 @@ export default class extends Controller {
 
     // 🆕 NEW: Dispatch initial workout state for current-exercise-set controller
     this.dispatchWorkoutStateUpdate('workout-initialized')
+
+    // 🆕 NEW: Listen for variation controller events
+    this.element.addEventListener('benchmark-variations:variation-changed', this.handleVariationChange.bind(this))
+    this.element.addEventListener('benchmark-variations:submit-with-variation', this.handleVariationSubmission.bind(this))
   }
 
   // 🆕 NEW: Dispatch events for current-exercise-set controller
@@ -820,10 +825,17 @@ export default class extends Controller {
     const benchmarkField = document.querySelector('[data-log-builder-target="benchmarkChoice"]')
 
     if (benchmarkField) {
-      benchmarkField.value = choice === 'yes' ? 'yes' : 'no'
+      // 🆕 UPDATED: Handle all choice types including just_save
+      benchmarkField.value = choice
       console.log(`Hidden field set to: ${benchmarkField.value}`)
     } else {
       console.error('Could not find benchmark choice field')
+    }
+
+    // 🆕 NEW: Handle just_save workflow - clear exercise data
+    if (choice === 'just_save') {
+      this.hiddenDetailsTarget.value = '[]'
+      console.log("Cleared exercise data for just_save workflow")
     }
 
     this.closeBenchmarkModal()
@@ -984,5 +996,53 @@ export default class extends Controller {
     this.submitButtonTarget.disabled = !hasContent
 
     console.log("Updated exercise sets data:", exerciseSetsArray)
+  }
+
+  // 🆕 NEW: Handle variation change from benchmark-variations controller
+  handleVariationChange(event) {
+    console.log("🔄 Received variation change:", event.detail.variation)
+
+    // Update benchmark data and context
+    this.benchmarkData = event.detail.benchmarkData || {}
+    this.benchmarkContext = event.detail.benchmarkContext || null
+
+    // Update context section if context exists
+    if (this.benchmarkContext && this.hasContextTextareaTarget) {
+      this.contextTextareaTarget.value = this.benchmarkContext
+      this.showContextBadge(this.benchmarkContext)
+      this.updateContextData()
+    } else if (this.hasContextTextareaTarget) {
+      // Clear context if no context for this variation
+      this.contextTextareaTarget.value = ''
+      this.hideContextSection()
+      // Remove existing context badge if present
+      const existingBadge = this.element.querySelector('[data-log-builder-target="contextBadge"]')
+      if (existingBadge) {
+        existingBadge.remove()
+        this.contextToggleButtonTarget.style.display = 'inline-block'
+      }
+    }
+
+    // Re-initialize the interface with new data
+    this.initializeBadgeInterface()
+  }
+
+  // 🆕 NEW: Handle variation submission from benchmark-variations controller
+  handleVariationSubmission(event) {
+    console.log("📝 Handling variation submission:", event.detail)
+
+    // Close the benchmark modal
+    this.closeBenchmarkModal()
+
+    // Submit the form
+    this.submitFormWithChoice()
+  }
+
+  // 🆕 NEW: Show variation selector (delegates to variations controller)
+  showVariationSelector() {
+    const variationEvent = new CustomEvent('log-builder:show-variation-selector', {
+      bubbles: true
+    })
+    this.element.dispatchEvent(variationEvent)
   }
 }
