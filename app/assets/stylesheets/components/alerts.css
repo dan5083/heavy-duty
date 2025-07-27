@@ -515,6 +515,9 @@
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
   padding: 1.5rem;
+  /* Align with Bootstrap row negative margins */
+  margin-left: calc(var(--bs-gutter-x) * -0.5);
+  margin-right: calc(var(--bs-gutter-x) * -0.5);
 }
 
 .alert-next-up h4 {
