@@ -1,7 +1,8 @@
 # FYI to see decluttered tree use:
 tree -I "node_modules|.git|.DS_Store|*.log|coverage|build|dist|tmp"
 # Show all models with filenames as headers:
-for file in app/models/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
+for file in app/models/[a-e]*.rb; do echo "=== $file ==="; cat "$file"; echo; done
+for file in app/models/[f-z]*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 
 # Show controllers.rb files starting with a-i
 for file in app/controllers/[a-i]*.rb; do
@@ -28,9 +29,6 @@ for f in app/views/[s-t]*/*.html.erb; do echo "=== $f ==="; cat "$f"; echo; done
 # u–z
 for f in app/views/[u-z]*/*.html.erb; do echo "=== $f ==="; cat "$f"; echo; done
 
-# See schema and app_constants
-echo "=== db/schema.rb ===" && cat db/schema.rb && echo -e "\n\n=== lib/app_constants.rb ===" && cat lib/app_constants.rb
-
 # See the helpers
 for file in app/helpers/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 # Check the routes to understand the flow
@@ -43,8 +41,8 @@ for file in app/logic/*.rb; do echo "=== $file ==="; cat "$file"; echo; done
 for file in app/javascript/controllers/**/[a-b]*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
 # JS Controllers [c-i]:
 for file in app/javascript/controllers/**/[c-i]*_controller.js; do echo "=== $file ==="; cat "$file"; echo; done
-# JS Controllers [j-k]:
-for f in app/javascript/controllers/**/[j-k]*_controller.js; do echo "=== $f ==="; cat "$f"; echo; done
+# JS Controllers [j-q]:
+justload log_builder_controller.js
 # JS Controllers [r–z]:
 for f in app/javascript/controllers/**/[r-z]*_controller.js; do echo "=== $f ==="; cat "$f"; echo; done
 

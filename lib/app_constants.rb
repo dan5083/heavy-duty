@@ -868,6 +868,7 @@ RECOVERY_OPTIONS = (3..10).to_a.freeze
 
 # Recovery cycle durations (in days) per muscle group
 TRAINING_CYCLE = {
+  cardio: 0.67, #special case (not part of split plans)
  entire_body: 10,
  upper_body: 6,
  lower_body: 8,

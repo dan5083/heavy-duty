@@ -1,0 +1,57 @@
+<!-- app/views/dashboard/_cardio_section.html.erb -->
+
+<% if @cardio_status[:completed] %>
+  <!-- Cardio Complete State - but still allow training -->
+  <% if @cardio_workout %>
+    <%= link_to new_split_plan_split_day_workout_workout_log_path(
+          @cardio_workout.split_day.split_plan,
+          @cardio_workout.split_day,
+          @cardio_workout
+        ),
+        class: "btn btn-success cardio-cta-button d-flex align-items-center" do %>
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <div class="text-start">
+        <div class="fw-bold">Cardio Done - Train Anyway</div>
+        <small class="text-light opacity-75">
+          <% if @cardio_status[:last_cardio_time] %>
+            Done <%= time_ago_in_words(@cardio_status[:last_cardio_time]) %> ago
+          <% else %>
+            Done recently
+          <% end %>
+        </small>
+      </div>
+    <% end %>
+  <% else %>
+    <!-- No cardio workout available -->
+    <div class="cardio-unavailable">
+      <div class="text-muted small">
+        <i class="bi bi-info-circle me-1"></i>
+        No cardio workout configured
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <!-- Cardio Todo State -->
+  <% if @cardio_workout %>
+    <%= link_to new_split_plan_split_day_workout_workout_log_path(
+          @cardio_workout.split_day.split_plan,
+          @cardio_workout.split_day,
+          @cardio_workout
+        ),
+        class: "btn btn-success btn-lg cardio-cta-button d-flex align-items-center" do %>
+      <i class="bi bi-heart-pulse me-2"></i>
+      <div class="text-start">
+        <div class="fw-bold">Daily Cardio</div>
+        <small class="text-light opacity-75">Tap to start</small>
+      </div>
+    <% end %>
+  <% else %>
+    <!-- No cardio workout available -->
+    <div class="cardio-unavailable">
+      <div class="text-muted small">
+        <i class="bi bi-info-circle me-1"></i>
+        No cardio workout configured
+      </div>
+    </div>
+  <% end %>
+<% end %>

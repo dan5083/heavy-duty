@@ -21,7 +21,7 @@ class TrainingArchiveController < ApplicationController
 
     @selected_muscle = params[:muscle]
 
-    # 🚀 FIXED: Preload workout and exercise_sets to eliminate N+1
+    # 🚀 FIXED: Preload workout and exercise_sets to eliminate N+1 + eager load exercise_sets for each log
     @logs = user_context.acting_user.workout_logs
                        .includes(:workout, :exercise_sets)
                        .order(created_at: :desc)
@@ -31,5 +31,9 @@ class TrainingArchiveController < ApplicationController
         log.workout && log.workout.muscle_group.to_s == @selected_muscle
       end
     end
+
+    # 🚀 NEW: Force eager loading of exercise_sets associations to prevent N+1 in views
+    # This ensures that when we call log.exercise_sets in the view, it uses preloaded data
+    @logs.each { |log| log.exercise_sets.to_a } if @logs.respond_to?(:each)
   end
 end

@@ -1,6 +1,6 @@
 module WorkoutsHelper
   def render_log_details(workout_log)
-    return content_tag(:em, "No exercises recorded") if workout_log.exercise_sets.empty?
+    return content_tag(:em, "No exercises recorded") if !workout_log.has_exercise_data?
 
     content_tag(:div) do
       # 🆕 NEW: Show exercise context if present
@@ -115,17 +115,25 @@ module WorkoutsHelper
 
   # 🆕 NEW: Check if workout log has meaningful content for display
   def workout_log_has_content?(workout_log)
-    workout_log.exercise_sets.any? || workout_log.has_context?
+    workout_log.has_exercise_data? || workout_log.has_context?
   end
 
-  # 🆕 NEW: Generate workout summary including context
+  # 🚀 FIXED: Generate workout summary using optimized methods to prevent N+1
   def workout_summary(workout_log)
     summary_parts = []
 
-    # Exercise count
-    if workout_log.exercise_sets.any?
-      exercise_count = workout_log.exercises_hash.keys.count
-      set_count = workout_log.exercise_sets.count
+    # 🚀 FIXED: Use optimized method that checks for preloaded data
+    if workout_log.has_exercise_data?
+      # Use preloaded data if available, otherwise fall back to optimized count
+      if workout_log.association(:exercise_sets).loaded?
+        exercise_count = workout_log.exercises_hash.keys.count
+        set_count = workout_log.exercise_sets.size
+      else
+        # This will still trigger queries, but it's a fallback
+        exercise_count = workout_log.exercises_hash.keys.count
+        set_count = workout_log.exercise_sets_count
+      end
+
       summary_parts << "#{pluralize(exercise_count, 'exercise')}, #{pluralize(set_count, 'set')}"
     end
 
@@ -155,7 +163,7 @@ module WorkoutsHelper
       end
 
       # Exercise sets (if present)
-      if workout_log.exercise_sets.any?
+      if workout_log.has_exercise_data?
         html += content_tag(:div, class: "exercises-section") do
           workout_log.exercises_hash.map do |exercise_name, sets|
             content_tag(:div, class: "exercise-group mb-3") do

@@ -12,12 +12,17 @@
    </h1>
  <% end %>
 
- <!-- Priority Alert - Next Ready Muscle -->
+ <!-- Priority Alert - Next Ready Muscle with Cardio Button -->
  <% if @next_ready %>
-   <div class="alert alert-next-up d-flex align-items-center mb-4">
+   <div class="alert alert-next-up d-flex align-items-center justify-content-between mb-4">
      <div class="flex-grow-1">
        <h4>NEXT UP: <%= @next_ready[:label] %></h4>
        <p class="mb-0">Ready for <strong><%= @next_ready[:days_ready] %> days</strong> • Train this muscle next!</p>
+     </div>
+
+     <!-- Daily Cardio Button -->
+     <div class="ms-3">
+       <%= render 'cardio_section' %>
      </div>
    </div>
  <% end %>

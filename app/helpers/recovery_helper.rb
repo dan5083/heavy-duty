@@ -48,6 +48,65 @@ module RecoveryHelper
    end
  end
 
+ # === CARDIO METHODS ===
+
+ # Get cardio status for dashboard
+ def cardio_status
+   last_cardio_log = user_context.acting_user.workout_logs
+                                .joins(:workout)
+                                .where(workouts: { muscle_group: 'cardio' })
+                                .order(created_at: :desc)
+                                .first
+
+   if last_cardio_log.nil?
+     { completed: false, last_cardio_time: nil }
+   else
+     hours_since = (Time.current - last_cardio_log.created_at) / 1.hour
+     {
+       completed: hours_since < 16,
+       last_cardio_time: last_cardio_log.created_at
+     }
+   end
+ end
+
+ # Create or find standalone cardio workout structure
+ def get_or_create_cardio_workout
+   # Look for existing cardio workout first
+   existing_cardio = Workout.joins(:split_day)
+                            .where(muscle_group: 'cardio')
+                            .where(split_days: {
+                              split_plan: user_context.acting_user.split_plans.last
+                            })
+                            .first
+
+   return existing_cardio if existing_cardio
+
+   # If no current split plan, create a minimal one for cardio
+   split_plan = user_context.acting_user.split_plans.last
+
+   unless split_plan
+     split_plan = user_context.acting_user.split_plans.create!(
+       name: "Basic Plan with Cardio",
+       split_length: 1,
+       is_custom: false
+     )
+   end
+
+   # Create cardio split day if it doesn't exist
+   cardio_split_day = split_plan.split_days.find_or_create_by(
+     muscle_group: 'cardio'
+   ) do |split_day|
+     split_day.day_number = split_plan.split_days.count + 1
+     split_day.label = "Daily Cardio"
+   end
+
+   # Create cardio workout
+   cardio_split_day.workouts.create!(
+     name: "Daily Cardio",
+     muscle_group: 'cardio'
+   )
+ end
+
  # === BENCHMARK HELPER METHODS ===
 
  def benchmark_status_for(muscle, benchmark_data)

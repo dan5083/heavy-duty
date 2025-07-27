@@ -159,15 +159,41 @@ class WorkoutLog < ApplicationRecord
     muscles_in_split - benchmarked_muscles
   end
 
-  # === EXISTING METHODS ===
+  # === OPTIMIZED METHODS TO PREVENT N+1 ===
 
+  # 🚀 FIXED: Use preloaded exercise_sets to prevent N+1
   def exercises_hash
-    exercise_sets.includes(:workout_log).group_by(&:exercise_name)
+    # If exercise_sets are preloaded, use them directly
+    if association(:exercise_sets).loaded?
+      exercise_sets.group_by(&:exercise_name)
+    else
+      # Fallback to original method if not preloaded
+      exercise_sets.includes(:workout_log).group_by(&:exercise_name)
+    end
   end
 
+  # 🚀 FIXED: Optimize exercises_summary to use preloaded data
   def exercises_summary
     exercises_hash.transform_values do |sets|
       sets.map(&:description)
+    end
+  end
+
+  # 🚀 NEW: Cached exercise sets count to prevent repeated COUNT queries
+  def exercise_sets_count
+    if association(:exercise_sets).loaded?
+      exercise_sets.size
+    else
+      exercise_sets.count
+    end
+  end
+
+  # 🚀 NEW: Check if workout has meaningful content without triggering queries
+  def has_exercise_data?
+    if association(:exercise_sets).loaded?
+      exercise_sets.any?
+    else
+      exercise_sets.exists?
     end
   end
 

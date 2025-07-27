@@ -454,13 +454,9 @@ export default class extends Controller {
   renderAddExerciseButtons() {
     return `
       <div class="text-center mt-4 mb-4">
-        <button class="btn btn-outline-info me-3"
-                data-action="click->log-builder#addCardioExercise">
-          <i class="bi bi-heart-pulse"></i> Add Cardiovascular Exercise
-        </button>
         <button class="btn btn-outline-success"
-                data-action="click->log-builder#addLiftingExercise">
-          <i class="bi bi-plus-lg"></i> Add Lifting Exercise
+                data-action="click->log-builder#addExercise">
+          <i class="bi bi-plus-lg"></i> Add Exercise
         </button>
       </div>
     `
@@ -578,18 +574,36 @@ export default class extends Controller {
     return { weight: null, unit: 'kg' }
   }
 
-  // 🆕 NEW: Add cardio exercise
-  addCardioExercise(event) {
+  // Add exercise (detects context automatically)
+  addExercise(event) {
     event.preventDefault()
-    console.log("Adding new cardio exercise...")
-    this.showExerciseSelector(event.target, true)
+    console.log("Adding new exercise...")
+
+    // Auto-detect if this is a cardio workout by checking existing exercises
+    const isCardioWorkout = this.isCurrentWorkoutCardio()
+    this.showExerciseSelector(event.target, isCardioWorkout)
   }
 
-  // 🆕 NEW: Add lifting exercise (renamed from addExercise)
-  addLiftingExercise(event) {
-    event.preventDefault()
-    console.log("Adding new lifting exercise...")
-    this.showExerciseSelector(event.target, false)
+  // Detect if current workout is cardio-focused
+  isCurrentWorkoutCardio() {
+    const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
+
+    // If no exercises yet, check the page URL or muscle group context
+    if (exerciseBlocks.length === 0) {
+      // Check if we're in a cardio workout (muscle_group=cardio in URL)
+      return window.location.href.includes('cardio') ||
+             document.querySelector('h2')?.textContent?.toLowerCase().includes('cardio')
+    }
+
+    // If exercises exist, check if any are cardio
+    for (let block of exerciseBlocks) {
+      const exerciseName = block.dataset.exerciseName
+      if (exerciseName && this.isCardioExercise(exerciseName)) {
+        return true
+      }
+    }
+
+    return false
   }
 
   showExerciseSelector(triggerElement, isCardio = false) {
