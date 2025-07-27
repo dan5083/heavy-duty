@@ -526,3 +526,26 @@
 .alert-next-up strong {
   color: white;
 }
+
+/* Mobile responsive layout */
+@media (max-width: 768px) {
+  .alert-next-up .d-flex {
+    flex-direction: column !important;
+    gap: 1rem;
+  }
+
+  .alert-next-up .flex-grow-1 {
+    text-align: center;
+  }
+
+  .alert-next-up .ms-3 {
+    margin-left: 0 !important;
+    align-self: center;
+  }
+
+  /* Make cardio button full width on mobile */
+  .alert-next-up .cardio-cta-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
