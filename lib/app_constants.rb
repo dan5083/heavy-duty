@@ -929,13 +929,30 @@ CLAUSE_LIBRARY = {
    css_class: "badge-energy"
  },
  reflection: {
-   options: [
-     "perfect form", "form broke down", "rushed the reps", "felt heavy", "too easy",
-     "need more weight", "maxed out", "great pump", "good mind-muscle connection",
-     "felt the stretch", "explosive power", "solid effort", "pushed to failure",
-     "left some in tank", "personal best", "feeling fresh", "still recovering",
-     "fired up", "mentally tired", "next time go heavier", "try different angle",
-     "increase volume"
+  options: [
+    "bombed out",
+    "distracted today",
+    "explosive power",
+    "felt heavy",
+    "felt the stretch",
+    "form broke down",
+    "good mind-muscle connection",
+    "great pump",
+    "just a fail",
+    "left some in tank",
+    "maxed out",
+    "need less weight",
+    "need more weight",
+    "not feeling it",
+    "perfect form",
+    "personal best",
+    "pushed to failure",
+    "rushed the reps",
+    "solid effort",
+    "too easy",
+    "1 of 2", "2 of 2",
+    "1 of 3", "2 of 3", "3 of 3",
+    "1 of 4", "2 of 4", "3 of 4", "4 of 4"
    ],
    color: "purple",
    css_class: "badge-reflection"
