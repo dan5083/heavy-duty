@@ -57,16 +57,18 @@ module WorkoutsHelper
     end
   end
 
-  # 🆕 Parse set description into structured badges
+  # 🆕 UPDATED: Parse set description into structured badges - FIXED for cardio 4 badges
   def parse_set_into_badges(exercise_set)
     if AppConstants.cardio_exercise?(exercise_set.exercise_name)
-    # Cardio badges - just time and energy
-    [
-      { type: 'time', content: exercise_set.duration_seconds ? "#{exercise_set.duration_seconds / 60} minutes" : "30 minutes" },
-      { type: 'energy', content: exercise_set.energy_calories ? "#{exercise_set.energy_calories} calories" : "100 calories" }
-    ]
+      # Cardio badges - time, distance, weight (as resistance), energy
+      [
+        { type: 'time', content: exercise_set.duration_display },
+        { type: 'distance', content: exercise_set.distance_display },
+        { type: 'weight', content: exercise_set.resistance_display },  # weight_kg shown as resistance
+        { type: 'energy', content: exercise_set.energy_display }
+      ]
     else
-      # Existing strength badges
+      # Strength badges - status, reps, weight, reflection
       [
         { type: 'status', content: "#{exercise_set.set_type.titleize} set" },
         { type: 'reps', content: exercise_set.reps ? "#{exercise_set.reps} reps" : "to failure" },
@@ -76,31 +78,74 @@ module WorkoutsHelper
     end
   end
 
-  # 🆕 Convert badge data to ExerciseSet attributes
+  # 🆕 UPDATED: Convert badge data to ExerciseSet attributes - FIXED for cardio
   def badges_to_exercise_set_attrs(badges_array, exercise_name, set_number)
     status_badge = badges_array.find { |b| b[:type] == 'status' }
-    reps_badge = badges_array.find { |b| b[:type] == 'reps' }
-    weight_badge = badges_array.find { |b| b[:type] == 'weight' }
     reflection_badge = badges_array.find { |b| b[:type] == 'reflection' }
 
-    # Parse set type from status badge
-    set_type = extract_set_type(status_badge&.dig(:content))
-
-    # Parse reps
-    reps = extract_reps(reps_badge&.dig(:content))
-
-    # Parse weight
-    weight_data = extract_weight(weight_badge&.dig(:content))
-
-    {
+    # Base attributes
+    attrs = {
       exercise_name: exercise_name,
       set_number: set_number,
-      set_type: set_type,
-      reps: reps,
-      weight_kg: weight_data[:weight],
-      weight_unit: weight_data[:unit],
+      set_type: extract_set_type(status_badge&.dig(:content)) || 'working',
       notes: reflection_badge&.dig(:content) || "solid effort"
     }
+
+    if AppConstants.cardio_exercise?(exercise_name)
+      # Cardio fields - time, distance, weight (resistance), energy
+      time_badge = badges_array.find { |b| b[:type] == 'time' }
+      distance_badge = badges_array.find { |b| b[:type] == 'distance' }
+      weight_badge = badges_array.find { |b| b[:type] == 'weight' }
+      energy_badge = badges_array.find { |b| b[:type] == 'energy' }
+
+      attrs.merge!({
+        duration_seconds: extract_duration(time_badge&.dig(:content)),
+        distance_value: extract_distance(distance_badge&.dig(:content)),
+        weight_kg: extract_weight(weight_badge&.dig(:content))[:weight],
+        energy_calories: extract_calories(energy_badge&.dig(:content))
+      })
+    else
+      # Strength fields
+      reps_badge = badges_array.find { |b| b[:type] == 'reps' }
+      weight_badge = badges_array.find { |b| b[:type] == 'weight' }
+
+      attrs.merge!({
+        reps: extract_reps(reps_badge&.dig(:content)),
+        weight_kg: extract_weight(weight_badge&.dig(:content))[:weight]
+      })
+    end
+
+    attrs
+  end
+
+  # 🆕 NEW: Extract duration from time badge (converts minutes to seconds)
+  def extract_duration(time_content)
+    return nil unless time_content.present?
+    return nil if time_content.downcase.include?('unknown')
+
+    # Extract from "30 minutes", "1 minute"
+    match = time_content.match(/(\d+)\s*minute/)
+    return match ? match[1].to_i * 60 : nil  # Convert to seconds
+  end
+
+  # 🆕 NEW: Extract distance from distance badge - METERS ONLY
+  def extract_distance(distance_content)
+    return nil unless distance_content.present?
+    return nil if distance_content.downcase.include?('unknown')
+
+    # Extract from "100 m", "50 m" etc.
+    match = distance_content.match(/(\d+)\s*m/)
+    return match ? match[1].to_i : nil
+  end
+
+  # 🆕 NEW: Extract calories from energy badge
+  def extract_calories(energy_content)
+    return nil unless energy_content.present?
+    return nil if energy_content.downcase.include?('unknown')
+
+    # Extract from "100 calories"
+    match = energy_content.match(/(\d+)\s*calorie/)
+    return match ? match[1].to_i : nil
   end
 
   # 🆕 Generate consistent default badges for new sets
@@ -108,7 +153,7 @@ module WorkoutsHelper
     [
       { type: 'status', content: 'Working set' },
       { type: 'reps', content: '1 reps' },
-      { type: 'weight', content: 'at 1 kg' },
+      { type: 'weight', content: '1 kg' },  # Always kg
       { type: 'reflection', content: 'solid effort' }
     ]
   end
@@ -209,22 +254,21 @@ module WorkoutsHelper
     match ? match[1].to_i : nil
   end
 
+  # UPDATED: Remove lbs conversion - KG ONLY
   def extract_weight(weight_content)
-    return { weight: nil, unit: 'kg' } unless weight_content.present?
-    return { weight: nil, unit: 'kg' } if weight_content.downcase.include?('bodyweight')
+    return { weight: nil } unless weight_content.present?
+    return { weight: nil } if weight_content.downcase.include?('bodyweight') ||
+                              weight_content.downcase.include?('no resistance') ||
+                              weight_content.downcase.include?('unknown')
 
-    # Extract from "at 75 kg" or "75 kg" or "75"
-    match = weight_content.match(/(\d+(?:\.\d+)?)\s*(kg|kilos?|lbs?|pounds?)?/i)
+    # Extract from "75 kg" or just "75"
+    match = weight_content.match(/(\d+(?:\.\d+)?)\s*kg?/i)
 
     if match
       weight = match[1].to_f
-      unit = case match[2]&.downcase
-             when /lb|pound/ then 'lbs'
-             else 'kg'
-             end
-      { weight: weight, unit: unit }
+      { weight: weight }
     else
-      { weight: nil, unit: 'kg' }
+      { weight: nil }
     end
   end
 end

@@ -141,24 +141,54 @@ export default class extends Controller {
 
       case 'weight':
         if (clauseLibrary.weight?.options) {
-          const weightOptions = clauseLibrary.weight.options.map(num => `at ${num} kg`)
-          return ["bodyweight", ...weightOptions]
+          // Weight options already include "kg" suffix and "Unknown"/"bodyweight"
+          return clauseLibrary.weight.options
         }
-        const fallbackWeights = []
-        for (let i = 1; i <= 300; i++) {
-          fallbackWeights.push(`at ${i} kg`)
+        // Fallback - kg only, no lbs
+        const fallbackWeights = ["Unknown", "bodyweight"]
+        for (let i = 1; i <= 700; i++) {
+          fallbackWeights.push(`${i} kg`)
         }
-        return ["bodyweight", ...fallbackWeights]
+        return fallbackWeights
 
-      // 🆕 NEW: Cardio badge types (simplified)
       case 'time':
-        return clauseLibrary.time?.options || ["30 minutes", "45 minutes", "60 minutes"]
+        if (clauseLibrary.time?.options) {
+          // Time options already include "Unknown" and proper formatting
+          return clauseLibrary.time.options
+        }
+        // Fallback
+        const timeOptions = ["Unknown"]
+        for (let i = 1; i <= 120; i++) {
+          timeOptions.push(i === 1 ? "1 minute" : `${i} minutes`)
+        }
+        return timeOptions
 
       case 'energy':
-        return clauseLibrary.energy?.options || ["100 calories", "200 calories", "300 calories"]
+        if (clauseLibrary.energy?.options) {
+          // Energy options already include "Unknown" and "calories" suffix
+          return clauseLibrary.energy.options
+        }
+        // Fallback
+        const energyOptions = ["Unknown"]
+        for (let i = 10; i <= 750; i += 10) {
+          energyOptions.push(`${i} calories`)
+        }
+        return energyOptions
+
+      case 'distance':
+        if (clauseLibrary.distance?.options) {
+          // Distance options already include "Unknown" and "m" suffix - METERS ONLY
+          return clauseLibrary.distance.options
+        }
+        // Fallback - meters only, 5m increments
+        const distanceOptions = ["Unknown"]
+        for (let i = 5; i <= 1000; i += 5) {
+          distanceOptions.push(`${i} m`)
+        }
+        return distanceOptions
 
       case 'reflection':
-        return clauseLibrary.reflection?.options || ["solid effort", "perfect form", "good pump"]
+        return clauseLibrary.reflection?.options || ["solid effort", "perfect form", "good pump", "felt heavy", "personal best"]
 
       default:
         return []
@@ -170,6 +200,9 @@ export default class extends Controller {
       status: 'badge-status',
       reps: 'badge-reps',
       weight: 'badge-weight',
+      time: 'badge-time',
+      energy: 'badge-energy',
+      distance: 'badge-distance',
       reflection: 'badge-reflection'
     }
 

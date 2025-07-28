@@ -5,20 +5,48 @@ class ApplicationController < ActionController::Base
 
   before_action :set_user_context, if: :user_signed_in?
   before_action :check_impersonation_timeout, if: :user_signed_in?
+  before_action :preload_trainer_clients, if: :user_signed_in? # 🆕 NEW
 
   # PUBLIC: Helper method for views - must be above private
   def user_context
     @user_context
   end
 
-  # Make user_context available in views
-  helper_method :user_context
+  # 🆕 NEW: Make preloaded clients available in views
+  def preloaded_clients
+    @preloaded_clients
+  end
+
+  # Make user_context and preloaded_clients available in views
+  helper_method :user_context, :preloaded_clients
 
   private
 
   def set_user_context
     @user_context = UserContext.new(current_user, session)
   end
+
+  # 🆕 NEW: Preload trainer clients to prevent N+1 in navbar
+  def preload_trainer_clients
+    # Skip preloading for controllers that don't need client data
+    return if params[:controller] == 'pwa'
+    return unless current_user&.trainer?
+
+    # Single query to get all client data needed for navbar
+    @preloaded_clients = current_user.personal_trainer
+                                   .clients
+                                   .includes(:split_plans)
+                                   .to_a # Force execution here
+
+    # Cache the count to avoid repeated COUNT queries
+    @client_count = @preloaded_clients.size
+  end
+
+  # 🆕 NEW: Helper for client count
+  def client_count
+    @client_count || 0
+  end
+  helper_method :client_count
 
   # CENTRALIZED: Single place for session timeout checking and clearing
   def check_impersonation_timeout

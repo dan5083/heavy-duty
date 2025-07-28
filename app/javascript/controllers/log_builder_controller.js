@@ -467,12 +467,14 @@ export default class extends Controller {
     return this.cardioExercises.includes(exerciseName)
   }
 
-  // Updated: Convert ExerciseSet data to badge format (now handles cardio)
+  // UPDATED: Convert ExerciseSet data to badge format - FIXED for cardio 4 badges
   exerciseSetToBadges(setData, exerciseName) {
     if (this.isCardioExercise(exerciseName)) {
-      // Cardio badges - just time and energy
+      // Cardio badges - time, distance, weight (as resistance), energy
       return [
         { type: 'time', content: setData.duration_seconds ? `${Math.round(setData.duration_seconds / 60)} minutes` : '30 minutes' },
+        { type: 'distance', content: setData.distance_value ? `${setData.distance_value} m` : '100 m' },
+        { type: 'weight', content: setData.weight_kg ? `${setData.weight_kg} kg` : 'no resistance' },
         { type: 'energy', content: setData.energy_calories ? `${setData.energy_calories} calories` : '100 calories' }
       ]
     } else {
@@ -480,13 +482,13 @@ export default class extends Controller {
       return [
         { type: 'status', content: `${setData.set_type || 'Working'} set` },
         { type: 'reps', content: setData.reps ? `${setData.reps} reps` : 'to failure' },
-        { type: 'weight', content: setData.weight_kg ? `at ${setData.weight_kg} ${setData.weight_unit || 'kg'}` : 'bodyweight' },
+        { type: 'weight', content: setData.weight_kg ? `${setData.weight_kg} kg` : 'bodyweight' },
         { type: 'reflection', content: setData.notes || 'solid effort' }
       ]
     }
   }
 
-  // Updated: Convert badges back to ExerciseSet format (now handles cardio)
+  // UPDATED: Convert badges back to ExerciseSet format - FIXED for cardio
   badgesToExerciseSet(badges, exerciseName, setNumber) {
     const statusBadge = badges.find(b => b.type === 'status')
     const reflectionBadge = badges.find(b => b.type === 'reflection')
@@ -499,11 +501,15 @@ export default class extends Controller {
     }
 
     if (this.isCardioExercise(exerciseName)) {
-      // Cardio fields - just time and energy
+      // Cardio fields - time, distance, weight (resistance), energy
       const timeBadge = badges.find(b => b.type === 'time')
+      const distanceBadge = badges.find(b => b.type === 'distance')
+      const weightBadge = badges.find(b => b.type === 'weight')
       const energyBadge = badges.find(b => b.type === 'energy')
 
       exerciseSetData.duration_seconds = this.extractDuration(timeBadge?.content)
+      exerciseSetData.distance_value = this.extractDistance(distanceBadge?.content)
+      exerciseSetData.weight_kg = this.extractWeight(weightBadge?.content)?.weight
       exerciseSetData.energy_calories = this.extractCalories(energyBadge?.content)
     } else {
       // Strength fields
@@ -513,7 +519,6 @@ export default class extends Controller {
       exerciseSetData.reps = this.extractReps(repsBadge?.content)
       const weightData = this.extractWeight(weightBadge?.content)
       exerciseSetData.weight_kg = weightData?.weight
-      exerciseSetData.weight_unit = weightData?.unit || 'kg'
     }
 
     return exerciseSetData
@@ -521,7 +526,7 @@ export default class extends Controller {
 
   // 🆕 NEW: Extract duration from time badge (converts minutes to seconds)
   extractDuration(timeContent) {
-    if (!timeContent) return null
+    if (!timeContent || timeContent === 'Unknown') return null
 
     // Extract from "30 minutes", "1 minute"
     const match = timeContent.match(/(\d+)\s*minute/)
@@ -531,9 +536,21 @@ export default class extends Controller {
     return null
   }
 
+  // 🆕 NEW: Extract distance from distance badge - METERS ONLY
+  extractDistance(distanceContent) {
+    if (!distanceContent || distanceContent === 'Unknown') return null
+
+    // Extract from "100 m", "50 m" etc.
+    const match = distanceContent.match(/(\d+)\s*m/)
+    if (match) {
+      return parseInt(match[1])
+    }
+    return null
+  }
+
   // 🆕 NEW: Extract calories from energy badge
   extractCalories(energyContent) {
-    if (!energyContent) return null
+    if (!energyContent || energyContent === 'Unknown') return null
 
     // Extract from "100 calories"
     const match = energyContent.match(/(\d+)\s*calorie/)
@@ -560,18 +577,19 @@ export default class extends Controller {
     return match ? parseInt(match[1]) : null
   }
 
+  // UPDATED: Remove lbs handling - KG ONLY
   extractWeight(weightContent) {
-    if (!weightContent || weightContent.toLowerCase().includes('bodyweight')) {
-      return { weight: null, unit: 'kg' }
+    if (!weightContent || weightContent === 'Unknown' || weightContent.toLowerCase().includes('bodyweight') || weightContent.toLowerCase().includes('no resistance')) {
+      return { weight: null }
     }
 
-    const match = weightContent.match(/(\d+(?:\.\d+)?)\s*(kg|kilos?|lbs?|pounds?)?/i)
+    // Extract from "75 kg" or just "75"
+    const match = weightContent.match(/(\d+(?:\.\d+)?)\s*kg?/i)
     if (match) {
       const weight = parseFloat(match[1])
-      const unit = match[2]?.toLowerCase().includes('lb') ? 'lbs' : 'kg'
-      return { weight, unit }
+      return { weight: weight }
     }
-    return { weight: null, unit: 'kg' }
+    return { weight: null }
   }
 
   // Add exercise (detects context automatically)
@@ -668,11 +686,13 @@ export default class extends Controller {
 
     if (!this.benchmarkData[exerciseName]) {
       if (isCardio) {
-        // Default cardio set - just time and energy
+        // Default cardio set - time, distance, weight (resistance), energy
         this.benchmarkData[exerciseName] = [{
           set_number: 1,
           set_type: 'working',
           duration_seconds: 1800, // 30 minutes
+          distance_value: 100, // 100 meters
+          weight_kg: 1, // 1kg resistance
           energy_calories: 100,
           notes: 'solid effort'
         }]
@@ -683,7 +703,6 @@ export default class extends Controller {
           set_type: 'working',
           reps: 1,
           weight_kg: 1,
-          weight_unit: 'kg',
           notes: 'solid effort'
         }]
       }
@@ -725,11 +744,13 @@ export default class extends Controller {
       const isCardio = this.isCardioExercise(exerciseName)
 
       if (isCardio) {
-        // Default cardio set - just time and energy
+        // Default cardio set - time, distance, weight (resistance), energy
         this.benchmarkData[exerciseName].push({
           set_number: newSetNumber,
           set_type: 'working',
           duration_seconds: 1800, // 30 minutes
+          distance_value: 100, // 100 meters
+          weight_kg: 1, // 1kg resistance
           energy_calories: 100,
           notes: 'solid effort'
         })
@@ -740,7 +761,6 @@ export default class extends Controller {
           set_type: 'working',
           reps: 1,
           weight_kg: 1,
-          weight_unit: 'kg',
           notes: 'solid effort'
         })
       }
@@ -989,14 +1009,15 @@ export default class extends Controller {
           }
 
           if (this.isCardioExercise(exerciseName)) {
-            // Cardio fields - just time and energy
+            // Cardio fields - time, distance, weight (resistance), energy
             exerciseSetData.duration_seconds = setData.duration_seconds
+            exerciseSetData.distance_value = setData.distance_value
+            exerciseSetData.weight_kg = setData.weight_kg
             exerciseSetData.energy_calories = setData.energy_calories
           } else {
             // Strength fields
             exerciseSetData.reps = setData.reps
             exerciseSetData.weight_kg = setData.weight_kg
-            exerciseSetData.weight_unit = setData.weight_unit || 'kg'
           }
 
           exerciseSetsArray.push(exerciseSetData)

@@ -49,8 +49,8 @@
         </ul>
 
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <!-- Simple Client Switcher for Trainers -->
-          <% if current_user.trainer? && user_context&.available_clients&.any? %>
+          <!-- 🆕 FIXED: Use preloaded clients to prevent N+1 -->
+          <% if current_user.trainer? && preloaded_clients&.any? %>
             <li class="nav-item dropdown me-3">
               <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center"
                       type="button"
@@ -72,13 +72,13 @@
                 <li>
                   <h6 class="dropdown-header">
                     <i class="bi bi-people-fill me-1"></i>
-                    My Clients (<%= user_context.available_clients.count %>)
+                    My Clients (<%= client_count %>)
                   </h6>
                 </li>
                 <li><hr class="dropdown-divider"></li>
 
-                <!-- Client list -->
-                <% user_context.available_clients.each do |client| %>
+                <!-- 🆕 FIXED: Use preloaded clients instead of fresh queries -->
+                <% preloaded_clients.each do |client| %>
                   <li>
                     <% if user_context.acting_user == client %>
                       <!-- Current client (already selected) -->

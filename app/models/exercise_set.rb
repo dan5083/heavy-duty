@@ -12,18 +12,47 @@ class ExerciseSet < ApplicationRecord
 
   def weight_display
     return "bodyweight" if weight_kg.nil?
-    "#{weight_kg} #{weight_unit}"
+    "#{weight_kg} kg"  # Always kg
+  end
+
+  def resistance_display
+    return "no resistance" if weight_kg.nil?
+    "#{weight_kg} kg"  # Same field, cardio context
+  end
+
+  def distance_display
+    return "unknown distance" if distance_value.nil?
+    "#{distance_value.to_i} m"
+  end
+
+  def duration_display
+    return "unknown time" if duration_seconds.nil?
+    minutes = duration_seconds / 60
+    if minutes >= 60
+      hours = minutes / 60
+      remaining_minutes = minutes % 60
+      "#{hours}h #{remaining_minutes}m"
+    else
+      "#{minutes} minutes"
+    end
+  end
+
+  def energy_display
+    return "unknown calories" if energy_calories.nil?
+    "#{energy_calories} calories"
   end
 
   def to_badge_format
     if AppConstants.cardio_exercise?(exercise_name)
-      # Cardio badges - just time and energy
+      # Cardio badges - time, distance, resistance (weight), energy
       [
-        { type: 'time', content: duration_seconds ? "#{duration_seconds / 60} minutes" : "30 minutes" },
-        { type: 'energy', content: energy_calories ? "#{energy_calories} calories" : "100 calories" }
+        { type: 'time', content: duration_display },
+        { type: 'distance', content: distance_display },
+        { type: 'weight', content: resistance_display },  # weight_kg shown as resistance
+        { type: 'energy', content: energy_display }
       ]
     else
-      # Existing strength badges
+      # Strength badges - status, reps, weight, reflection
       [
         { type: 'status', content: "#{set_type.titleize} set" },
         { type: 'reps', content: reps ? "#{reps} reps" : "to failure" },
@@ -33,14 +62,9 @@ class ExerciseSet < ApplicationRecord
     end
   end
 
-  def energy_display
-    return nil unless energy_calories
-    "#{energy_calories} calories"
-  end
-
   def description
     if AppConstants.cardio_exercise?(exercise_name)
-      "#{duration_seconds ? "#{duration_seconds / 60} minutes" : "30 minutes"}, #{energy_calories ? "#{energy_calories} calories" : "100 calories"}"
+      "#{duration_display}, #{distance_display}, #{resistance_display}, #{energy_display}"
     else
       "#{set_type.titleize} set, #{reps || 'failure'} reps, #{weight_display}, #{notes || 'solid effort'}"
     end

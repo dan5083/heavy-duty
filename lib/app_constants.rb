@@ -912,21 +912,27 @@ CLAUSE_LIBRARY = {
    css_class: "badge-reps"
  },
  weight: {
-   options: (1..300).to_a,
+   options: ["Unknown"] + (1..700).map { |kg| "#{kg} kg" } + ["bodyweight"],
    color: "yellow",
    css_class: "badge-weight"
  },
  # 🆕 NEW: Time badge for cardio duration
  time: {
-   options: (1..120).map { |min| "#{min} minute#{'s' if min > 1}" },
+   options: ["Unknown"] + (1..120).map { |min| "#{min} minute#{'s' if min > 1}" },
    color: "orange",
    css_class: "badge-time"
  },
  # 🆕 NEW: Energy badge for cardio calories
  energy: {
-   options: (10..750).step(10).map { |cal| "#{cal} calories" },
+   options: ["Unknown"] + (10..750).step(10).map { |cal| "#{cal} calories" },
    color: "red",
    css_class: "badge-energy"
+ },
+ # 🆕 NEW: Distance badge for cardio - METERS ONLY
+ distance: {
+   options: ["Unknown"] + (5..1000).step(5).map { |m| "#{m} m" },
+   color: "teal",
+   css_class: "badge-distance"
  },
  reflection: {
   options: [
@@ -966,6 +972,7 @@ BADGE_TYPES = {
  weight: { icon: "⚖️", description: "Weight used" },
  time: { icon: "⏱️", description: "Duration" },
  energy: { icon: "🔥", description: "Calories burned" },
+ distance: { icon: "📏", description: "Distance covered" },
  reflection: { icon: "💭", description: "Notes and feelings" }
 }.freeze
 
@@ -1001,41 +1008,6 @@ def self.all_badge_types
  BADGE_TYPES.keys
 end
 
-# 🆕 Helper methods for time/distance generation
-def self.generate_time_options
- options = []
-
- # Seconds: 15, 30, 45 for short intervals
- [15, 30, 45].each { |sec| options << "#{sec} seconds" }
-
- # Minutes: 1-60 for main cardio sessions
- (1..60).each { |min| options << "#{min} minute#{'s' if min > 1}" }
-
- # Hours: 1-3 for long endurance sessions
- (1..3).each { |hour| options << "#{hour} hour#{'s' if hour > 1}" }
-
- options
-end
-
-def self.generate_distance_options
-  options = []
-
-  # Meters for shorter distances
-  [50, 100, 200, 400, 800, 1000].each { |m| options << "#{m}m" }
-
-  # Kilometers for running/cycling
-  [0.5, 1, 1.5, 2, 2.5, 3, 5, 10, 15, 20, 25, 30, 42.2].each { |km|
-    options << "#{km}km"
-  }
-
-  # Miles for those who prefer imperial
-  [0.5, 1, 1.5, 2, 3, 5, 10, 13.1, 26.2].each { |miles|
-    options << "#{miles} mile#{'s' if miles != 1}"
-  }
-
-  options
-end
-
 # 🆕 Detect if an exercise is cardio-based (updated to use new structure)
 def self.cardio_exercise?(exercise_name)
  return false unless exercise_name.present?
@@ -1045,7 +1017,7 @@ end
 # 🆕 Get appropriate badge types for an exercise
 def self.badge_types_for_exercise(exercise_name)
  if cardio_exercise?(exercise_name)
-   [:time, :energy]
+   [:time, :distance, :weight, :energy]
  else
    [:status, :reps, :weight, :reflection]
  end
@@ -1108,4 +1080,4 @@ def self.recovery_days_for(muscle)
  TRAINING_CYCLE[muscle] || 5
 end
 
-end
+end  # End of AppConstants class

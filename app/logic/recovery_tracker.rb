@@ -5,6 +5,11 @@ class RecoveryTracker
     @preloaded_data = preload_all_workout_data
   end
 
+  # 🆕 NEW: Expose preloaded data for external use
+  def preloaded_data
+    @preloaded_data
+  end
+
   # === RECOVERY METHODS ===
 
   def ready_date_for(muscle)
@@ -132,30 +137,36 @@ class RecoveryTracker
 
   private
 
-  # 🚀 NEW: Single query to preload ALL workout data
+  # 🚀 OPTIMIZED: Single query with comprehensive preloading
   def preload_all_workout_data
-    # Get all workout logs for user with workouts preloaded
-    all_logs = @user.workout_logs.includes(:workout).order(created_at: :desc)
+    # Single query to get all workout logs with workouts preloaded
+    # Force execution immediately to prevent multiple queries later
+    all_logs = @user.workout_logs
+                   .includes(:workout)
+                   .order(created_at: :desc)
+                   .load  # Force immediate execution
 
     # Group by muscle group and get the latest for each
     latest_by_muscle = {}
     benchmarks_by_muscle = {}
 
     all_logs.each do |log|
+      # Use preloaded workout association (no additional query)
       muscle_group = log.workout.muscle_group
 
       # Track latest workout per muscle group
       latest_by_muscle[muscle_group] ||= log
 
-      # Track latest benchmark per muscle group
-      if log.is_benchmark? && !benchmarks_by_muscle[muscle_group]
+      # Track latest benchmark per muscle group (only default variations to avoid confusion)
+      if log.is_benchmark? && log.is_default_variation? && !benchmarks_by_muscle[muscle_group]
         benchmarks_by_muscle[muscle_group] = log
       end
     end
 
     {
       latest_by_muscle: latest_by_muscle,
-      benchmarks_by_muscle: benchmarks_by_muscle
+      benchmarks_by_muscle: benchmarks_by_muscle,
+      all_logs: all_logs  # Cache the loaded data for reuse
     }
   end
 

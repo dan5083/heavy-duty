@@ -143,13 +143,16 @@ class WorkoutLogsController < ApplicationController
             set_type: set_data['set_type'] || 'working',
             reps: set_data['reps'],
             weight_kg: set_data['weight_kg'],
-            weight_unit: set_data['weight_unit'] || 'kg',
             notes: set_data['notes']
           )
 
-          # 🆕 NEW: Handle cardio fields if present
+          # 🆕 FIXED: Handle cardio fields properly - no seconds, just minutes converted
           if set_data['duration_seconds'].present?
             exercise_set.duration_seconds = set_data['duration_seconds']
+          end
+
+          if set_data['distance_value'].present?
+            exercise_set.distance_value = set_data['distance_value']
           end
 
           if set_data['energy_calories'].present?

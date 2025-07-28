@@ -307,7 +307,7 @@
     window.availableExercises = <%= raw(AppConstants.exercises_for_muscle_group(@workout.muscle_group.to_sym).to_json) %>;
     window.cardioExercises = <%= raw(AppConstants.cardio_exercises.to_json) %>;
 
-    // Pass AppConstants clause library to JavaScript
+    // UPDATED: Pass AppConstants clause library to JavaScript with distance support
     window.clauseLibrary = {
       status: {
         options: <%= raw(AppConstants::CLAUSE_LIBRARY[:status][:options].to_json) %>
@@ -324,6 +324,9 @@
       energy: {
         options: <%= raw(AppConstants::CLAUSE_LIBRARY[:energy][:options].to_json) %>
       },
+      distance: {
+        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:distance][:options].to_json) %>
+      },
       reflection: {
         options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reflection][:options].to_json) %>
       }
@@ -333,4 +336,5 @@
     console.log("🔄 All variation data loaded:", window.allVariationData);
     console.log("🔄 Default benchmark data (Variation A):", window.benchmarkData);
     console.log("🔄 Available exercises:", window.availableExercises);
+    console.log("🔄 Clause library with distance support:", window.clauseLibrary);
   </script>

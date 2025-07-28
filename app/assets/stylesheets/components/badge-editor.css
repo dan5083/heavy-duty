@@ -1,5 +1,3 @@
-/* app/assets/stylesheets/components/badge-editor.css */
-
 /* ===============================================
    EXERCISE HEADERS
    =============================================== */
@@ -69,7 +67,7 @@
   transform: scale(0.95);
 }
 
-/* Badge Colors */
+/* Badge Colors - Reusing existing colors for cardio */
 .badge-status {
   background: var(--accent-primary);
   border-color: var(--accent-primary);
@@ -87,6 +85,22 @@
 
 .badge-reflection {
   background: var(--accent-recovery);
+  border-color: var(--accent-recovery);
+}
+
+/* Cardio badge colors - reuse existing palette */
+.badge-time {
+  background: #f59e0b; /* Same as weight - orange/yellow */
+  border-color: #f59e0b;
+}
+
+.badge-distance {
+  background: var(--accent-success); /* Same as reps - green */
+  border-color: var(--accent-success);
+}
+
+.badge-energy {
+  background: var(--accent-recovery); /* Same as reflection - purple */
   border-color: var(--accent-recovery);
 }
 

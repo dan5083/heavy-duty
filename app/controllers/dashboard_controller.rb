@@ -23,15 +23,16 @@ class DashboardController < ApplicationController
       end
     end
 
+    # 🚀 OPTIMIZED: Single query with comprehensive preloading
     @workouts_by_muscle = latest_plan
       .split_days
-      .includes(:workouts)
+      .includes(workouts: :workout_logs)  # Preload workouts and their logs
       .flat_map(&:workouts)
       .group_by { |w| w.muscle_group.to_sym }
       .transform_values(&:first)
 
-    # Use acting_user for recovery tracking
-    recovery = RecoveryTracker.new(user_context.acting_user)
+    # 🚀 OPTIMIZED: Use memoized recovery tracker to prevent duplicate queries
+    recovery = recovery_tracker
 
     # Get muscles from current split plan - EXCLUDE cardio
     muscles = latest_plan.split_days.pluck(:muscle_group).map(&:to_sym).uniq.reject { |muscle| muscle == :cardio }
@@ -69,14 +70,65 @@ class DashboardController < ApplicationController
       }
     end
 
-    # Add cardio status for dashboard - this is separate from muscle grid
-    @cardio_status = get_cardio_status
-    @cardio_workout = get_or_create_cardio_workout
+    # 🚀 OPTIMIZED: Get cardio data more efficiently
+    @cardio_status = get_cardio_status_optimized
+    @cardio_workout = get_or_create_cardio_workout_optimized(latest_plan)
   end
 
   private
 
-  # Cardio status logic moved to controller
+  # 🚀 NEW: Memoized recovery tracker to prevent duplicate instantiation
+  def recovery_tracker
+    @recovery_tracker ||= RecoveryTracker.new(user_context.acting_user)
+  end
+
+  # 🚀 OPTIMIZED: More efficient cardio status check
+  def get_cardio_status_optimized
+    # Reuse the recovery tracker's preloaded data if possible
+    recovery = recovery_tracker
+
+    # Check if cardio data is in the preloaded data
+    latest_by_muscle = recovery.preloaded_data[:latest_by_muscle]
+    last_cardio_log = latest_by_muscle['cardio']
+
+    if last_cardio_log.nil?
+      { completed: false, last_cardio_time: nil }
+    else
+      hours_since = (Time.current - last_cardio_log.created_at) / 1.hour
+      {
+        completed: hours_since < 16,
+        last_cardio_time: last_cardio_log.created_at
+      }
+    end
+  end
+
+  # 🚀 OPTIMIZED: More efficient cardio workout lookup
+  def get_or_create_cardio_workout_optimized(split_plan)
+    # Look for existing cardio workout using preloaded associations
+    existing_cardio = @workouts_by_muscle[:cardio]
+    return existing_cardio if existing_cardio
+
+    # If no cardio in current workouts, check if we need to create the structure
+    cardio_split_day = split_plan.split_days.find_or_create_by(
+      muscle_group: 'cardio'
+    ) do |split_day|
+      split_day.day_number = split_plan.split_days.count + 1
+      split_day.label = "Daily Cardio"
+    end
+
+    # Create cardio workout
+    cardio_workout = cardio_split_day.workouts.create!(
+      name: "Daily Cardio",
+      muscle_group: 'cardio'
+    )
+
+    # Update the workouts_by_muscle hash for consistency
+    @workouts_by_muscle[:cardio] = cardio_workout
+
+    cardio_workout
+  end
+
+  # OLD METHOD - keep as fallback but shouldn't be called
   def get_cardio_status
     last_cardio_log = user_context.acting_user.workout_logs
                                  .joins(:workout)

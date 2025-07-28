@@ -21,19 +21,22 @@ class TrainingArchiveController < ApplicationController
 
     @selected_muscle = params[:muscle]
 
-    # 🚀 FIXED: Preload workout and exercise_sets to eliminate N+1 + eager load exercise_sets for each log
+    # 🚀 FIXED: Single query with ALL necessary preloading to eliminate N+1
     @logs = user_context.acting_user.workout_logs
-                       .includes(:workout, :exercise_sets)
+                       .includes(:workout, :exercise_sets)  # Preload workout and exercise_sets
                        .order(created_at: :desc)
 
     if @selected_muscle.present?
-      @logs = @logs.select do |log|
-        log.workout && log.workout.muscle_group.to_s == @selected_muscle
-      end
+      @logs = @logs.joins(:workout).where(workouts: { muscle_group: @selected_muscle })
     end
 
-    # 🚀 NEW: Force eager loading of exercise_sets associations to prevent N+1 in views
+    # 🚀 FIXED: Force loading of associations to prevent lazy loading in views
     # This ensures that when we call log.exercise_sets in the view, it uses preloaded data
-    @logs.each { |log| log.exercise_sets.to_a } if @logs.respond_to?(:each)
+    @logs = @logs.to_a  # Convert to array to force query execution
+
+    # Preload exercise_sets associations for all logs
+    @logs.each do |log|
+      log.association(:exercise_sets).target # Force load the association
+    end
   end
 end
