@@ -64,6 +64,8 @@ EXERCISE_TAGS = {
 
   "Bench Press (Incline)" => [:chest, :chest_pectorals, :push_chest_shoulders_triceps, :chest_and_triceps, :upper_body, :shoulders, :shoulders_deltoids, :triceps, :arms_biceps_and_triceps, :core],
 
+  "Bench Press (Iso-lateral)" => [:chest, :chest_pectorals, :push_chest_shoulders_triceps, :chest_and_triceps, :upper_body, :shoulders, :shoulders_deltoids, :triceps, :arms_biceps_and_triceps, :core],
+
   "Bench Press (Regular)" => [:chest, :chest_pectorals, :push_chest_shoulders_triceps, :chest_and_triceps, :upper_body, :triceps, :arms_biceps_and_triceps, :shoulders, :shoulders_deltoids, :core, :entire_body],
 
   "Bench Press (Smith Machine)" => [:chest, :chest_pectorals, :push_chest_shoulders_triceps, :chest_and_triceps, :upper_body, :triceps, :arms_biceps_and_triceps, :shoulders, :shoulders_deltoids, :core],
