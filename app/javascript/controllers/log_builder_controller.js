@@ -21,7 +21,10 @@ export default class extends Controller {
     "customDate",
     "customTime",
     "hiddenDatetime",
-    "hiddenVariation"
+    "hiddenVariation",
+    "exerciseInput",
+    "autocompleteDropdown",
+    "fallbackButtons"
   ]
 
   connect() {
@@ -30,17 +33,22 @@ export default class extends Controller {
     // Get benchmark data from ExerciseSet structure
     this.benchmarkData = window.benchmarkData || {}
     this.benchmarkContext = window.benchmarkContext || null
-    this.availableExercises = window.availableExercises || []
-    this.cardioExercises = window.cardioExercises || []
+
+    // 🆕 NEW: Use all exercises and cardio context instead of separate lists
+    this.allExercises = window.allExercises || []
+    this.isCardioWorkout = window.isCardioWorkout || false
 
     console.log("Benchmark data:", this.benchmarkData)
     console.log("Benchmark context:", this.benchmarkContext)
-    console.log("Available exercises:", this.availableExercises)
-    console.log("Cardio exercises:", this.cardioExercises)
+    console.log("All exercises:", this.allExercises)
+    console.log("Is cardio workout:", this.isCardioWorkout)
 
     this.initializeBadgeInterface()
     this.element.addEventListener('badge-editor:badge-changed', this.handleBadgeChange.bind(this))
     this.element.addEventListener('badge-editor:add-badge', this.handleAddBadge.bind(this))
+
+    // 🆕 NEW: Initialize autocomplete functionality
+    this.initializeAutocomplete()
 
     // 🆕 NEW: Initialize context functionality
     this.initializeContextSection()
@@ -56,6 +64,221 @@ export default class extends Controller {
     // 🆕 NEW: Listen for variation controller events
     this.element.addEventListener('benchmark-variations:variation-changed', this.handleVariationChange.bind(this))
     this.element.addEventListener('benchmark-variations:submit-with-variation', this.handleVariationSubmission.bind(this))
+  }
+
+  // 🆕 NEW: Initialize autocomplete functionality
+  initializeAutocomplete() {
+    if (this.hasExerciseInputTarget) {
+      // Track autocomplete state
+      this.autocompleteVisible = false
+      this.selectedIndex = -1
+      this.filteredExercises = []
+
+      // Add click outside listener to close autocomplete
+      document.addEventListener('click', (e) => {
+        if (!this.element.contains(e.target)) {
+          this.hideAutocomplete()
+        }
+      })
+    }
+  }
+
+  // 🆕 NEW: Handle exercise input for autocomplete
+  handleExerciseInput(event) {
+    const query = event.target.value.trim()
+
+    if (query.length === 0) {
+      this.hideAutocomplete()
+      return
+    }
+
+    // Show dropdown after first character
+    if (query.length >= 1) {
+      this.filterAndShowExercises(query)
+    }
+  }
+
+  // 🆕 NEW: Handle keyboard navigation in autocomplete
+  handleExerciseKeydown(event) {
+    if (!this.autocompleteVisible) {
+      // If autocomplete not visible, handle Enter to add exercise directly
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        const exerciseName = this.exerciseInputTarget.value.trim()
+        if (exerciseName) {
+          this.selectExercise(exerciseName)
+        }
+      }
+      return
+    }
+
+    // Handle keyboard navigation when autocomplete is visible
+    switch(event.key) {
+      case 'ArrowDown':
+        event.preventDefault()
+        this.selectedIndex = Math.min(this.selectedIndex + 1, this.filteredExercises.length - 1)
+        this.updateAutocompleteSelection()
+        break
+
+      case 'ArrowUp':
+        event.preventDefault()
+        this.selectedIndex = Math.max(this.selectedIndex - 1, -1)
+        this.updateAutocompleteSelection()
+        break
+
+      case 'Enter':
+        event.preventDefault()
+        if (this.selectedIndex >= 0 && this.selectedIndex < this.filteredExercises.length) {
+          this.selectExercise(this.filteredExercises[this.selectedIndex])
+        } else {
+          // No selection, use typed text
+          const exerciseName = this.exerciseInputTarget.value.trim()
+          if (exerciseName) {
+            this.selectExercise(exerciseName)
+          }
+        }
+        break
+
+      case 'Escape':
+        event.preventDefault()
+        this.hideAutocomplete()
+        break
+    }
+  }
+
+  // 🆕 NEW: Filter exercises and show autocomplete dropdown
+  filterAndShowExercises(query) {
+    const lowerQuery = query.toLowerCase()
+
+    // Filter exercises that contain the query
+    this.filteredExercises = this.allExercises.filter(exercise =>
+      exercise.toLowerCase().includes(lowerQuery)
+    ).slice(0, 10) // Limit to 10 results
+
+    if (this.filteredExercises.length === 0) {
+      this.hideAutocomplete()
+      return
+    }
+
+    // Build dropdown HTML
+    const dropdownHtml = this.filteredExercises.map((exercise, index) => `
+      <div class="autocomplete-item ${index === this.selectedIndex ? 'selected' : ''}"
+           data-exercise="${exercise}"
+           data-index="${index}">
+        ${this.highlightMatch(exercise, query)}
+      </div>
+    `).join('')
+
+    this.autocompleteDropdownTarget.innerHTML = dropdownHtml
+    this.showAutocomplete()
+
+    // Add click listeners to dropdown items
+    this.autocompleteDropdownTarget.querySelectorAll('.autocomplete-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        const exerciseName = e.target.closest('.autocomplete-item').dataset.exercise
+        this.selectExercise(exerciseName)
+      })
+    })
+  }
+
+  // 🆕 NEW: Highlight matching text in exercise names
+  highlightMatch(exerciseName, query) {
+    const regex = new RegExp(`(${query})`, 'gi')
+    return exerciseName.replace(regex, '<strong>$1</strong>')
+  }
+
+  // 🆕 NEW: Show autocomplete dropdown
+  showAutocomplete() {
+    this.autocompleteDropdownTarget.style.display = 'block'
+    this.autocompleteVisible = true
+    this.selectedIndex = -1
+  }
+
+  // 🆕 NEW: Hide autocomplete dropdown
+  hideAutocomplete() {
+    if (this.hasAutocompleteDropdownTarget) {
+      this.autocompleteDropdownTarget.style.display = 'none'
+      this.autocompleteVisible = false
+      this.selectedIndex = -1
+    }
+  }
+
+  // 🆕 NEW: Update visual selection in autocomplete
+  updateAutocompleteSelection() {
+    this.autocompleteDropdownTarget.querySelectorAll('.autocomplete-item').forEach((item, index) => {
+      if (index === this.selectedIndex) {
+        item.classList.add('selected')
+      } else {
+        item.classList.remove('selected')
+      }
+    })
+  }
+
+  // 🆕 NEW: Focus exercise input (called from fallback button)
+  focusExerciseInput() {
+    if (this.hasExerciseInputTarget) {
+      this.exerciseInputTarget.focus()
+
+      // 🆕 FIXED: If there's text in the input, try to add it as an exercise
+      const exerciseName = this.exerciseInputTarget.value.trim()
+      if (exerciseName) {
+        this.selectExercise(exerciseName)
+      }
+    }
+  }
+
+  // 🆕 NEW: Select exercise from autocomplete or direct input
+  selectExercise(exerciseName) {
+    console.log(`Adding exercise: ${exerciseName}`)
+
+    this.updateWorkoutData()
+
+    if (!this.benchmarkData[exerciseName]) {
+      if (this.isCardioWorkout) {
+        // Default cardio set - time, distance, weight (resistance), energy
+        this.benchmarkData[exerciseName] = [{
+          set_number: 1,
+          set_type: 'working',
+          duration_seconds: 1800, // 30 minutes
+          distance_value: 100, // 100 meters
+          weight_kg: 1, // 1kg resistance
+          energy_calories: 100,
+          notes: 'solid effort'
+        }]
+      } else {
+        // Default lifting set
+        this.benchmarkData[exerciseName] = [{
+          set_number: 1,
+          set_type: 'working',
+          reps: 1,
+          weight_kg: 1,
+          notes: 'solid effort'
+        }]
+      }
+    }
+
+    this.hideEmptyState()
+    this.renderWorkoutBadges()
+    this.updateHiddenField()
+
+    // Clear the input and hide autocomplete
+    this.exerciseInputTarget.value = ''
+    this.hideAutocomplete()
+
+    // 🆕 NEW: Dispatch exercise addition event
+    this.dispatchWorkoutStateUpdate('exercise-added', {
+      exerciseName: exerciseName,
+      isCardio: this.isCardioWorkout
+    })
+
+    setTimeout(() => {
+      const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
+      const newExercise = exerciseBlocks[exerciseBlocks.length - 1]
+      if (newExercise) {
+        newExercise.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+        newExercise.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }
+    }, 50)
   }
 
   // 🆕 NEW: Dispatch events for current-exercise-set controller
@@ -293,12 +516,6 @@ export default class extends Controller {
     this.contextToggleButtonTarget.style.display = 'none'
   }
 
-  // 🆕 NEW: Utility to truncate text
-  truncateText(text, limit) {
-    if (text.length <= limit) return text
-    return text.substring(0, limit) + '...'
-  }
-
   // 🆕 NEW: Hide context section helper
   hideContextSection() {
     this.contextBodyTarget.style.display = 'none'
@@ -322,10 +539,22 @@ export default class extends Controller {
   showEmptyState() {
     this.emptyStateTarget.style.display = 'block'
     this.exerciseListTarget.innerHTML = ''
+
+    // Show the input field and fallback buttons
+    if (this.hasFallbackButtonsTarget) {
+      this.fallbackButtonsTarget.style.display = 'flex'
+    }
   }
 
   hideEmptyState() {
-    this.emptyStateTarget.style.display = 'none'
+    // 🆕 FIXED: Don't hide the entire empty state, just hide fallback buttons
+    // Keep the autocomplete input visible so users can add more exercises
+    if (this.hasFallbackButtonsTarget) {
+      this.fallbackButtonsTarget.style.display = 'none'
+    }
+
+    // Don't hide the entire emptyStateTarget - keep the autocomplete input visible
+    // this.emptyStateTarget.style.display = 'none'  // REMOVED
   }
 
   renderWorkoutBadges() {
@@ -335,7 +564,6 @@ export default class extends Controller {
       html += this.renderExerciseBlock(exerciseName, sets, exerciseIndex)
     })
 
-    html += this.renderAddExerciseButtons()
     this.exerciseListTarget.innerHTML = html
 
     // 🆕 NEW: Dispatch exercise structure update
@@ -451,25 +679,9 @@ export default class extends Controller {
     `
   }
 
-  renderAddExerciseButtons() {
-    return `
-      <div class="text-center mt-4 mb-4">
-        <button class="btn btn-outline-success"
-                data-action="click->log-builder#addExercise">
-          <i class="bi bi-plus-lg"></i> Add Exercise
-        </button>
-      </div>
-    `
-  }
-
-  // 🆕 NEW: Check if an exercise is cardio
-  isCardioExercise(exerciseName) {
-    return this.cardioExercises.includes(exerciseName)
-  }
-
-  // UPDATED: Convert ExerciseSet data to badge format - FIXED for cardio 4 badges
+  // 🆕 UPDATED: Convert ExerciseSet data to badge format - Uses cardio workout context
   exerciseSetToBadges(setData, exerciseName) {
-    if (this.isCardioExercise(exerciseName)) {
+    if (this.isCardioWorkout) {
       // Cardio badges - time, distance, weight (as resistance), energy
       return [
         { type: 'time', content: setData.duration_seconds ? `${Math.round(setData.duration_seconds / 60)} minutes` : '30 minutes' },
@@ -488,7 +700,7 @@ export default class extends Controller {
     }
   }
 
-  // UPDATED: Convert badges back to ExerciseSet format - FIXED for cardio
+  // 🆕 UPDATED: Convert badges back to ExerciseSet format - Uses cardio workout context
   badgesToExerciseSet(badges, exerciseName, setNumber) {
     const statusBadge = badges.find(b => b.type === 'status')
     const reflectionBadge = badges.find(b => b.type === 'reflection')
@@ -500,7 +712,7 @@ export default class extends Controller {
       notes: reflectionBadge?.content || 'solid effort'
     }
 
-    if (this.isCardioExercise(exerciseName)) {
+    if (this.isCardioWorkout) {
       // Cardio fields - time, distance, weight (resistance), energy
       const timeBadge = badges.find(b => b.type === 'time')
       const distanceBadge = badges.find(b => b.type === 'distance')
@@ -592,141 +804,6 @@ export default class extends Controller {
     return { weight: null }
   }
 
-  // Add exercise (detects context automatically)
-  addExercise(event) {
-    event.preventDefault()
-    console.log("Adding new exercise...")
-
-    // Auto-detect if this is a cardio workout by checking existing exercises
-    const isCardioWorkout = this.isCurrentWorkoutCardio()
-    this.showExerciseSelector(event.target, isCardioWorkout)
-  }
-
-  // Detect if current workout is cardio-focused
-  isCurrentWorkoutCardio() {
-    const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
-
-    // If no exercises yet, check the page URL or muscle group context
-    if (exerciseBlocks.length === 0) {
-      // Check if we're in a cardio workout (muscle_group=cardio in URL)
-      return window.location.href.includes('cardio') ||
-             document.querySelector('h2')?.textContent?.toLowerCase().includes('cardio')
-    }
-
-    // If exercises exist, check if any are cardio
-    for (let block of exerciseBlocks) {
-      const exerciseName = block.dataset.exerciseName
-      if (exerciseName && this.isCardioExercise(exerciseName)) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  showExerciseSelector(triggerElement, isCardio = false) {
-    const exercises = isCardio ? this.cardioExercises : this.availableExercises
-    const exerciseType = isCardio ? 'cardio' : 'lifting'
-
-    const dropdown = document.createElement('div')
-    dropdown.className = 'exercise-selector-dropdown position-absolute bg-white border rounded shadow-lg'
-    dropdown.style.cssText = `
-      display: block;
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 1000;
-      min-width: 300px;
-      border-color: #dee2e6;
-    `
-
-    const exercisesHtml = exercises.map(exercise => `
-      <div class="exercise-option px-3 py-2 cursor-pointer"
-           style="cursor: pointer;"
-           onmouseover="this.style.backgroundColor='#f8f9fa'"
-           onmouseout="this.style.backgroundColor=''"
-           data-exercise="${exercise}">
-        ${exercise}
-      </div>
-    `).join('')
-
-    dropdown.innerHTML = `
-      <div class="p-3 border-bottom">
-        <strong>Choose a ${exerciseType} exercise:</strong>
-      </div>
-      ${exercisesHtml}
-    `
-
-    const rect = triggerElement.getBoundingClientRect()
-    dropdown.style.top = `${rect.bottom + window.scrollY}px`
-    dropdown.style.left = `${rect.left + window.scrollX}px`
-
-    document.body.appendChild(dropdown)
-
-    dropdown.querySelectorAll('.exercise-option').forEach(option => {
-      option.addEventListener('click', (e) => {
-        this.selectExercise(e.target.dataset.exercise, isCardio)
-        dropdown.remove()
-      })
-    })
-
-    setTimeout(() => {
-      document.addEventListener('click', function hideDropdown(e) {
-        if (!dropdown.contains(e.target)) {
-          dropdown.remove()
-          document.removeEventListener('click', hideDropdown)
-        }
-      })
-    }, 100)
-  }
-
-  selectExercise(exerciseName, isCardio = false) {
-    console.log(`Adding ${isCardio ? 'cardio' : 'lifting'} exercise: ${exerciseName}`)
-
-    this.updateWorkoutData()
-
-    if (!this.benchmarkData[exerciseName]) {
-      if (isCardio) {
-        // Default cardio set - time, distance, weight (resistance), energy
-        this.benchmarkData[exerciseName] = [{
-          set_number: 1,
-          set_type: 'working',
-          duration_seconds: 1800, // 30 minutes
-          distance_value: 100, // 100 meters
-          weight_kg: 1, // 1kg resistance
-          energy_calories: 100,
-          notes: 'solid effort'
-        }]
-      } else {
-        // Default lifting set
-        this.benchmarkData[exerciseName] = [{
-          set_number: 1,
-          set_type: 'working',
-          reps: 1,
-          weight_kg: 1,
-          notes: 'solid effort'
-        }]
-      }
-    }
-
-    this.hideEmptyState()
-    this.renderWorkoutBadges()
-    this.updateHiddenField()
-
-    // 🆕 NEW: Dispatch exercise addition event
-    this.dispatchWorkoutStateUpdate('exercise-added', {
-      exerciseName: exerciseName,
-      isCardio: isCardio
-    })
-
-    setTimeout(() => {
-      const exerciseBlocks = this.exerciseListTarget.querySelectorAll('.exercise-block')
-      const newExercise = exerciseBlocks[exerciseBlocks.length - 2]
-      if (newExercise) {
-        newExercise.style.animation = 'badge-spawn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-      }
-    }, 50)
-  }
-
   addSet(event) {
     event.preventDefault()
     event.stopPropagation()
@@ -741,9 +818,8 @@ export default class extends Controller {
     if (exerciseName) {
       const currentSets = this.benchmarkData[exerciseName]
       const newSetNumber = currentSets.length + 1
-      const isCardio = this.isCardioExercise(exerciseName)
 
-      if (isCardio) {
+      if (this.isCardioWorkout) {
         // Default cardio set - time, distance, weight (resistance), energy
         this.benchmarkData[exerciseName].push({
           set_number: newSetNumber,
@@ -1008,7 +1084,7 @@ export default class extends Controller {
             notes: setData.notes || 'solid effort'
           }
 
-          if (this.isCardioExercise(exerciseName)) {
+          if (this.isCardioWorkout) {
             // Cardio fields - time, distance, weight (resistance), energy
             exerciseSetData.duration_seconds = setData.duration_seconds
             exerciseSetData.distance_value = setData.distance_value
@@ -1071,13 +1147,5 @@ export default class extends Controller {
 
     // Submit the form
     this.submitFormWithChoice()
-  }
-
-  // 🆕 NEW: Show variation selector (delegates to variations controller)
-  showVariationSelector() {
-    const variationEvent = new CustomEvent('log-builder:show-variation-selector', {
-      bubbles: true
-    })
-    this.element.dispatchEvent(variationEvent)
   }
 }

@@ -21,7 +21,11 @@
         Today's <%= AppConstants::LABELS[@workout.muscle_group.to_sym] %> Workout
       </h2>
       <p class="text-muted mb-0" data-typography-animator-target="fadeIn">
-        Choose variation below • Tap badges to edit • Add exercises with <code>+</code>
+        <% if @is_cardio_workout %>
+          Type any exercise name • Tap badges to edit • Add exercises with <code>+</code>
+        <% else %>
+          Type any exercise name • Tap badges to edit • Add exercises with <code>+</code>
+        <% end %>
       </p>
     </div>
   </div>
@@ -65,28 +69,48 @@
         <!-- Initial content loaded from benchmark -->
       </div>
 
-<!-- Empty State with Exercise Selection Buttons -->
+      <!-- Empty State with Exercise Selection -->
       <div class="empty-exercise text-center"
            data-log-builder-target="emptyState"
            data-benchmark-variations-target="emptyState">
-        <!-- Exercise Type Selection Buttons -->
-        <div class="d-flex flex-column gap-3 align-items-center">
+
+        <!-- 🆕 NEW: Autocomplete Exercise Input -->
+        <div class="exercise-input-section mb-4">
+          <div class="autocomplete-wrapper position-relative">
+            <input type="text"
+                   class="form-control form-control-lg"
+                   placeholder="<%= @is_cardio_workout ? 'Type cardio exercise name...' : 'Type exercise name...' %>"
+                   data-log-builder-target="exerciseInput"
+                   data-action="input->log-builder#handleExerciseInput keydown->log-builder#handleExerciseKeydown"
+                   autocomplete="off">
+            <div class="autocomplete-dropdown"
+                 data-log-builder-target="autocompleteDropdown"
+                 style="display: none;">
+              <!-- Autocomplete results will be populated here -->
+            </div>
+          </div>
+          <small class="form-text text-muted mt-2">
+            <% if @is_cardio_workout %>
+              <i class="bi bi-heart-pulse me-1"></i>
+              Start typing any cardio exercise name - suggestions will appear as you type
+            <% else %>
+              <i class="bi bi-plus-circle me-1"></i>
+              Start typing any exercise name - suggestions will appear as you type
+            <% end %>
+          </small>
+        </div>
+
+        <!-- Fallback Add Exercise Button (shown when no input focus) -->
+        <div class="d-flex flex-column gap-3 align-items-center"
+             data-log-builder-target="fallbackButtons">
           <button class="btn btn-success btn-lg"
-                  data-action="click->log-builder#addExercise"
+                  data-action="click->log-builder#focusExerciseInput"
                   style="min-width: 200px;">
             <i class="bi bi-plus-lg me-2"></i>
             <strong>Add Exercise</strong>
           </button>
-
-          <button class="btn btn-outline-secondary btn-sm"
-                  data-action="click->log-builder#addCardioExercise"
-                  style="min-width: 160px;">
-            <i class="bi bi-heart-pulse me-2"></i>
-            Add Cardio
-          </button>
         </div>
       </div>
-
     </div>
 
     <!-- 🆕 NEW: Exercise Context Section -->
@@ -282,59 +306,62 @@
 
 </div>
 
-  <!-- 🆕 OPTIMIZED: Pass variation data to JavaScript using preloaded data -->
-  <script>
-    // 🆕 NEW: Use preloaded controller data instead of individual method calls
-    window.allVariationData = <%= raw(@all_variation_data.transform_values do |exercises|
-      {
-        exercises: exercises,
-        context: nil  # Context will be added separately below
-      }
-    end.to_json) %>;
+<!-- 🆕 UPDATED: Pass exercise data and cardio context to JavaScript -->
+<script>
+  // 🆕 NEW: Use preloaded controller data instead of individual method calls
+  window.allVariationData = <%= raw(@all_variation_data.transform_values do |exercises|
+    {
+      exercises: exercises,
+      context: nil  # Context will be added separately below
+    }
+  end.to_json) %>;
 
-    // 🆕 NEW: Add context data to the variation data
-    <% @all_context_data.each do |variation, context| %>
-      <% if context.present? %>
-        window.allVariationData['<%= variation %>'].context = <%= raw(context.to_json) %>;
-      <% end %>
+  // 🆕 NEW: Add context data to the variation data
+  <% @all_context_data.each do |variation, context| %>
+    <% if context.present? %>
+      window.allVariationData['<%= variation %>'].context = <%= raw(context.to_json) %>;
     <% end %>
+  <% end %>
 
-    // Legacy support - default to Variation A for existing log-builder code
-    window.benchmarkData = <%= raw((@all_variation_data['A'] || {}).to_json) %>;
-    window.benchmarkContext = <%= raw((@all_context_data['A']).to_json) %>;
+  // Legacy support - default to Variation A for existing log-builder code
+  window.benchmarkData = <%= raw((@all_variation_data['A'] || {}).to_json) %>;
+  window.benchmarkContext = <%= raw((@all_context_data['A']).to_json) %>;
 
-    // Available exercises for this muscle group
-    window.availableExercises = <%= raw(AppConstants.exercises_for_muscle_group(@workout.muscle_group.to_sym).to_json) %>;
-    window.cardioExercises = <%= raw(AppConstants.cardio_exercises.to_json) %>;
+  // 🆕 NEW: Pass all exercises for autocomplete (no muscle group filtering)
+  window.allExercises = <%= raw(AppConstants.all_exercises.to_json) %>;
 
-    // UPDATED: Pass AppConstants clause library to JavaScript with distance support
-    window.clauseLibrary = {
-      status: {
-        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:status][:options].to_json) %>
-      },
-      reps: {
-        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reps][:options].to_json) %>
-      },
-      weight: {
-        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:weight][:options].to_json) %>
-      },
-      time: {
-        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:time][:options].to_json) %>
-      },
-      energy: {
-        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:energy][:options].to_json) %>
-      },
-      distance: {
-        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:distance][:options].to_json) %>
-      },
-      reflection: {
-        options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reflection][:options].to_json) %>
-      }
-    };
+  // 🆕 NEW: Pass cardio context instead of cardio exercise list
+  window.isCardioWorkout = <%= @is_cardio_workout.to_json %>;
 
-    // Debug logging
-    console.log("🔄 All variation data loaded:", window.allVariationData);
-    console.log("🔄 Default benchmark data (Variation A):", window.benchmarkData);
-    console.log("🔄 Available exercises:", window.availableExercises);
-    console.log("🔄 Clause library with distance support:", window.clauseLibrary);
-  </script>
+  // UPDATED: Pass AppConstants clause library to JavaScript with distance support
+  window.clauseLibrary = {
+    status: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:status][:options].to_json) %>
+    },
+    reps: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reps][:options].to_json) %>
+    },
+    weight: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:weight][:options].to_json) %>
+    },
+    time: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:time][:options].to_json) %>
+    },
+    energy: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:energy][:options].to_json) %>
+    },
+    distance: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:distance][:options].to_json) %>
+    },
+    reflection: {
+      options: <%= raw(AppConstants::CLAUSE_LIBRARY[:reflection][:options].to_json) %>
+    }
+  };
+
+  // Debug logging
+  console.log("🔄 All variation data loaded:", window.allVariationData);
+  console.log("🔄 Default benchmark data (Variation A):", window.benchmarkData);
+  console.log("🔄 All exercises for autocomplete:", window.allExercises);
+  console.log("🔄 Is cardio workout:", window.isCardioWorkout);
+  console.log("🔄 Clause library with distance support:", window.clauseLibrary);
+</script>

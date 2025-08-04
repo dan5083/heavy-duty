@@ -39,6 +39,9 @@ class WorkoutLogsController < ApplicationController
     @current_variation = @available_variations.include?('A') ? 'A' : (@available_variations.first || 'A')
     @benchmark_data = @all_variation_data[@current_variation] || {}
     @benchmark_context = @all_context_data[@current_variation]
+
+    # 🆕 NEW: Pass cardio context instead of exercise-specific cardio detection
+    @is_cardio_workout = AppConstants.cardio_workout?(@workout.muscle_group)
   end
 
   def create
@@ -125,6 +128,10 @@ class WorkoutLogsController < ApplicationController
     Rails.logger.info "🏋️ Beat benchmark: #{beat_benchmark}"
     Rails.logger.info "🏋️ Benchmark variation: #{benchmark_variation}" if benchmark_variation
 
+    # 🆕 NEW: Determine if this is a cardio workout context
+    is_cardio_workout = AppConstants.cardio_workout?(@workout.muscle_group)
+    Rails.logger.info "🏋️ Cardio workout context: #{is_cardio_workout}"
+
     ActiveRecord::Base.transaction do
       Rails.logger.info "🏋️ Starting database transaction"
 
@@ -146,17 +153,19 @@ class WorkoutLogsController < ApplicationController
             notes: set_data['notes']
           )
 
-          # 🆕 FIXED: Handle cardio fields properly - no seconds, just minutes converted
-          if set_data['duration_seconds'].present?
-            exercise_set.duration_seconds = set_data['duration_seconds']
-          end
+          # 🆕 UPDATED: Handle cardio fields based on workout context, not exercise name
+          if is_cardio_workout
+            if set_data['duration_seconds'].present?
+              exercise_set.duration_seconds = set_data['duration_seconds']
+            end
 
-          if set_data['distance_value'].present?
-            exercise_set.distance_value = set_data['distance_value']
-          end
+            if set_data['distance_value'].present?
+              exercise_set.distance_value = set_data['distance_value']
+            end
 
-          if set_data['energy_calories'].present?
-            exercise_set.energy_calories = set_data['energy_calories']
+            if set_data['energy_calories'].present?
+              exercise_set.energy_calories = set_data['energy_calories']
+            end
           end
 
           if exercise_set.save
@@ -182,7 +191,8 @@ class WorkoutLogsController < ApplicationController
             acting_user_id: user_context.acting_user.id,
             has_exercise_context: @log.has_context?,
             custom_datetime: workout_datetime.present?,
-            workout_datetime: @log.created_at.iso8601
+            workout_datetime: @log.created_at.iso8601,
+            is_cardio_workout: is_cardio_workout
           }
         )
 
@@ -212,7 +222,8 @@ class WorkoutLogsController < ApplicationController
                 previous_benchmark_count: existing_benchmarks.count,
                 has_exercise_context: @log.has_context?,
                 custom_datetime: workout_datetime.present?,
-                workout_datetime: @log.created_at.iso8601
+                workout_datetime: @log.created_at.iso8601,
+                is_cardio_workout: is_cardio_workout
               }
             )
 

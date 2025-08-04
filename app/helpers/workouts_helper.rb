@@ -57,9 +57,13 @@ module WorkoutsHelper
     end
   end
 
-  # 🆕 UPDATED: Parse set description into structured badges - FIXED for cardio 4 badges
+  # 🆕 UPDATED: Parse set description into structured badges - Uses workout context
   def parse_set_into_badges(exercise_set)
-    if AppConstants.cardio_exercise?(exercise_set.exercise_name)
+    # 🆕 NEW: Determine cardio context from workout instead of exercise name
+    workout = exercise_set.workout_log.workout
+    is_cardio_workout = AppConstants.cardio_workout?(workout.muscle_group)
+
+    if is_cardio_workout
       # Cardio badges - time, distance, weight (as resistance), energy
       [
         { type: 'time', content: exercise_set.duration_display },
@@ -78,8 +82,8 @@ module WorkoutsHelper
     end
   end
 
-  # 🆕 UPDATED: Convert badge data to ExerciseSet attributes - FIXED for cardio
-  def badges_to_exercise_set_attrs(badges_array, exercise_name, set_number)
+  # 🆕 UPDATED: Convert badge data to ExerciseSet attributes - Uses workout context if available
+  def badges_to_exercise_set_attrs(badges_array, exercise_name, set_number, workout_context = nil)
     status_badge = badges_array.find { |b| b[:type] == 'status' }
     reflection_badge = badges_array.find { |b| b[:type] == 'reflection' }
 
@@ -91,7 +95,15 @@ module WorkoutsHelper
       notes: reflection_badge&.dig(:content) || "solid effort"
     }
 
-    if AppConstants.cardio_exercise?(exercise_name)
+    # 🆕 NEW: Use workout context if provided, otherwise fall back to exercise name inference
+    is_cardio = if workout_context
+      AppConstants.cardio_workout?(workout_context)
+    else
+      # Fallback: check if exercise name is in cardio list (for backward compatibility)
+      AppConstants.cardio_exercises.include?(exercise_name)
+    end
+
+    if is_cardio
       # Cardio fields - time, distance, weight (resistance), energy
       time_badge = badges_array.find { |b| b[:type] == 'time' }
       distance_badge = badges_array.find { |b| b[:type] == 'distance' }
